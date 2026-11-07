@@ -94,7 +94,7 @@ def test_threat_classifier_bundled_default_model():
     """Verify that bundled default baseline model loads and produces calibrated prediction."""
     classifier = ThreatClassifier.load_default()
     assert classifier.is_loaded is True
-    assert classifier.model_name in ("logistic_regression", "random_forest")
+    assert classifier.model_name in ("logistic_regression", "random_forest", "gradient_boosting")
     assert len(classifier.feature_names) > 30
 
     ev = ScanEvidence(original_url="https://secure.banking-login-verify.com/account")

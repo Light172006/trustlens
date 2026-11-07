@@ -23,6 +23,7 @@ class ThreatClassifier:
     """Production ML inference interface for website threat probability estimation."""
 
     DEFAULT_ARTIFACT_PATH = Path(__file__).resolve().parent / "artifacts" / "baseline_classifier.joblib"
+    CANDIDATE_ARTIFACT_PATH = Path(__file__).resolve().parent / "artifacts" / "candidate_multiclass_classifier.joblib"
 
     def __init__(
         self,
@@ -33,12 +34,23 @@ class ThreatClassifier:
         self.model_name: str = "none"
         self.model_version: str = "0.0.0"
         self.feature_names: list[str] = []
+        self.classes: list[str] = []
         self.is_loaded: bool = False
 
         if artifact_or_path:
             self.load_artifact(artifact_or_path)
         elif auto_load_default and self.DEFAULT_ARTIFACT_PATH.exists():
             self.load_artifact(self.DEFAULT_ARTIFACT_PATH)
+
+    @classmethod
+    def load(cls, path: str | Path) -> "ThreatClassifier":
+        """Load a ThreatClassifier from an explicit artifact path."""
+        return cls(artifact_or_path=path)
+
+    @classmethod
+    def load_candidate(cls) -> "ThreatClassifier":
+        """Convenience factory to load the candidate multiclass model if available."""
+        return cls(artifact_or_path=cls.CANDIDATE_ARTIFACT_PATH)
 
     @classmethod
     def load_default(cls) -> "ThreatClassifier":
@@ -77,6 +89,7 @@ class ThreatClassifier:
             self.model_name = artifact.get("model_name", "classifier")
             self.model_version = artifact.get("model_version", "1.0.0")
             self.feature_names = artifact["feature_names"]
+            self.classes = artifact.get("classes", [])
             self.is_loaded = True
 
             logger.info("Successfully loaded ML model: %s (v%s)", self.model_name, self.model_version)
@@ -103,17 +116,24 @@ class ThreatClassifier:
 
             # Predict probability
             if hasattr(self.model, "predict_proba"):
-                proba = float(self.model.predict_proba(df)[0, 1])
+                probas = self.model.predict_proba(df)[0]
+                if len(probas) >= 3:
+                    # 3-class model: [0: Legitimate, 1: Phishing, 2: Malware]
+                    p_threat = float(probas[1] + probas[2])
+                    proba = p_threat
+                else:
+                    # Binary model: [0: Benign, 1: Threat]
+                    proba = float(probas[1])
             else:
                 raw_pred = self.model.predict(df)[0]
                 proba = float(raw_pred)
 
             proba = max(0.0, min(1.0, proba))
 
-            # Calibrate label
+            # Calibrate label based on decision threshold
             if proba >= 0.70:
                 label = "malicious"
-            elif proba >= 0.35:
+            elif proba >= 0.50:
                 label = "suspicious"
             else:
                 label = "legitimate"
@@ -133,11 +153,57 @@ class ThreatClassifier:
             logger.warning("ML inference failed gracefully: %s", exc)
             return None
 
+    def predict_multiclass(self, features: ExtractedFeatures) -> dict[str, float] | None:
+        """Execute multi-class inference returning class probability distribution.
+
+        Returns:
+            Dictionary with probabilities for 'legitimate', 'phishing', 'malware', and aggregate 'threat',
+            or None if inference fails.
+        """
+        if not self.is_loaded or self.model is None:
+            return None
+
+        try:
+            feature_dict = features.to_ml_dict()
+            ordered_values = {f: [feature_dict.get(f, 0.0)] for f in self.feature_names}
+            df = pd.DataFrame(ordered_values)
+
+            if hasattr(self.model, "predict_proba"):
+                probas = self.model.predict_proba(df)[0]
+                if len(probas) >= 3:
+                    p_legit = float(probas[0])
+                    p_phish = float(probas[1])
+                    p_mal = float(probas[2])
+                    return {
+                        "legitimate": round(p_legit, 4),
+                        "phishing": round(p_phish, 4),
+                        "malware": round(p_mal, 4),
+                        "threat": round(p_phish + p_mal, 4),
+                    }
+                else:
+                    p_threat = float(probas[1])
+                    return {
+                        "legitimate": round(1.0 - p_threat, 4),
+                        "threat": round(p_threat, 4),
+                    }
+            return None
+        except Exception as exc:
+            logger.warning("Multiclass ML inference failed gracefully: %s", exc)
+            return None
+
     def _extract_top_features(self, features: ExtractedFeatures, proba: float) -> list[dict[str, Any]]:
         """Identify features that contributed most strongly to the prediction."""
         top: list[dict[str, Any]] = []
         if features.is_ip_host:
             top.append({"feature": "is_ip_host", "value": True, "impact": "high"})
+        if features.has_userinfo:
+            top.append({"feature": "has_userinfo", "value": True, "impact": "high"})
+        if features.has_homoglyphs:
+            top.append({"feature": "has_homoglyphs", "value": True, "impact": "high"})
+        if features.is_punycode:
+            top.append({"feature": "is_punycode", "value": True, "impact": "medium"})
+        if features.has_non_standard_port:
+            top.append({"feature": "has_non_standard_port", "value": True, "impact": "medium"})
         if features.openphish_match:
             top.append({"feature": "openphish_match", "value": True, "impact": "critical"})
         if features.urlhaus_online:

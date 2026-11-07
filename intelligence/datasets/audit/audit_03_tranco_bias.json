@@ -1,0 +1,138 @@
+{
+  "structural_bias_comparison": {
+    "tranco_sample_count": 96090,
+    "threat_sample_count": 26609,
+    "path_length": {
+      "tranco_mean": 1.0,
+      "threat_mean": 28.572964034725093,
+      "tranco_pct_root_only": 100.0,
+      "threat_pct_root_only": 14.634146341463413
+    },
+    "query_length": {
+      "tranco_mean": 0.0,
+      "threat_mean": 18.22702844902101,
+      "tranco_pct_has_query": 0.0,
+      "threat_pct_has_query": 20.406629335938966
+    },
+    "url_length": {
+      "tranco_mean": 21.530200853366637,
+      "threat_mean": 72.55552632567928
+    },
+    "url_entropy": {
+      "tranco_mean": 3.6686143428036218,
+      "threat_mean": 4.274069953775038
+    },
+    "is_ip_host": {
+      "tranco_pct_ip": 0.0,
+      "threat_pct_ip": 5.791273629223196
+    }
+  },
+  "deep_benign_stress_test": {
+    "total_benign_deep_urls": 25,
+    "false_positive_count": 25,
+    "false_positive_rate_on_deep_benign": 1.0,
+    "accuracy_on_deep_benign": 0.0,
+    "false_positive_examples": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Computer_security",
+        "malicious_probability": 0.9998660872473537
+      },
+      {
+        "url": "https://en.wikipedia.org/wiki/Transport_Layer_Security",
+        "malicious_probability": 0.9998641104557591
+      },
+      {
+        "url": "https://docs.python.org/3/library/urllib.parse.html",
+        "malicious_probability": 0.9998641104557591
+      },
+      {
+        "url": "https://docs.github.com/en/rest/reference/repos",
+        "malicious_probability": 0.9998120676447507
+      },
+      {
+        "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security",
+        "malicious_probability": 0.9997963783681291
+      },
+      {
+        "url": "https://stackoverflow.com/questions/tagged/python?tab=votes&page=2",
+        "malicious_probability": 0.9998589195923737
+      },
+      {
+        "url": "https://stackoverflow.com/questions/1234567/how-do-i-parse-a-url-in-python",
+        "malicious_probability": 0.9998706043016816
+      },
+      {
+        "url": "https://www.amazon.com/s?k=wireless+headphones&crid=3N5P",
+        "malicious_probability": 0.9998973567223466
+      },
+      {
+        "url": "https://www.amazon.com/gp/bestsellers/electronics/ref=zg_bs_nav_0",
+        "malicious_probability": 0.999819194946743
+      },
+      {
+        "url": "https://www.ebay.com/b/Apple-Laptops/111422/bn_16480579?rt=nc&_udlo=500",
+        "malicious_probability": 0.9998964402448658
+      },
+      {
+        "url": "https://www.walmart.com/browse/electronics/laptops/3944_3951_1089430",
+        "malicious_probability": 0.9998175807086278
+      },
+      {
+        "url": "https://github.com/torvalds/linux/commits/master",
+        "malicious_probability": 0.9999107212545933
+      },
+      {
+        "url": "https://github.com/psf/requests/releases/tag/v2.31.0",
+        "malicious_probability": 0.9998817199915438
+      },
+      {
+        "url": "https://gitlab.com/gitlab-org/gitlab/-/issues/12345",
+        "malicious_probability": 0.9998838436329668
+      },
+      {
+        "url": "https://hub.docker.com/_/python/tags?page=1&ordering=last_updated",
+        "malicious_probability": 0.9998973567223466
+      },
+      {
+        "url": "https://pypi.org/project/scikit-learn/#history",
+        "malicious_probability": 0.9998819575901032
+      },
+      {
+        "url": "https://www.bbc.com/news/technology-68123456",
+        "malicious_probability": 0.9998106115460247
+      },
+      {
+        "url": "https://www.cnn.com/2026/01/15/tech/artificial-intelligence-trends/index.html",
+        "malicious_probability": 0.9998109711198906
+      },
+      {
+        "url": "https://www.nytimes.com/section/technology",
+        "malicious_probability": 0.9998203328422705
+      },
+      {
+        "url": "https://www.theverge.com/2026/2/1/tech-review-best-laptops",
+        "malicious_probability": 0.999819194946743
+      },
+      {
+        "url": "https://www.google.com/search?q=trustlens+threat+intelligence+audit&hl=en",
+        "malicious_probability": 0.9998973567223466
+      },
+      {
+        "url": "https://aws.amazon.com/security/introduction/?sec-nav=true",
+        "malicious_probability": 0.9998973567223466
+      },
+      {
+        "url": "https://azure.microsoft.com/en-us/solutions/web-apps/",
+        "malicious_probability": 0.9997963783681291
+      },
+      {
+        "url": "https://cloud.google.com/bigquery/docs/quickstarts",
+        "malicious_probability": 0.9996572732445758
+      },
+      {
+        "url": "https://stripe.com/docs/api/charges/create",
+        "malicious_probability": 0.999855089868417
+      }
+    ]
+  }
+}

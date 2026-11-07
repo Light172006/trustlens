@@ -24,6 +24,8 @@ class ExtractedFeatures(BaseModel):
     digit_count: int = Field(default=0, ge=0)
     special_char_count: int = Field(default=0, ge=0)
     suspicious_keyword_count: int = Field(default=0, ge=0)
+    has_executable_extension: bool = Field(default=False)
+    malware_keyword_count: int = Field(default=0, ge=0)
 
     # Structural features
     subdomain_count: int = Field(default=0, ge=0)
@@ -32,6 +34,7 @@ class ExtractedFeatures(BaseModel):
     is_punycode: bool = Field(default=False)
     has_homoglyphs: bool = Field(default=False)
     has_non_standard_port: bool = Field(default=False)
+    has_c2_port: bool = Field(default=False)
 
     # HTTP & Web security features
     is_https: bool = Field(default=False)
@@ -85,12 +88,15 @@ class ExtractedFeatures(BaseModel):
             "digit_count": self.digit_count,
             "special_char_count": self.special_char_count,
             "suspicious_keyword_count": self.suspicious_keyword_count,
+            "has_executable_extension": 1.0 if self.has_executable_extension else 0.0,
+            "malware_keyword_count": float(self.malware_keyword_count),
             "subdomain_count": self.subdomain_count,
             "is_ip_host": 1.0 if self.is_ip_host else 0.0,
             "has_userinfo": 1.0 if self.has_userinfo else 0.0,
             "is_punycode": 1.0 if self.is_punycode else 0.0,
             "has_homoglyphs": 1.0 if self.has_homoglyphs else 0.0,
             "has_non_standard_port": 1.0 if self.has_non_standard_port else 0.0,
+            "has_c2_port": 1.0 if self.has_c2_port else 0.0,
             "is_https": 1.0 if self.is_https else 0.0,
             "redirect_count": self.redirect_count,
             "has_cross_domain_redirect": 1.0 if self.has_cross_domain_redirect else 0.0,

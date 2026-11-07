@@ -45,6 +45,24 @@ SUSPICIOUS_KEYWORDS = frozenset(
     ]
 )
 
+# File extensions frequently associated with malware payloads, droppers, and trojans
+EXECUTABLE_EXTENSIONS = frozenset(
+    [
+        ".exe", ".bin", ".zip", ".rar", ".7z", ".tar", ".gz", ".apk", ".dll",
+        ".iso", ".msi", ".bat", ".cmd", ".sh", ".vbs", ".ps1", ".scr", ".elf",
+        ".dmg", ".vhd", ".jar", ".dat", ".sys", ".drv", ".class",
+    ]
+)
+
+# Keywords frequently associated with malware staging, dropper delivery, and C2 gates
+MALWARE_KEYWORDS = frozenset(
+    [
+        "download", "downloads", "descargas", "payload", "bin", "drops", "c2",
+        "gate", "install", "installer", "setup", "updater", "raw", "bot",
+        "rat", "miner", "stage", "stager", "beacon", "inject", "exec",
+    ]
+)
+
 
 def calculate_shannon_entropy(text: str) -> float:
     """Calculate the Shannon entropy of a string in bits per character.
@@ -77,7 +95,7 @@ def count_suspicious_keywords(text: str) -> int:
     return count
 
 
-def extract_lexical_features(url: str) -> dict[str, int | float]:
+def extract_lexical_features(url: str) -> dict[str, int | float | bool]:
     """Extract lexical features from a given URL string.
 
     Args:
@@ -97,6 +115,8 @@ def extract_lexical_features(url: str) -> dict[str, int | float]:
             "digit_count": 0,
             "special_char_count": 0,
             "suspicious_keyword_count": 0,
+            "has_executable_extension": False,
+            "malware_keyword_count": 0,
         }
 
     try:
@@ -121,6 +141,12 @@ def extract_lexical_features(url: str) -> dict[str, int | float]:
     # Keywords in host, path, and query
     keywords = count_suspicious_keywords(f"{host} {path} {query}")
 
+    # Malware delivery indicators
+    path_lower = path.lower()
+    has_exec_ext = any(path_lower.endswith(ext) for ext in EXECUTABLE_EXTENSIONS)
+    tokens = re.split(r"[\W_]+", f"{path_lower} {query.lower()}")
+    malware_kws = sum(1 for t in tokens if t in MALWARE_KEYWORDS)
+
     return {
         "url_length": len(url),
         "host_length": len(host),
@@ -131,5 +157,7 @@ def extract_lexical_features(url: str) -> dict[str, int | float]:
         "digit_count": digit_count,
         "special_char_count": special_count,
         "suspicious_keyword_count": keywords,
+        "has_executable_extension": has_exec_ext,
+        "malware_keyword_count": malware_kws,
     }
 
