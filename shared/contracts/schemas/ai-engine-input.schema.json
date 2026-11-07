@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://trustlens.internal/schemas/v1/ai-engine-input.schema.json",
+  "title": "TrustLens AI Engine Input Schema",
+  "description": "Defines precisely what the TrustLens Intelligence Engine accepts for threat analysis and feature extraction. Owned by AI/ML Engineering.",
+  "version": "1.0.0",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/EngineInvocationEnvelope",
+      "title": "Invocation Envelope",
+      "description": "Standard service envelope containing evidence and execution flags."
+    },
+    {
+      "$ref": "scanner-evidence.schema.json#/$defs/ScanEvidence",
+      "title": "Direct ScanEvidence Object",
+      "description": "Direct normalized scan evidence payload passed to analyze_website() or extract_features()."
+    }
+  ],
+  "$defs": {
+    "EngineInvocationEnvelope": {
+      "type": "object",
+      "description": "Structured invocation envelope passed to the intelligence analysis service.",
+      "properties": {
+        "evidence": {
+          "$ref": "scanner-evidence.schema.json#/$defs/ScanEvidence",
+          "description": "Normalized website scan evidence container conforming to the intelligence engine's ScanEvidence model."
+        },
+        "query_providers": {
+          "type": "boolean",
+          "default": false,
+          "description": "If True, the intelligence engine queries external threat feeds directly. If False (default), the engine interprets threat intelligence observations already collected by the backend and supplied in evidence.threat_intelligence."
+        },
+        "is_scan_failed": {
+          "type": "boolean",
+          "default": false,
+          "description": "If True, signals an unrecoverable internal scanner worker failure, instructing the scoring engine to produce an INCONCLUSIVE verdict with null risk_score and zero confidence."
+        }
+      },
+      "required": ["evidence"],
+      "additionalProperties": false
+    }
+  }
+}
+

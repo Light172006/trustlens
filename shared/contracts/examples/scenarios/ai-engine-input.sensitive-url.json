@@ -1,0 +1,46 @@
+{
+  "evidence": {
+    "scan_id": "e89a452c-93b8-62fc-bdf6-9e6bb1235005",
+    "original_url": "https://example.com/reset?token=supersecret123",
+    "canonical_url": "https://example.com/reset?token=supersecret123",
+    "host": "example.com",
+    "scheme": "https",
+    "is_sensitive": true,
+    "http": {
+      "status_code": 200,
+      "final_url": "https://example.com/reset?token=supersecret123",
+      "redirect_count": 0,
+      "redirects": [],
+      "security_headers": {
+        "strict-transport-security": "max-age=63072000"
+      },
+      "cookies": [],
+      "response_time_ms": 88.0
+    },
+    "tls": {
+      "valid": true,
+      "chain_valid": true,
+      "hostname_match": true,
+      "days_until_expiry": 90,
+      "is_expired": false,
+      "expires_soon": null,
+      "protocol_version": "TLSv1.3",
+      "cipher_suite": null,
+      "subject_cn": null,
+      "issuer": null,
+      "san_dns": [],
+      "sct_present": false
+    },
+    "domain_intelligence": null,
+    "threat_intelligence": {
+      "openphish_match": false,
+      "openphish_status": "no_match",
+      "urlhaus_match": null,
+      "urlhaus_status": "skipped_sensitive_url",
+      "urlhaus_url_status": null
+    },
+    "community_intelligence": null
+  },
+  "query_providers": false,
+  "is_scan_failed": false
+}

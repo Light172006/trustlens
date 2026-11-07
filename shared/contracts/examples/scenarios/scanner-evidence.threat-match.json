@@ -1,0 +1,81 @@
+{
+  "scan_id": "c67e230a-71f6-40da-9bd4-7c4ff9013003",
+  "original_url": "http://secure-paypal-login-verify.com/account/login",
+  "canonical_url": "http://secure-paypal-login-verify.com/account/login",
+  "host": "secure-paypal-login-verify.com",
+  "scheme": "http",
+  "is_sensitive": false,
+  "http": {
+    "status_code": 200,
+    "final_url": "http://secure-paypal-login-verify.com/account/login",
+    "redirect_count": 0,
+    "redirects": [],
+    "security_headers": {},
+    "cookies": [],
+    "http_to_https_redirect": false,
+    "response_time_ms": 210.0,
+    "fetched_at": "2026-11-07T06:15:05Z"
+  },
+  "tls": null,
+  "domain_intelligence": {
+    "domain_age_days": 2,
+    "registrar": "NameCheap",
+    "created_date": "2026-11-05",
+    "nameservers": [
+      "ns1.phishdns.example",
+      "ns2.phishdns.example"
+    ],
+    "data_source": "rdap",
+    "retrieval_timestamp": "2026-11-07T06:15:02Z",
+    "lookup_status": "available"
+  },
+  "threat_intelligence": {
+    "openphish_match": true,
+    "openphish_status": "match",
+    "urlhaus_match": false,
+    "urlhaus_status": "no_match",
+    "urlhaus_url_status": null,
+    "provider_checks": [
+      {
+        "provider": "openphish",
+        "result_status": "match",
+        "matched": true,
+        "details": {
+          "feed": "community"
+        },
+        "checked_at": "2026-11-07T06:15:02Z",
+        "latency_ms": 12.0
+      },
+      {
+        "provider": "urlhaus",
+        "result_status": "no_match",
+        "matched": false,
+        "details": {},
+        "checked_at": "2026-11-07T06:15:03Z",
+        "latency_ms": 40.0
+      }
+    ]
+  },
+  "community_intelligence": null,
+  "scanner_execution": {
+    "status": "succeeded",
+    "started_at": "2026-11-07T06:15:00Z",
+    "completed_at": "2026-11-07T06:15:06Z",
+    "duration_ms": 6000.0,
+    "checks_attempted": [
+      "dns_resolution",
+      "http_fetch",
+      "threat_feeds",
+      "domain_lookup"
+    ],
+    "checks_completed": [
+      "dns_resolution",
+      "http_fetch",
+      "threat_feeds",
+      "domain_lookup"
+    ],
+    "checks_unavailable": [],
+    "failure_code": null,
+    "failure_message": null
+  }
+}

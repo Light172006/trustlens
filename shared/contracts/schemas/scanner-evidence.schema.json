@@ -1,0 +1,741 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://trustlens.internal/schemas/v1/scanner-evidence.schema.json",
+  "title": "TrustLens Scanner Evidence Schema",
+  "description": "Normalized technical observations collected by the backend scanning infrastructure. Jointly owned by Backend and AI/ML Engineering.",
+  "version": "1.0.0",
+  "type": "object",
+  "$defs": {
+    "CookieEvidence": {
+      "type": "object",
+      "description": "Normalized cookie observation extracted from Set-Cookie headers.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Cookie name"
+        },
+        "secure": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether Secure attribute is set"
+        },
+        "httponly": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether HttpOnly attribute is set"
+        },
+        "samesite": {
+          "type": ["string", "null"],
+          "enum": ["Strict", "Lax", "None", null],
+          "default": null,
+          "description": "SameSite value ('Strict', 'Lax', 'None', or null if absent)"
+        }
+      },
+      "required": ["name"],
+      "additionalProperties": false
+    },
+    "RedirectHopEvidence": {
+      "type": "object",
+      "description": "Observation of an individual redirect hop followed by the scanner worker.",
+      "properties": {
+        "hop_index": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5,
+          "description": "Zero-based redirect hop index (0 to 5)"
+        },
+        "source_url": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 2048,
+          "description": "Source URL before following redirect"
+        },
+        "destination_url": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 2048,
+          "description": "Target URL specified in Location header"
+        },
+        "http_status": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 599,
+          "description": "HTTP status code of redirect response (e.g. 301, 302, 307, 308)"
+        },
+        "resolved_host": {
+          "type": "string",
+          "maxLength": 253,
+          "description": "Resolved hostname for this hop"
+        },
+        "resolved_ips": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Validated, pinned public IP addresses for this hop"
+        },
+        "tls_verified": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether TLS handshake and certificate were successfully verified for this hop"
+        },
+        "created_at": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "UTC timestamp when hop was executed"
+        }
+      },
+      "required": ["hop_index", "source_url", "destination_url", "http_status", "resolved_host"],
+      "additionalProperties": false
+    },
+    "HttpEvidence": {
+      "type": "object",
+      "description": "Normalized HTTP layer observations.",
+      "properties": {
+        "status_code": {
+          "type": ["integer", "null"],
+          "minimum": 100,
+          "maximum": 599,
+          "default": null,
+          "description": "Final HTTP status code; null if connection failed or unreachable"
+        },
+        "final_url": {
+          "type": ["string", "null"],
+          "format": "uri",
+          "maxLength": 2048,
+          "default": null,
+          "description": "Effective target URL after following redirects"
+        },
+        "redirect_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10,
+          "default": 0,
+          "description": "Total number of redirect hops followed"
+        },
+        "redirects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RedirectHopEvidence"
+          },
+          "default": [],
+          "description": "Chronological history of individual redirect hops"
+        },
+        "security_headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": ["string", "null"]
+          },
+          "default": {},
+          "description": "Observed HTTP response headers (normalized to lowercase keys)"
+        },
+        "cookies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CookieEvidence"
+          },
+          "default": [],
+          "description": "Normalized cookies observed in Set-Cookie response headers"
+        },
+        "http_to_https_redirect": {
+          "type": ["boolean", "null"],
+          "default": null,
+          "description": "Whether initial plain HTTP request redirected to an HTTPS destination"
+        },
+        "response_time_ms": {
+          "type": ["number", "null"],
+          "minimum": 0.0,
+          "default": null,
+          "description": "Response time in milliseconds for the HTTP exchange"
+        },
+        "fetched_at": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "default": null,
+          "description": "UTC timestamp of the completed HTTP fetch"
+        }
+      },
+      "additionalProperties": false
+    },
+    "TlsCertificateDetails": {
+      "type": "object",
+      "description": "Extended X.509 leaf certificate metadata matching the certificates database table.",
+      "properties": {
+        "leaf_fingerprint_sha256": {
+          "type": ["string", "null"],
+          "pattern": "^[0-9a-fA-F]{64}$",
+          "description": "SHA-256 hex digest fingerprint of leaf certificate"
+        },
+        "serial_number": {
+          "type": ["string", "null"],
+          "description": "Certificate serial number string"
+        },
+        "not_before": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "Certificate validity start UTC timestamp"
+        },
+        "not_after": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "Certificate validity expiration UTC timestamp"
+        },
+        "signature_algorithm": {
+          "type": ["string", "null"],
+          "description": "Signature algorithm (e.g. sha256WithRSAEncryption, ecdsa-with-SHA256)"
+        },
+        "public_key_algorithm": {
+          "type": ["string", "null"],
+          "description": "Public key algorithm (e.g. RSA, EC)"
+        },
+        "public_key_bits": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "Public key bit size (e.g. 2048, 4096, 256)"
+        },
+        "revocation_status": {
+          "type": "string",
+          "enum": ["not_checked", "valid", "revoked", "unknown"],
+          "default": "not_checked",
+          "description": "Revocation check status (MVP always labels 'not_checked')"
+        },
+        "fetched_at": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "UTC timestamp when certificate was fetched"
+        },
+        "unavailable_reason": {
+          "type": ["string", "null"],
+          "enum": ["target_not_https", "tls_handshake_failed", "no_parseable_leaf_certificate", "target_fetch_blocked", null],
+          "default": null,
+          "description": "Reason when certificate observations could not be obtained"
+        }
+      },
+      "additionalProperties": false
+    },
+    "TlsCertificateEvidence": {
+      "type": "object",
+      "description": "Normalized TLS handshake and certificate observations.",
+      "properties": {
+        "valid": {
+          "type": ["boolean", "null"],
+          "default": null,
+          "description": "Overall TLS validity; null if TLS unobserved or unavailable"
+        },
+        "chain_valid": {
+          "type": ["boolean", "null"],
+          "default": null,
+          "description": "Whether certificate chain is trusted by system root store; null if unobserved"
+        },
+        "hostname_match": {
+          "type": ["boolean", "null"],
+          "default": null,
+          "description": "Whether certificate SAN/CN matches target hostname; null if unobserved"
+        },
+        "days_until_expiry": {
+          "type": ["integer", "null"],
+          "default": null,
+          "description": "Days remaining until expiration; negative integer if expired, null if unobserved"
+        },
+        "is_expired": {
+          "type": ["boolean", "null"],
+          "default": null,
+          "description": "Whether certificate notAfter date is in the past; null if unobserved"
+        },
+        "expires_soon": {
+          "type": ["boolean", "null"],
+          "default": null,
+          "description": "Whether certificate expires within configured threshold (30 days); null if unobserved"
+        },
+        "protocol_version": {
+          "type": ["string", "null"],
+          "default": null,
+          "description": "Negotiated TLS version string (e.g. 'TLSv1.3', 'TLSv1.2', 'TLSv1.0')"
+        },
+        "cipher_suite": {
+          "type": ["string", "null"],
+          "default": null,
+          "description": "Negotiated cipher suite name (e.g. 'TLS_AES_256_GCM_SHA384')"
+        },
+        "subject_cn": {
+          "type": ["string", "null"],
+          "default": null,
+          "description": "Subject Common Name string"
+        },
+        "issuer": {
+          "type": ["string", "null"],
+          "default": null,
+          "description": "Certificate Issuer distinguished name string"
+        },
+        "san_dns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Subject Alternative Names (DNS entries)"
+        },
+        "sct_present": {
+          "type": "boolean",
+          "default": false,
+          "description": "Signed Certificate Timestamp extension presence"
+        },
+        "certificate_details": {
+          "anyOf": [
+            { "$ref": "#/$defs/TlsCertificateDetails" },
+            { "type": "null" }
+          ],
+          "default": null,
+          "description": "Extended leaf certificate snapshot matching backend PostgreSQL schema"
+        }
+      },
+      "additionalProperties": false
+    },
+    "DomainIntelligenceEvidence": {
+      "type": "object",
+      "description": "Domain intelligence and registration facts.",
+      "properties": {
+        "domain_age_days": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "default": null,
+          "description": "Age of domain in days since registration; null if unavailable"
+        },
+        "registrar": {
+          "type": ["string", "null"],
+          "default": null,
+          "description": "Domain registrar name"
+        },
+        "created_date": {
+          "type": ["string", "null"],
+          "default": null,
+          "description": "ISO registration date string (YYYY-MM-DD or date-time)"
+        },
+        "nameservers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Domain authoritative nameservers"
+        },
+        "data_source": {
+          "type": ["string", "null"],
+          "default": null,
+          "description": "Source of domain intelligence (e.g., 'whois', 'rdap')"
+        },
+        "retrieval_timestamp": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "default": null,
+          "description": "UTC timestamp of domain intelligence lookup"
+        },
+        "lookup_status": {
+          "type": ["string", "null"],
+          "enum": ["available", "unavailable", "not_found", "skipped", null],
+          "default": null,
+          "description": "Status of domain intelligence lookup"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ProviderCheckResult": {
+      "type": "object",
+      "description": "Normalized result of querying an external or local threat intelligence provider.",
+      "properties": {
+        "provider": {
+          "type": "string",
+          "enum": ["openphish", "urlhaus", "community"],
+          "description": "Threat provider identifier"
+        },
+        "result_status": {
+          "type": "string",
+          "enum": ["match", "no_match", "unavailable", "not_configured", "skipped_sensitive_url", "stale_cache"],
+          "description": "Standardized provider lookup status"
+        },
+        "matched": {
+          "type": "boolean",
+          "default": false,
+          "description": "True only if an active malicious match was verified"
+        },
+        "details": {
+          "type": "object",
+          "default": {},
+          "description": "Provider-specific facts, URL status, and metadata"
+        },
+        "checked_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "UTC timestamp of provider check"
+        },
+        "latency_ms": {
+          "type": ["number", "null"],
+          "minimum": 0.0,
+          "default": null,
+          "description": "Query latency in milliseconds"
+        }
+      },
+      "required": ["provider", "result_status", "matched", "checked_at"],
+      "additionalProperties": false
+    },
+    "ThreatIntelEvidence": {
+      "type": "object",
+      "description": "Threat feed query results and indicator matches.",
+      "properties": {
+        "openphish_match": {
+          "type": ["boolean", "null"],
+          "default": null,
+          "description": "True if matched in OpenPhish feed; false if no match, null if unavailable"
+        },
+        "openphish_status": {
+          "type": "string",
+          "enum": ["match", "no_match", "unavailable", "not_configured", "skipped_sensitive_url", "stale_cache"],
+          "default": "no_match",
+          "description": "OpenPhish query status"
+        },
+        "urlhaus_match": {
+          "type": ["boolean", "null"],
+          "default": null,
+          "description": "True if matched in URLhaus database; false if no match, null if unavailable"
+        },
+        "urlhaus_status": {
+          "type": "string",
+          "enum": ["match", "no_match", "unavailable", "not_configured", "skipped_sensitive_url", "stale_cache"],
+          "default": "no_match",
+          "description": "URLhaus query status"
+        },
+        "urlhaus_url_status": {
+          "type": ["string", "null"],
+          "enum": ["online", "offline", "unknown", null],
+          "default": null,
+          "description": "URLhaus URL status: 'online' (decisive), 'offline' (historical), or 'unknown'"
+        },
+        "provider_checks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ProviderCheckResult"
+          },
+          "default": [],
+          "description": "Structured provider check records"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CommunityReportSummary": {
+      "type": "object",
+      "description": "Summary of an individual community report associated with this target.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Report UUID"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["phishing", "malware", "impersonation", "fraudulent_payment", "scam", "suspicious_redirect", "other"],
+          "description": "Report category"
+        },
+        "claimed_verdict": {
+          "type": "string",
+          "enum": ["SUSPICIOUS", "MALICIOUS"],
+          "description": "Verdict claimed by reporter"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "confirmed", "rejected", "duplicate"],
+          "description": "Moderation status"
+        },
+        "evidence_text": {
+          "type": "string",
+          "maxLength": 2000,
+          "description": "Sanitized evidence description text"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Report creation timestamp"
+        },
+        "moderated_at": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "default": null,
+          "description": "Moderation review timestamp"
+        }
+      },
+      "required": ["id", "category", "claimed_verdict", "status", "created_at"],
+      "additionalProperties": false
+    },
+    "CommunityIntelligenceEvidence": {
+      "type": "object",
+      "description": "Community reports and verification data.",
+      "properties": {
+        "confirmed_report_count": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0,
+          "description": "Total moderator-confirmed reports"
+        },
+        "distinct_reporter_count": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0,
+          "description": "Count of distinct reporter accounts for confirmed reports"
+        },
+        "pending_report_count": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0,
+          "description": "Unreviewed community reports count"
+        },
+        "reports": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CommunityReportSummary"
+          },
+          "default": [],
+          "description": "Confirmed community report summaries"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ScannerExecutionMetadata": {
+      "type": "object",
+      "description": "Operational scanner worker status, stage outcomes, and error tracking.",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["queued", "running", "succeeded", "partial", "failed"],
+          "description": "Worker execution status"
+        },
+        "started_at": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "default": null,
+          "description": "UTC timestamp when worker began processing"
+        },
+        "completed_at": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "default": null,
+          "description": "UTC timestamp when worker finished processing"
+        },
+        "duration_ms": {
+          "type": ["number", "null"],
+          "minimum": 0.0,
+          "default": null,
+          "description": "Total scan duration in milliseconds"
+        },
+        "checks_attempted": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "List of scanner sub-checks attempted (e.g. dns, http, tls, threat_feeds, community)"
+        },
+        "checks_completed": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "List of scanner sub-checks successfully completed"
+        },
+        "checks_unavailable": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "List of scanner sub-checks that could not be completed"
+        },
+        "failure_code": {
+          "type": ["string", "null"],
+          "default": null,
+          "description": "Error code if scan failed (e.g. TARGET_NOT_PUBLIC, CONNECT_TIMEOUT)"
+        },
+        "failure_message": {
+          "type": ["string", "null"],
+          "default": null,
+          "description": "Human-readable failure explanation if scan failed"
+        }
+      },
+      "required": ["status"],
+      "additionalProperties": false
+    },
+    "ScanEvidence": {
+      "type": "object",
+      "description": "Root container of normalized website scan evidence consumed by the intelligence engine.",
+      "properties": {
+        "scan_id": {
+          "type": "string",
+          "default": "",
+          "description": "Unique scan identifier (UUID string)"
+        },
+        "original_url": {
+          "type": "string",
+          "format": "uri",
+          "minLength": 1,
+          "maxLength": 2048,
+          "description": "Original URL as submitted"
+        },
+        "canonical_url": {
+          "type": ["string", "null"],
+          "format": "uri",
+          "maxLength": 2048,
+          "default": null,
+          "description": "Normalized canonical URL"
+        },
+        "host": {
+          "type": ["string", "null"],
+          "maxLength": 253,
+          "default": null,
+          "description": "Target hostname"
+        },
+        "scheme": {
+          "type": ["string", "null"],
+          "enum": ["http", "https", null],
+          "default": null,
+          "description": "Target scheme (http or https)"
+        },
+        "is_sensitive": {
+          "type": "boolean",
+          "default": false,
+          "description": "True if URL contains sensitive query parameters or user selected sensitive flag"
+        },
+        "http": {
+          "anyOf": [
+            { "$ref": "#/$defs/HttpEvidence" },
+            { "type": "null" }
+          ],
+          "default": null,
+          "description": "HTTP layer observations"
+        },
+        "tls": {
+          "anyOf": [
+            { "$ref": "#/$defs/TlsCertificateEvidence" },
+            { "type": "null" }
+          ],
+          "default": null,
+          "description": "TLS certificate observations"
+        },
+        "domain_intelligence": {
+          "anyOf": [
+            { "$ref": "#/$defs/DomainIntelligenceEvidence" },
+            { "type": "null" }
+          ],
+          "default": null,
+          "description": "Domain metadata"
+        },
+        "threat_intelligence": {
+          "anyOf": [
+            { "$ref": "#/$defs/ThreatIntelEvidence" },
+            { "type": "null" }
+          ],
+          "default": null,
+          "description": "Threat feed match observations"
+        },
+        "community_intelligence": {
+          "anyOf": [
+            { "$ref": "#/$defs/CommunityIntelligenceEvidence" },
+            { "type": "null" }
+          ],
+          "default": null,
+          "description": "Community reports"
+        }
+      },
+      "required": ["original_url"],
+      "additionalProperties": true
+    }
+  },
+  "properties": {
+    "scan_id": {
+      "type": "string",
+      "default": "",
+      "description": "Unique scan identifier (UUID string)"
+    },
+    "original_url": {
+      "type": "string",
+      "format": "uri",
+      "minLength": 1,
+      "maxLength": 2048,
+      "description": "Original URL as submitted"
+    },
+    "canonical_url": {
+      "type": ["string", "null"],
+      "format": "uri",
+      "maxLength": 2048,
+      "default": null,
+      "description": "Normalized canonical URL"
+    },
+    "host": {
+      "type": ["string", "null"],
+      "maxLength": 253,
+      "default": null,
+      "description": "Target hostname"
+    },
+    "scheme": {
+      "type": ["string", "null"],
+      "enum": ["http", "https", null],
+      "default": null,
+      "description": "Target scheme (http or https)"
+    },
+    "is_sensitive": {
+      "type": "boolean",
+      "default": false,
+      "description": "True if URL contains sensitive query parameters"
+    },
+    "http": {
+      "anyOf": [
+        { "$ref": "#/$defs/HttpEvidence" },
+        { "type": "null" }
+      ],
+      "default": null,
+      "description": "HTTP layer observations"
+    },
+    "tls": {
+      "anyOf": [
+        { "$ref": "#/$defs/TlsCertificateEvidence" },
+        { "type": "null" }
+      ],
+      "default": null,
+      "description": "TLS certificate observations"
+    },
+    "domain_intelligence": {
+      "anyOf": [
+        { "$ref": "#/$defs/DomainIntelligenceEvidence" },
+        { "type": "null" }
+      ],
+      "default": null,
+      "description": "Domain metadata"
+    },
+    "threat_intelligence": {
+      "anyOf": [
+        { "$ref": "#/$defs/ThreatIntelEvidence" },
+        { "type": "null" }
+      ],
+      "default": null,
+      "description": "Threat feed match observations"
+    },
+    "community_intelligence": {
+      "anyOf": [
+        { "$ref": "#/$defs/CommunityIntelligenceEvidence" },
+        { "type": "null" }
+      ],
+      "default": null,
+      "description": "Community reports"
+    },
+    "scanner_execution": {
+      "anyOf": [
+        { "$ref": "#/$defs/ScannerExecutionMetadata" },
+        { "type": "null" }
+      ],
+      "default": null,
+      "description": "Operational scanner status, timing, and errors"
+    }
+  },
+  "required": ["original_url"],
+  "additionalProperties": false
+}
+

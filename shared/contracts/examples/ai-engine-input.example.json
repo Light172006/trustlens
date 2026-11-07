@@ -1,0 +1,97 @@
+{
+  "evidence": {
+    "scan_id": "a45c01e8-59d4-4eb8-99b2-5a2dd79e1001",
+    "original_url": "https://www.example.org/security?source=mail",
+    "canonical_url": "https://www.example.org/security?source=mail",
+    "host": "www.example.org",
+    "scheme": "https",
+    "is_sensitive": false,
+    "http": {
+      "status_code": 200,
+      "final_url": "https://www.example.org/security?source=mail",
+      "redirect_count": 0,
+      "redirects": [],
+      "security_headers": {
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "content-security-policy": "default-src 'self'",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "permissions-policy": "geolocation=(), camera=()"
+      },
+      "cookies": [
+        {
+          "name": "session",
+          "secure": true,
+          "httponly": true,
+          "samesite": "Lax"
+        }
+      ],
+      "http_to_https_redirect": null,
+      "response_time_ms": 120.0,
+      "fetched_at": "2026-11-07T06:10:05Z"
+    },
+    "tls": {
+      "valid": true,
+      "chain_valid": true,
+      "hostname_match": true,
+      "days_until_expiry": 180,
+      "is_expired": false,
+      "expires_soon": false,
+      "protocol_version": "TLSv1.3",
+      "cipher_suite": "TLS_AES_256_GCM_SHA384",
+      "subject_cn": "www.example.org",
+      "issuer": "CN=Example Public TLS CA, O=Example Trust, C=US",
+      "san_dns": [
+        "www.example.org",
+        "example.org"
+      ],
+      "sct_present": true
+    },
+    "domain_intelligence": {
+      "domain_age_days": 5200,
+      "registrar": "MarkMonitor Inc.",
+      "created_date": "2012-08-15",
+      "nameservers": [
+        "a.iana-servers.net",
+        "b.iana-servers.net"
+      ],
+      "data_source": "rdap",
+      "retrieval_timestamp": "2026-11-07T06:10:02Z",
+      "lookup_status": "available"
+    },
+    "threat_intelligence": {
+      "openphish_match": false,
+      "openphish_status": "no_match",
+      "urlhaus_match": false,
+      "urlhaus_status": "no_match",
+      "urlhaus_url_status": null,
+      "provider_checks": [
+        {
+          "provider": "openphish",
+          "result_status": "no_match",
+          "matched": false,
+          "details": {},
+          "checked_at": "2026-11-07T06:10:02Z",
+          "latency_ms": 15.0
+        },
+        {
+          "provider": "urlhaus",
+          "result_status": "no_match",
+          "matched": false,
+          "details": {},
+          "checked_at": "2026-11-07T06:10:03Z",
+          "latency_ms": 45.0
+        }
+      ]
+    },
+    "community_intelligence": {
+      "confirmed_report_count": 0,
+      "distinct_reporter_count": 0,
+      "pending_report_count": 0,
+      "reports": []
+    }
+  },
+  "query_providers": false,
+  "is_scan_failed": false
+}
+

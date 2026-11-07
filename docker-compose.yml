@@ -1,0 +1,98 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: trustlens_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-trustlens_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-trustlens_password}
+      POSTGRES_DB: ${POSTGRES_DB:-trustlens_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-trustlens_user} -d ${POSTGRES_DB:-trustlens_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - trustlens_network
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: trustlens_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - trustlens_network
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: trustlens_api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - DATABASE_URL=postgresql+asyncpg://trustlens_user:trustlens_password@postgres:5432/trustlens_db
+      - DATABASE_SYNC_URL=postgresql+psycopg://trustlens_user:trustlens_password@postgres:5432/trustlens_db
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+      - SECRET_KEY=${SECRET_KEY:-local-dev-secret-key-at-least-32-chars-long-trustlens}
+    volumes:
+      - ./backend:/workspace
+    networks:
+      - trustlens_network
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: trustlens_worker
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - ENVIRONMENT=development
+      - DATABASE_URL=postgresql+asyncpg://trustlens_user:trustlens_password@postgres:5432/trustlens_db
+      - DATABASE_SYNC_URL=postgresql+psycopg://trustlens_user:trustlens_password@postgres:5432/trustlens_db
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+      - SECRET_KEY=${SECRET_KEY:-local-dev-secret-key-at-least-32-chars-long-trustlens}
+    volumes:
+      - ./backend:/workspace
+    networks:
+      - trustlens_network
+    command: ["celery", "-A", "app.workers.celery_app.celery_app", "worker", "-l", "info", "-Q", "scans,celery", "-c", "2"]
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  trustlens_network:
+    driver: bridge
+

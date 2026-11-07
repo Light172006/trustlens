@@ -1,0 +1,40 @@
+{
+  "scan_id": "a45c01e8-59d4-4eb8-99b2-5a2dd79e1001",
+  "verdict": "SAFE",
+  "risk_score": 0,
+  "confidence": 0.85,
+  "scoring_version": "trustlens-1.0",
+  "checks_completed": 4,
+  "coverage": {
+    "threat_intel": "complete",
+    "web_security": "complete",
+    "certificate": "complete",
+    "community": "complete"
+  },
+  "findings": [],
+  "provider_checks": [
+    {
+      "provider": "openphish",
+      "result_status": "no_match",
+      "matched": false,
+      "details": {},
+      "checked_at": "2026-11-07T06:10:02Z",
+      "latency_ms": 15.0
+    },
+    {
+      "provider": "urlhaus",
+      "result_status": "no_match",
+      "matched": false,
+      "details": {
+        "url_status": null
+      },
+      "checked_at": "2026-11-07T06:10:03Z",
+      "latency_ms": 45.0
+    }
+  ],
+  "features": null,
+  "ml_prediction": null,
+  "summary": "No material risk was found by the checks performed. Continue to verify the site's identity before sharing sensitive information.",
+  "evaluated_at": "2026-11-07T06:10:07Z"
+}
+
