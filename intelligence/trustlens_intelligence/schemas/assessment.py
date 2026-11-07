@@ -63,6 +63,7 @@ class ThreatAssessment(BaseModel):
     def to_api_dict(self) -> dict[str, Any]:
         """Convert assessment into format matching API.md and PRD.md contracts."""
         return {
+            "scan_id": self.scan_id,
             "verdict": self.verdict.value,
             "risk_score": self.risk_score,
             "confidence": round(self.confidence, 2),

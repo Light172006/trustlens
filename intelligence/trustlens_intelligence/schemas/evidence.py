@@ -138,7 +138,15 @@ class ScanEvidence(BaseModel):
             if not self.host:
                 self.host = extract_safe_hostname(target) or None
             if not self.scheme:
-                parsed = urlparse(target if "://" in target else f"http://{target}")
-                if parsed.scheme:
-                    self.scheme = parsed.scheme.lower()
+                try:
+                    parsed = urlparse(target if "://" in target else f"http://{target}")
+                    if parsed.scheme:
+                        self.scheme = parsed.scheme.lower()
+                except Exception:
+                    if target.lower().startswith("https://"):
+                        self.scheme = "https"
+                    elif target.lower().startswith("http://"):
+                        self.scheme = "http"
+                    else:
+                        self.scheme = "http"
 

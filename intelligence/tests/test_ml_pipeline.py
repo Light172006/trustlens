@@ -80,6 +80,10 @@ def test_threat_classifier_graceful_failure():
     classifier = ThreatClassifier()
     assert classifier.is_loaded is False
 
+    # Loading non-existent path or directory returns False without crashing
+    assert classifier.load_artifact(Path(__file__).parent) is False
+    assert classifier.load_artifact("/path/that/does/not/exist.joblib") is False
+
     ev = ScanEvidence(original_url="https://example.com")
     features = FeatureExtractor().extract(ev)
     pred = classifier.predict(features)

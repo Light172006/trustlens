@@ -16,6 +16,7 @@ from trustlens_intelligence.schemas.evidence import ScanEvidence
 from trustlens_intelligence.schemas.findings import Finding
 from trustlens_intelligence.schemas.providers import ProviderCheckResult
 from trustlens_intelligence.scoring.weights import DEFAULT_WEIGHTS, ScoringWeights
+from trustlens_intelligence.threat_feeds.manager import ThreatIntelManager
 
 
 class ScoreCalculationResult(NamedTuple):
@@ -44,21 +45,8 @@ class RiskCalculator:
         """Compute the coverage status across the 4 analysis layers."""
         coverage: dict[str, LayerCoverage] = {}
 
-        # 1. Threat Intel Coverage
-        if not provider_checks:
-            coverage["threat_intel"] = LayerCoverage.UNAVAILABLE
-        else:
-            status_map = {p.provider: p.result_status for p in provider_checks}
-            openphish_st = status_map.get(ProviderName.OPENPHISH.value)
-            urlhaus_st = status_map.get(ProviderName.URLHAUS.value)
-
-            clean_set = {ProviderResultStatus.MATCH, ProviderResultStatus.NO_MATCH}
-            if openphish_st in clean_set and urlhaus_st in clean_set:
-                coverage["threat_intel"] = LayerCoverage.COMPLETE
-            elif any(p.matched for p in provider_checks):
-                coverage["threat_intel"] = LayerCoverage.COMPLETE
-            else:
-                coverage["threat_intel"] = LayerCoverage.PARTIAL
+        # 1. Threat Intel Coverage (delegated to ThreatIntelManager as single source of truth)
+        coverage["threat_intel"] = ThreatIntelManager.evaluate_threat_coverage(provider_checks)
 
         # 2. Web Security Coverage
         if evidence.http and evidence.http.status_code is not None:

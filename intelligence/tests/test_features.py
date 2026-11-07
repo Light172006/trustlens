@@ -195,6 +195,10 @@ def test_strict_url_canonicalization():
     # Fragment removed
     assert canonicalize_url_strict("https://example.com/path#section") == "https://example.com/path"
 
+    # IDNA internationalized domain converted to ASCII Punycode (PRD FR-03)
+    assert canonicalize_url_strict("http://münchen.de/path") == "http://xn--mnchen-3ya.de/path"
+    assert canonicalize_url_strict("http://xn--mnchen-3ya.de/path") == "http://xn--mnchen-3ya.de/path"
+
 
 def test_punycode_and_homoglyph_detection():
     """Verify Punycode IDNA decoding detects confusable character substitution."""
@@ -206,4 +210,27 @@ def test_punycode_and_homoglyph_detection():
     features = FeatureExtractor().extract(ev)
     assert features.is_punycode is True
     assert features.has_homoglyphs is True
+
+
+def test_malformed_url_port_and_bracketed_ipv6_graceful_handling():
+    """Verify that out-of-range ports, non-numeric ports, and malformed IPv6 brackets do not crash extraction."""
+    from trustlens_intelligence.features.structural import extract_structural_features
+    from trustlens_intelligence.features.lexical import extract_lexical_features
+
+    # 1. Out-of-range port: 99999
+    res_port = extract_structural_features("http://example.com:99999/path")
+    assert res_port["has_non_standard_port"] is True
+
+    # 2. Non-numeric port: abc
+    res_abc = extract_structural_features("http://example.com:abc/path")
+    assert res_abc["has_non_standard_port"] is True
+
+    # 3. Malformed IPv6 brackets
+    res_ipv6_struct = extract_structural_features("http://[invalid:ipv6:here]/path")
+    assert isinstance(res_ipv6_struct, dict)
+
+    res_ipv6_lex = extract_lexical_features("http://[invalid:ipv6:here]/path")
+    assert isinstance(res_ipv6_lex, dict)
+    assert res_ipv6_lex["url_length"] > 0
+
 

@@ -50,8 +50,8 @@ class ThreatClassifier:
         try:
             if isinstance(artifact_or_path, (str, Path)):
                 path = Path(artifact_or_path)
-                if not path.exists():
-                    logger.warning("Model artifact not found at %s", path)
+                if not path.exists() or not path.is_file():
+                    logger.warning("Model artifact not found or not a valid file at %s", path)
                     return False
                 artifact = joblib.load(path)
             elif isinstance(artifact_or_path, dict):

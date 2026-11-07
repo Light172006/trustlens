@@ -147,14 +147,22 @@ def test_ai_output_pydantic_compatibility():
         assert ta.scoring_version == data["scoring_version"]
 
 
-def test_analyze_website_with_contract_inputs():
-    """Verify end-to-end execution of analyze_website using contract examples."""
+def test_analyze_website_with_contract_inputs(validators):
+    """Verify end-to-end execution of analyze_website using contract examples and schema validation."""
     # Scenario 1: Clean site
     with open(EXAMPLES_DIR / "scanner-evidence.example.json", "r", encoding="utf-8") as f:
         clean_ev = ScanEvidence.model_validate(json.load(f))
     clean_out = analyze_website(clean_ev)
     assert clean_out.verdict == Verdict.SAFE
     assert clean_out.risk_score == 0
+
+    # Scenario 2: Missing TLS
+    with open(SCENARIOS_DIR / "scanner-evidence.missing-tls.json", "r", encoding="utf-8") as f:
+        missing_tls_ev = ScanEvidence.model_validate(json.load(f))
+    missing_tls_out = analyze_website(missing_tls_ev)
+    assert missing_tls_out.verdict == Verdict.SAFE
+    assert missing_tls_out.risk_score == 18
+    assert missing_tls_out.coverage["certificate"] == LayerCoverage.NOT_APPLICABLE
 
     # Scenario 3: Threat match
     with open(SCENARIOS_DIR / "scanner-evidence.threat-match.json", "r", encoding="utf-8") as f:
@@ -174,6 +182,12 @@ def test_analyze_website_with_contract_inputs():
         sens_ev = ScanEvidence.model_validate(json.load(f))
     sens_out = analyze_website(sens_ev)
     assert sens_out.verdict == Verdict.INCONCLUSIVE
+
+    # Verify that to_api_dict() of every scenario cleanly validates against ai-engine-output.schema.json
+    for out in [clean_out, missing_tls_out, threat_out, outage_out, sens_out]:
+        out_dict = out.to_api_dict()
+        errs = list(validators["ai-engine-output"].iter_errors(out_dict))
+        assert not errs, f"Generated output failed schema validation: {[e.message for e in errs]}"
 
 
 def test_contract_enum_consistency(schema_registry):

@@ -8,7 +8,7 @@ import math
 import re
 from urllib.parse import urlparse
 
-from trustlens_intelligence.features.url_utils import extract_safe_hostname
+from trustlens_intelligence.common.url_utils import extract_safe_hostname
 
 # Keywords frequently weaponized in phishing, credential-harvesting, and scam URLs
 SUSPICIOUS_KEYWORDS = frozenset(
@@ -99,10 +99,15 @@ def extract_lexical_features(url: str) -> dict[str, int | float]:
             "suspicious_keyword_count": 0,
         }
 
-    parsed = urlparse(url if "://" in url else f"http://{url}")
+    try:
+        parsed = urlparse(url if "://" in url else f"http://{url}")
+        path = parsed.path or ""
+        query = parsed.query or ""
+    except Exception:
+        path = ""
+        query = ""
+
     host = extract_safe_hostname(url)
-    path = parsed.path or ""
-    query = parsed.query or ""
 
     # Special characters common in obfuscated or adversarial URLs
     special_chars = set("@-_%?=&/.~+")

@@ -11,6 +11,7 @@ import threading
 import time
 from typing import Any
 
+from trustlens_intelligence.common.url_utils import canonicalize_url_strict
 from trustlens_intelligence.config.constants import LayerCoverage, ProviderName, ProviderResultStatus
 from trustlens_intelligence.config.settings import ThreatFeedSettings
 from trustlens_intelligence.schemas.providers import ProviderCheckResult
@@ -82,14 +83,14 @@ class ThreatIntelManager:
         # 1. Purge expired entries
         expired_keys = [k for k, (_, exp) in self._cache.items() if now >= exp]
         for k in expired_keys:
-            del self._cache[k]
+            self._cache.pop(k, None)
 
         # 2. If still at or over capacity, evict oldest 10% of entries
         if len(self._cache) >= self.max_cache_size:
             to_remove = max(1, len(self._cache) // 10)
             oldest_keys = list(self._cache.keys())[:to_remove]
             for k in oldest_keys:
-                del self._cache[k]
+                self._cache.pop(k, None)
 
     def query_all(
         self,
@@ -110,9 +111,10 @@ class ThreatIntelManager:
         results: list[ProviderCheckResult] = []
         now = time.time()
         ttl = self.settings.provider_cache_ttl_seconds
+        canonical_target = canonicalize_url_strict(url) if url else ""
 
         for name, provider in self._providers.items():
-            cache_key = (name, url.strip().lower())
+            cache_key = (name, canonical_target)
 
             if use_cache:
                 with self._lock:
@@ -143,7 +145,8 @@ class ThreatIntelManager:
 
         return results
 
-    def evaluate_threat_coverage(self, results: list[ProviderCheckResult]) -> LayerCoverage:
+    @staticmethod
+    def evaluate_threat_coverage(results: list[ProviderCheckResult]) -> LayerCoverage:
         """Evaluate the overall coverage status of the threat intelligence layer.
 
         Rule from PRD FR-09:
@@ -165,7 +168,7 @@ class ThreatIntelManager:
         if openphish_status in valid_statuses and urlhaus_status in valid_statuses:
             return LayerCoverage.COMPLETE
 
-        # If at least one produced a match, it's usable for malicious detection
+        # If at least one produced a match, it is usable for detection but coverage remains partial
         if any(r.matched for r in results):
             return LayerCoverage.PARTIAL
 

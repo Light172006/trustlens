@@ -92,8 +92,30 @@ def test_threat_assessment_api_dict_contract():
         summary="Suspicious website activity.",
     )
     api_dict = assessment.to_api_dict()
+    assert api_dict["scan_id"] == "scan_123"
     assert api_dict["verdict"] == "SUSPICIOUS"
     assert api_dict["risk_score"] == 42
     assert api_dict["confidence"] == 0.85
     assert api_dict["coverage"]["threat_intel"] == "complete"
+
+
+def test_scan_evidence_adversarial_and_edge_case_inputs():
+    """Verify ScanEvidence handles adversarial and malformed URL structures gracefully."""
+    import pytest
+    from pydantic import ValidationError
+
+    # Empty and whitespace URLs must raise ValidationError
+    with pytest.raises(ValidationError):
+        ScanEvidence(original_url="")
+    with pytest.raises(ValidationError):
+        ScanEvidence(original_url="   ")
+
+    # Malformed IPv6 brackets must not crash instantiation
+    ev_bracket = ScanEvidence(original_url="http://[invalid:ipv6:here]/test")
+    assert ev_bracket.scheme == "http"
+
+    # Out-of-range port
+    ev_port = ScanEvidence(original_url="http://example.com:99999/")
+    assert ev_port.host == "example.com"
+
 

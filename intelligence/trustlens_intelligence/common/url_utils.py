@@ -7,6 +7,7 @@ and IP address identification resilient against octal, hex, and dword evasion.
 import ipaddress
 import re
 from urllib.parse import urlparse, urlunparse
+import idna
 
 
 def extract_safe_hostname(url_or_host: str) -> str:
@@ -125,8 +126,16 @@ def canonicalize_url_strict(url: str) -> str:
     try:
         parsed = urlparse(url)
         scheme = parsed.scheme.lower()
-        host = (parsed.hostname or "").lower().rstrip(".")
-        port = parsed.port
+        raw_host = (parsed.hostname or "").lower().rstrip(".")
+        try:
+            # Normalize internationalized domain name to ASCII punycode (PRD FR-03)
+            host = idna.encode(raw_host).decode("ascii") if raw_host else ""
+        except Exception:
+            host = raw_host
+        try:
+            port = parsed.port
+        except (ValueError, TypeError):
+            port = None
 
         # Strip default ports
         if (scheme == "http" and port == 80) or (scheme == "https" and port == 443):
