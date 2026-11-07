@@ -1,10 +1,10 @@
 # TrustLens — Frontend Response & API Integration Requirements
 
-**Document Version:** 1.0  
+**Document Version:** 2.0  
 **Target Audience:** UI/UX Engineer, Frontend Engineering Team (React 19 / TypeScript)  
 **Author:** Backend Architecture & Security Engineering Team  
-**Scope:** Phases 1 through 5 (Application Foundation, Authentication, Scanning Infrastructure, Background Workers, and AI Intelligence Engine Integration)  
-**Status:** Implemented, Tested, and Verified (41/41 Automated Tests Passing)
+**Scope:** Phases 1 through 7 (Foundation, Authentication, Scanning Infrastructure, Background Workers, AI Integration, Dashboard & Analytics, Collaborative Threat Intelligence & Moderation)  
+**Status:** Implemented, Tested, and Verified (57/57 Automated Tests Passing)
 
 ---
 
@@ -14,7 +14,7 @@ TrustLens is a unified website security assessment platform delivering explainab
 
 ### Three-Person Engineering Collaboration
 1. **AI Engineer:** Develops the threat engine models, heuristic weights, and assessment logic (`shared/contracts/ai_contracts.py`).
-2. **Backend Engineer (Provided):** Implements REST APIs, PostgreSQL ORM, Celery pipeline, strict SSRF/network validation, authentication, and integration bridges.
+2. **Backend Engineer (Provided):** Implements REST APIs, PostgreSQL ORM, Celery pipeline, strict SSRF/network validation, authentication, community threat intelligence, dashboard analytics, and integration bridges.
 3. **UI/UX Engineer (You):** Builds the responsive React 19 / Vite / Tailwind CSS 4 frontend using Radix UI primitives, TanStack Query, and React Hook Form.
 
 ---
@@ -69,9 +69,11 @@ All error responses from the backend follow this exact JSON contract. The fronte
 |---|---|---|---|
 | `VALIDATION_ERROR` | 422 / 400 | Malformed schema or invalid field syntax | Highlight invalid inputs using inline form field errors. |
 | `AUTHENTICATION_REQUIRED` | 401 | Missing, malformed, or expired access token | Clear session state and route to `/login`. |
-| `FORBIDDEN` | 403 | Insufficient role or attempt to view another user's scan | Render full-page `Access Denied` panel. |
-| `RESOURCE_NOT_FOUND` | 404 | Scan, finding, or user not found | Render `Not Found` empty state with return CTA. |
-| `STATE_CONFLICT` | 409 | Duplicate resource conflict (e.g. email already exists) | Display inline collision notice on email field. |
+| `FORBIDDEN` | 403 | Insufficient role or attempt to view another user's scan/report | Render full-page `Access Denied` panel. |
+| `OWN_REPORT_VOTE_NOT_ALLOWED` | 403 | User attempted to vote on their own submitted report | Toast warning: *"You cannot vote on your own community report."* |
+| `RESOURCE_NOT_FOUND` | 404 | Scan, report, finding, or user not found | Render `Not Found` empty state with return CTA. |
+| `STATE_CONFLICT` | 409 | Duplicate resource conflict or re-moderating non-pending report | Inline collision notice or *"Report was already moderated by another user."* |
+| `REPORT_NOT_VOTABLE` | 409 | Attempting to vote on unconfirmed report | Disable vote buttons; show *"Only confirmed reports can receive votes."* |
 | `RATE_LIMIT_EXCEEDED` | 429 | Sliding window rate limit exceeded | Toast warning with `Retry-After` seconds countdown. |
 | `TARGET_NOT_PUBLIC` | 400 | SSRF Defense: loopback, private, or cloud metadata IP | Show security notice: *"Private, loopback, and internal addresses cannot be scanned."* |
 | `UNSUPPORTED_URL_SCHEME` | 400 | Non-HTTP/HTTPS protocol (e.g. `ftp://`, `file://`) | Inline error: *"Only HTTP and HTTPS URLs are supported."* |
@@ -82,7 +84,7 @@ All error responses from the backend follow this exact JSON contract. The fronte
 
 ---
 
-## 4. Endpoints & Response Payloads (Phases 1–5)
+## 4. Endpoints & Response Payloads (Phases 1–7)
 
 ### 4.1 Health Check Probes
 
@@ -98,194 +100,53 @@ Returns top-level platform health.
 }
 ```
 
-#### `GET /health/database`
+#### `GET /health/database` & `GET /health/redis`
 - **Status:** 200 OK / 503 Service Unavailable
-```json
-{
-  "name": "database",
-  "healthy": true,
-  "latency_ms": 1.45,
-  "message": "Database ping successful"
-}
-```
-
-#### `GET /health/redis`
-- **Status:** 200 OK / 503 Service Unavailable
-```json
-{
-  "name": "redis",
-  "healthy": true,
-  "latency_ms": 0.82,
-  "message": "Redis ping successful"
-}
-```
 
 ---
 
 ### 4.2 Authentication Endpoints (`/api/v1/auth`)
 
-#### `POST /api/v1/auth/register`
-Creates a new account and returns initial tokens.
-- **Request:**
-```json
-{
-  "email": "analyst@example.com",
-  "password": "SecurePassword123!",
-  "display_name": "Security Analyst"
-}
-```
-- **Response (HTTP 201 Created):**
-```json
-{
-  "user": {
-    "id": "e96f947e-8556-427c-b633-fc480c51b7fe",
-    "email": "analyst@example.com",
-    "display_name": "Security Analyst",
-    "role": "user",
-    "is_active": true,
-    "created_at": "2026-11-07T13:30:00Z"
-  },
-  "tokens": {
-    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "token_type": "bearer",
-    "expires_in": 900,
-    "csrf_token": "e2a149c4dd7c4d51b31d2e82f3c051ac"
-  }
-}
-```
-
-#### `POST /api/v1/auth/login`
-- **Request:**
-```json
-{
-  "email": "analyst@example.com",
-  "password": "SecurePassword123!"
-}
-```
-- **Response (HTTP 200 OK):** Identical payload to registration response above.
-
-#### `POST /api/v1/auth/refresh`
-Rotates the refresh token and issues a new access token.
-- **Request:**
-```json
-{
-  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-}
-```
-- **Response (HTTP 200 OK):**
-```json
-{
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "token_type": "bearer",
-  "expires_in": 900,
-  "csrf_token": "8d3840212fef403692df894a8f9f2571"
-}
-```
-
-#### `POST /api/v1/auth/logout`
-Revokes the refresh session.
-- **Response (HTTP 200 OK):**
-```json
-{
-  "success": true,
-  "message": "Successfully logged out."
-}
-```
-
-#### `GET /api/v1/auth/me` or `GET /api/v1/users/me`
-Fetches the currently authenticated profile.
-- **Response (HTTP 200 OK):**
-```json
-{
-  "id": "e96f947e-8556-427c-b633-fc480c51b7fe",
-  "email": "analyst@example.com",
-  "display_name": "Security Analyst",
-  "role": "user",
-  "is_active": true,
-  "created_at": "2026-11-07T13:30:00Z"
-}
-```
+- `POST /api/v1/auth/register` (HTTP 201 Created)
+- `POST /api/v1/auth/login` (HTTP 200 OK)
+- `POST /api/v1/auth/refresh` (HTTP 200 OK)
+- `POST /api/v1/auth/logout` (HTTP 200 OK)
+- `GET /api/v1/auth/me` & `GET /api/v1/users/me` (HTTP 200 OK)
 
 ---
 
 ### 4.3 Website Scan & Assessment Endpoints (`/api/v1/scans`)
 
-#### `POST /api/v1/scans` (Submit Target for Analysis)
-- **Request:**
-```json
-{
-  "url": "https://example.com/login",
-  "treat_as_sensitive": false
-}
-```
-
-- **Response A: Fresh Scan Queued (HTTP 202 Accepted)**
-```json
-{
-  "scan": {
-    "id": "c1f7b029-4556-41bf-bb44-ec853c8b4ad1",
-    "original_url": "https://example.com/login",
-    "canonical_url": "https://example.com/login",
-    "host": "example.com",
-    "scheme": "https",
-    "is_sensitive": false,
-    "status": "queued",
-    "verdict": "INCONCLUSIVE",
-    "risk_score": null,
-    "scoring_version": "trustlens-1.0",
-    "checks_completed": 0,
-    "created_at": "2026-11-07T13:32:00Z",
-    "started_at": null,
-    "completed_at": null,
-    "failure_code": null,
-    "failure_message": null
-  },
-  "deduplicated": false
-}
-```
-
-- **Response B: Duplicate Scan within 60 Seconds (HTTP 200 OK)**
-When an identical URL was submitted by the same user within the last 60 seconds and is still `queued` or `running`:
-```json
-{
-  "scan": {
-    "id": "c1f7b029-4556-41bf-bb44-ec853c8b4ad1",
-    "original_url": "https://example.com/login",
-    "canonical_url": "https://example.com/login",
-    "host": "example.com",
-    "scheme": "https",
-    "is_sensitive": false,
-    "status": "running",
-    "verdict": "INCONCLUSIVE",
-    "risk_score": null,
-    "scoring_version": "trustlens-1.0",
-    "checks_completed": 2,
-    "created_at": "2026-11-07T13:32:00Z",
-    "started_at": "2026-11-07T13:32:01Z",
-    "completed_at": null,
-    "failure_code": null,
-    "failure_message": null
-  },
-  "deduplicated": true
-}
-```
-*Frontend Action:* When `deduplicated: true`, immediately route to `/scans/:scanId` without displaying any error.
+- `POST /api/v1/scans` (HTTP 202 Accepted for new scan, HTTP 200 OK if deduplicated within 60s)
+- `GET /api/v1/scans` (HTTP 200 OK, paginated user scans)
+- `GET /api/v1/scans/{scan_id}` (HTTP 200 OK, full report)
+- `GET /api/v1/scans/{scan_id}/findings` (HTTP 200 OK)
+- `GET /api/v1/scans/{scan_id}/certificate` (HTTP 200 OK)
+- `DELETE /api/v1/scans/{scan_id}` (HTTP 204 No Content)
 
 ---
 
-#### `GET /api/v1/scans` (List User Scans)
-Returns paginated history strictly scoped to the requesting user.
-- **Query Parameters:**
-  - `page` (default: 1)
-  - `page_size` (default: 20, max: 100)
-  - `status` (optional filter: `queued`, `running`, `succeeded`, `partial`, `failed`)
-  - `verdict` (optional filter: `SAFE`, `SUSPICIOUS`, `MALICIOUS`, `INCONCLUSIVE`)
-- **Response (HTTP 200 OK):**
+### 4.4 Dashboard Endpoints (`/api/v1/dashboard`)
+
+#### `GET /api/v1/dashboard/summary`
+Returns user-scoped security scan statistics, verdict distributions, and the 10 most recent scans.
+- **Status:** 200 OK
+- **Response:**
 ```json
 {
-  "items": [
+  "summary": {
+    "total_scans": 18,
+    "scans_last_30_days": 12,
+    "verdict_counts": {
+      "SAFE": 9,
+      "SUSPICIOUS": 5,
+      "MALICIOUS": 2,
+      "INCONCLUSIVE": 2
+    },
+    "active_scans": 1,
+    "pending_community_reports": 2
+  },
+  "recent_scans": [
     {
       "id": "c1f7b029-4556-41bf-bb44-ec853c8b4ad1",
       "canonical_url": "https://example.com/login",
@@ -296,6 +157,66 @@ Returns paginated history strictly scoped to the requesting user.
       "created_at": "2026-11-07T13:32:00Z",
       "completed_at": "2026-11-07T13:32:04Z"
     }
+  ]
+}
+```
+
+---
+
+### 4.5 Collaborative Threat Reporting Endpoints (`/api/v1/community/reports`)
+
+#### `POST /api/v1/community/reports` (Submit Report)
+Submits a suspicious URL with observed technical evidence for moderator review.
+- **Request:**
+```json
+{
+  "url": "https://payments-example.test/secure/login",
+  "scan_id": null,
+  "category": "phishing",
+  "claimed_verdict": "MALICIOUS",
+  "evidence_text": "The page impersonates a corporate payment portal and harvests account credentials on an unassociated domain."
+}
+```
+- **Response A: Fresh Submission (HTTP 201 Created):**
+```json
+{
+  "report": {
+    "id": "d78f341b-82a7-42e8-ae75-8d5000124001",
+    "canonical_url": "https://payments-example.test/secure/login",
+    "host": "payments-example.test",
+    "category": "phishing",
+    "claimed_verdict": "MALICIOUS",
+    "status": "pending",
+    "evidence_text": "The page impersonates a corporate payment portal and harvests account credentials on an unassociated domain.",
+    "created_at": "2026-11-07T14:00:00Z",
+    "moderated_at": null
+  },
+  "duplicate_submission": false
+}
+```
+- **Response B: Deduplicated Submission within 30 Days (HTTP 200 OK):**
+Returns the existing report with `duplicate_submission: true`.
+
+#### `GET /api/v1/community/reports` (Public Confirmed Feed)
+Public endpoint. Returns only `confirmed` reports with confirmation and false-positive vote counts.
+- **Query Parameters:** `category`, `host`, `page`, `page_size`
+- **Response (HTTP 200 OK):**
+```json
+{
+  "items": [
+    {
+      "id": "d78f341b-82a7-42e8-ae75-8d5000124001",
+      "canonical_url": "https://payments-example.test/secure/login",
+      "host": "payments-example.test",
+      "category": "phishing",
+      "claimed_verdict": "MALICIOUS",
+      "status": "confirmed",
+      "evidence_summary": "The page impersonates a corporate payment portal...",
+      "confirmation_count": 8,
+      "false_positive_count": 1,
+      "created_at": "2026-11-07T14:00:00Z",
+      "moderated_at": "2026-11-07T14:30:00Z"
+    }
   ],
   "total": 1,
   "page": 1,
@@ -304,196 +225,98 @@ Returns paginated history strictly scoped to the requesting user.
 }
 ```
 
----
+#### `GET /api/v1/community/reports/mine` (My Submissions)
+Returns private history of reports submitted by the authenticated user across all moderation states (`pending`, `confirmed`, `rejected`, `duplicate`).
+- **Response (HTTP 200 OK):** Paginated array of `UserCommunityReportItem`.
 
-#### `GET /api/v1/scans/{scan_id}` (Comprehensive Scan Report)
-The primary endpoint powering the Report Page.
+#### `GET /api/v1/community/reports/{report_id}` (Report Detail)
+- Public users can view only `confirmed` reports.
+- Report owner and moderators can view report in any state.
+- **Response (HTTP 200 OK):** Detailed report data with vote counts and moderation explanation.
+
+#### `POST /api/v1/community/reports/{report_id}/votes` (Cast/Update Vote)
+Endorses or disputes a confirmed report.
+- **Request:**
+```json
+{
+  "vote": "confirm"
+}
+```
 - **Response (HTTP 200 OK):**
 ```json
 {
-  "scan": {
-    "id": "c1f7b029-4556-41bf-bb44-ec853c8b4ad1",
-    "original_url": "https://example.com/login",
-    "canonical_url": "https://example.com/login",
-    "host": "example.com",
-    "scheme": "https",
-    "is_sensitive": false,
-    "status": "succeeded",
-    "verdict": "SAFE",
-    "risk_score": 12,
-    "scoring_version": "trustlens-1.0",
-    "checks_completed": 4,
-    "created_at": "2026-11-07T13:32:00Z",
-    "started_at": "2026-11-07T13:32:01Z",
-    "completed_at": "2026-11-07T13:32:04Z",
-    "failure_code": null,
-    "failure_message": null
+  "report_id": "d78f341b-82a7-42e8-ae75-8d5000124001",
+  "vote": "confirm",
+  "updated": false,
+  "counts": {
+    "confirm": 9,
+    "false_positive": 1
+  }
+}
+```
+
+---
+
+### 4.6 Moderation & Administration Endpoints (`/api/v1/admin`)
+
+#### `GET /api/v1/admin/reports` (Moderator Queue)
+Returns pending reports for triage. Restricted to `moderator` and `admin` roles.
+- **Query Parameters:** `status` (default: `pending`), `page`, `page_size`
+- **Response (HTTP 200 OK):** Paginated array of `AdminReportItem`.
+
+#### `POST /api/v1/admin/reports/{report_id}/moderation` (Record Decision)
+Atomically commits a moderation decision and appends an auditable record in `audit_events`.
+- **Request:**
+```json
+{
+  "decision": "confirmed",
+  "reason": "Independently verified phishing page replicating brand assets on an unassociated domain."
+}
+```
+- **Response (HTTP 200 OK):**
+```json
+{
+  "report": {
+    "id": "d78f341b-82a7-42e8-ae75-8d5000124001",
+    "status": "confirmed",
+    "moderator_user_id": "9f3f0ae8-21e3-5d0f-b3b3-5f1ef6e8a202",
+    "moderation_reason": "Independently verified phishing page replicating brand assets on an unassociated domain.",
+    "moderated_at": "2026-11-07T14:30:00Z"
   },
-  "coverage": {
-    "threat_intel": "complete",
-    "web_security": "complete",
-    "certificate": "complete",
-    "community": "complete"
-  },
-  "provider_checks": [
-    {
-      "provider": "openphish",
-      "result_status": "no_match",
-      "matched": false,
-      "checked_at": "2026-11-07T13:32:03Z",
-      "details": {
-        "feed_timestamp": "2026-11-07T10:00:00Z"
-      }
-    },
-    {
-      "provider": "urlhaus",
-      "result_status": "no_match",
-      "matched": false,
-      "checked_at": "2026-11-07T13:32:03Z",
-      "details": {
-        "query_status": "ok"
-      }
-    }
-  ],
-  "redirects": [
-    {
-      "hop": 1,
-      "source_url": "http://example.com/login",
-      "destination_url": "https://example.com/login",
-      "status_code": 301,
-      "host": "example.com",
-      "ip": "93.184.216.34",
-      "tls_verified": true
-    }
-  ]
+  "audit_event_id": "e89a452c-93b8-53f9-bf86-9e6112345001"
 }
 ```
 
----
-
-#### `GET /api/v1/scans/{scan_id}/findings` (Findings & Explanations)
-Returns fine-grained heuristic findings that generated the risk score.
-- **Response (HTTP 200 OK):**
-```json
-{
-  "items": [
-    {
-      "code": "HSTS_MISSING",
-      "title": "Strict-Transport-Security Header Missing",
-      "description": "The web server does not advertise HSTS, leaving users vulnerable to SSL-stripping man-in-the-middle attacks.",
-      "severity": "medium",
-      "category": "web_security",
-      "points": 10,
-      "evidence": {
-        "header_evaluated": "strict-transport-security",
-        "value": null
-      },
-      "remediation": "Add 'Strict-Transport-Security: max-age=31536000; includeSubDomains' to HTTP response headers.",
-      "source": "backend_scanner"
-    },
-    {
-      "code": "CSP_MISSING",
-      "title": "Content-Security-Policy Missing",
-      "description": "The site does not define a Content Security Policy to restrict origin execution of scripts.",
-      "severity": "low",
-      "category": "web_security",
-      "points": 5,
-      "evidence": {
-        "header_evaluated": "content-security-policy",
-        "value": null
-      },
-      "remediation": "Configure a Content-Security-Policy header restricting script execution to approved domains.",
-      "source": "backend_scanner"
-    }
-  ],
-  "total": 2
-}
-```
-
----
-
-#### `GET /api/v1/scans/{scan_id}/certificate` (X.509 Certificate Details)
-Returns full parsed cryptographic parameters.
-- **Response (HTTP 200 OK):**
-```json
-{
-  "host": "example.com",
-  "valid": true,
-  "subject": "CN=example.com,O=Internet Corporation for Assigned Names and Numbers",
-  "issuer": "CN=DigiCert Global G2 TLS RSA SHA256 2020 CA1,O=DigiCert Inc,C=US",
-  "valid_from": "2026-01-15T00:00:00Z",
-  "valid_to": "2027-01-15T23:59:59Z",
-  "days_until_expiration": 69,
-  "sans": ["example.com", "www.example.com"],
-  "serial_number": "0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d",
-  "sha256_fingerprint": "a4b5c6d7e8f90123456789abcdef0123456789abcdef0123456789abcdef0123",
-  "signature_algorithm": "sha256WithRSAEncryption",
-  "key_algorithm": "RSA (2048 bit)",
-  "chain_valid": true,
-  "hostname_match": true,
-  "reasons": []
-}
-```
-*Note on Certificate State:* If TLS is absent (HTTP-only) or handshake failed:
-`valid` is `false`, and `reasons` contains explanations such as `["HOSTNAME_MISMATCH"]`, `["CERTIFICATE_EXPIRED"]`, or `["PORT_443_CLOSED"]`.
-
----
-
-#### `DELETE /api/v1/scans/{scan_id}` (Delete Scan)
-Deletes the scan and cascades deletion of its redirects, findings, and certificate records.
-- **Response:** HTTP 204 No Content
+#### `GET /api/v1/admin/providers` (Feed Telemetry)
+Returns operational status and freshness of OpenPhish and URLhaus feeds.
 
 ---
 
 ## 5. Polling & State Transition Rules
 
 ### 5.1 Scan State Machine
-
-```mermaid
-stateDiagram-v2
-    [*] --> queued : POST /scans (HTTP 202)
-    queued --> running : Worker starts pipeline
-    running --> succeeded : All checks completed
-    running --> partial : Non-critical check failed
-    running --> failed : Target unreachable / SSRF
-    succeeded --> [*]
-    partial --> [*]
-    failed --> [*]
-```
+`queued` -> `running` -> (`succeeded` | `partial` | `failed`)
 
 ### 5.2 Polling Algorithm
-When on `/scans/:scanId`:
-1. If `scan.status` is `queued` or `running`:
-   - Poll `GET /api/v1/scans/:scanId` every **2 seconds** for the first 30 seconds.
-   - If scan is still active after 30 seconds, back off to every **5 seconds**.
-2. **Terminal Stop Condition:** When `scan.status` is `succeeded`, `partial`, or `failed`, cancel the polling timer immediately.
-3. **Visibility Optimization:** Pause polling when the document is hidden (`document.visibilityState === 'hidden'`) and resume immediately upon visibility.
-4. **No Artificial Loading:** Do not display a fake progress percentage (e.g. "45% done"). Display active step labels using `ScanStatusStepper`: *Queued* -> *Inspecting Network & DNS* -> *Running Threat Intelligence* -> *Completed*.
+1. Poll `GET /api/v1/scans/:scanId` every **2 seconds** for initial 30 seconds.
+2. Back off to **5 seconds** if active beyond 30 seconds.
+3. Terminate polling on `succeeded`, `partial`, or `failed`.
+4. Pause on document visibility hidden; resume immediately on visible.
 
 ---
 
 ## 6. Verdict Semantics & UI Copy Rules
 
-The platform enforces 4 unambiguous verdicts. The UI must strictly follow these rules:
-
-| Verdict | Meaning | Design Token | Mandatory Canonical Copy |
+| Verdict | Meaning | Token | Mandatory Canonical Copy |
 |---|---|---|---|
 | `SAFE` | Bounded checks found no known threats or high-severity vulnerabilities. | `--color-safe` (`#15803D`) | *"No material risk was found by the checks performed. This is not a guarantee that the website is safe."* |
 | `SUSPICIOUS` | Indicators requiring caution (e.g. self-signed TLS, unconfirmed reports, missing security controls). | `--color-suspicious` (`#B45309`) | *"Some signals require caution. Review the findings before sharing information."* |
-| `MALICIOUS` | Direct match in threat feed (OpenPhish / URLhaus) or confirmed malicious report. | `--color-malicious` (`#B91C1C`) | *"This URL matched a trusted threat indicator or independently confirmed community intelligence. Do not visit or enter information."* |
+| `MALICIOUS` | Direct match in threat feed or confirmed community intelligence. | `--color-malicious` (`#B91C1C`) | *"This URL matched a trusted threat indicator or independently confirmed community intelligence. Do not visit or enter information."* |
 | `INCONCLUSIVE` | DNS/HTTP lookup failed, worker timeout, or sensitive URL prevented full scan. | `--color-inconclusive` (`#475569`) | *"TrustLens could not collect enough reliable evidence. Do not interpret this result as safe."* |
-
-### Critical Presentation Guardrails
-- **Disclaimer Required:** `SAFE` must NEVER display copy claiming "100% Secure", "Verified Legitimate", or "Virus-Free".
-- **Padlock Icon Forbidden:** Never render a green SSL padlock as a badge of safety. A valid TLS certificate only guarantees encryption in transit, not legitimacy.
-- **Provider Status Integrity:** When `result_status` is `unavailable`, `not_configured`, or `stale_cache`, render an amber warning icon with: *"This source could not be checked. It is not a clean result."* Never render it as "Clean" or "Safe".
-- **Sensitive URL Display:** If `is_sensitive` is `true`, show an informational notice: *"Sensitive URL scan mode: URLhaus external check was skipped to protect privacy. SAFE verdict is disabled."*
 
 ---
 
 ## 7. Ready-to-Use TypeScript Definitions (`api.ts`)
-
-Frontend developers can copy and paste the following TypeScript declarations directly into `src/types/api.ts`:
 
 ```typescript
 // ==========================================
@@ -512,6 +335,18 @@ export type ProviderResultStatus =
   | 'not_configured' 
   | 'skipped_sensitive_url' 
   | 'stale_cache';
+
+export type ReportCategory = 
+  | 'phishing' 
+  | 'malware' 
+  | 'scam' 
+  | 'credential_harvesting' 
+  | 'unsolicited_bulk' 
+  | 'other';
+export type ClaimedVerdict = 'MALICIOUS' | 'SUSPICIOUS' | 'SAFE';
+export type ReportStatus = 'pending' | 'confirmed' | 'rejected' | 'duplicate';
+export type VoteType = 'confirm' | 'false_positive';
+export type ModerationDecision = 'confirmed' | 'rejected' | 'duplicate';
 
 // Error Envelope
 export interface ApiErrorPayload {
@@ -546,7 +381,173 @@ export interface AuthResponse {
   tokens: AuthTokens;
 }
 
-// Scan Submissions & Records
+// Dashboard
+export interface DashboardVerdictCounts {
+  SAFE: number;
+  SUSPICIOUS: number;
+  MALICIOUS: number;
+  INCONCLUSIVE: number;
+}
+
+export interface DashboardSummaryMetrics {
+  total_scans: number;
+  scans_last_30_days: number;
+  verdict_counts: DashboardVerdictCounts;
+  active_scans: number;
+  pending_community_reports: number;
+}
+
+export interface DashboardRecentScanItem {
+  id: string;
+  canonical_url: string;
+  host: string;
+  status: ScanStatus;
+  verdict: ScanVerdict;
+  risk_score: number | null;
+  created_at: string;
+  completed_at: string | null;
+}
+
+export interface DashboardSummaryResponse {
+  summary: DashboardSummaryMetrics;
+  recent_scans: DashboardRecentScanItem[];
+}
+
+// Community Reports & Voting
+export interface CommunityReportCreateRequest {
+  url: string;
+  scan_id?: string | null;
+  category: ReportCategory;
+  claimed_verdict: ClaimedVerdict;
+  evidence_text: string;
+}
+
+export interface CommunityReportResponse {
+  id: string;
+  canonical_url: string;
+  host: string;
+  category: string;
+  claimed_verdict: string;
+  status: ReportStatus;
+  evidence_text: string;
+  created_at: string;
+  moderated_at: string | null;
+}
+
+export interface CommunityReportSubmitResponse {
+  report: CommunityReportResponse;
+  duplicate_submission: boolean;
+}
+
+export interface PublicCommunityReportItem {
+  id: string;
+  canonical_url: string;
+  host: string;
+  category: string;
+  claimed_verdict: string;
+  status: ReportStatus;
+  evidence_summary: string;
+  confirmation_count: number;
+  false_positive_count: number;
+  created_at: string;
+  moderated_at: string | null;
+}
+
+export interface UserCommunityReportItem {
+  id: string;
+  canonical_url: string;
+  category: string;
+  claimed_verdict: string;
+  status: ReportStatus;
+  evidence_text: string;
+  moderation_reason: string | null;
+  created_at: string;
+  moderated_at: string | null;
+}
+
+export interface CommunityReportDetailData {
+  id: string;
+  canonical_url: string;
+  host: string;
+  category: string;
+  claimed_verdict: string;
+  status: ReportStatus;
+  evidence_summary: string;
+  confirmation_count: number;
+  false_positive_count: number;
+  moderation_reason: string | null;
+  created_at: string;
+  moderated_at: string | null;
+}
+
+export interface CommunityReportDetailResponse {
+  report: CommunityReportDetailData;
+}
+
+export interface CommunityVoteRequest {
+  vote: VoteType;
+}
+
+export interface CommunityVoteCounts {
+  confirm: number;
+  false_positive: number;
+}
+
+export interface CommunityVoteResponse {
+  report_id: string;
+  vote: VoteType;
+  updated: boolean;
+  counts: CommunityVoteCounts;
+}
+
+// Moderation & Admin
+export interface AdminReportItem {
+  id: string;
+  canonical_url: string;
+  host: string;
+  category: string;
+  claimed_verdict: string;
+  status: ReportStatus;
+  evidence_text: string;
+  reporter_id: string;
+  confirmation_count: number;
+  false_positive_count: number;
+  created_at: string;
+}
+
+export interface ModerationDecisionRequest {
+  decision: ModerationDecision;
+  reason: string;
+}
+
+export interface ModeratedReportData {
+  id: string;
+  status: ReportStatus;
+  moderator_user_id: string;
+  moderation_reason: string;
+  moderated_at: string;
+}
+
+export interface ModerationDecisionResponse {
+  report: ModeratedReportData;
+  audit_event_id: string;
+}
+
+export interface ProviderHealthItem {
+  provider: string;
+  enabled: boolean;
+  status: string;
+  last_success_at: string | null;
+  freshness_seconds: number | null;
+  freshness_limit_seconds: number | null;
+  records_active: number | null;
+}
+
+export interface ProviderHealthResponse {
+  providers: ProviderHealthItem[];
+}
+
+// Scans & Reports
 export interface ScanCreateRequest {
   url: string;
   treat_as_sensitive?: boolean;
@@ -663,9 +664,10 @@ export interface PaginatedResponse<T> {
 
 ## 8. Summary Checklist for UI/UX Engineer
 
-- [x] **Backend Ready:** All Phase 1–5 APIs implemented with Async SQLAlchemy and FastAPI.
-- [x] **Automated Tests:** 41/41 passing unit and integration tests.
+- [x] **Backend Ready:** All Phase 1–7 APIs implemented with Async SQLAlchemy and FastAPI.
+- [x] **Automated Tests:** 57/57 passing unit and integration tests.
 - [x] **SSRF Defense:** Hardened against loopback, cloud metadata (169.254.169.254), carrier-grade NAT, and private IPs.
-- [x] **Deduplication:** Automatic 60-second window avoids redundant scan charges and worker bottlenecks.
+- [x] **Deduplication:** Automatic 60-second window on scans and 30-day window on community reports.
 - [x] **AI Contract Guardrails:** Typed Pydantic and JSON schema contracts integrated without fabricating ML scores.
-
+- [x] **Dashboard:** User-scoped analytics, 30-day velocity, verdict breakdowns, and recent scan logs.
+- [x] **Community Intelligence:** Confirmed reports public feed, crowd voting, and auditable moderator triage.

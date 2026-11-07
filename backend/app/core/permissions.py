@@ -75,6 +75,37 @@ async def get_current_user(
     return user
 
 
+async def get_current_user_optional(
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+    db: AsyncSession = Depends(get_db),
+) -> User | None:
+    """Retrieve authenticated user if valid token present, otherwise None."""
+    if not credentials or not credentials.credentials:
+        return None
+    try:
+        payload = decode_token(credentials.credentials)
+        if payload.get("type") != "access":
+            return None
+        user_id_str = payload.get("sub")
+        if not user_id_str:
+            return None
+        user = await db.get(User, uuid.UUID(user_id_str))
+        if user and user.account_status == "active":
+            return user
+        return None
+    except Exception:
+        return None
+
+
+async def require_moderator_or_admin(
+    current_user: User = Depends(get_current_user),
+) -> User:
+    """Ensure authenticated user holds Moderator or Administrator role."""
+    if current_user.role not in (Role.MODERATOR.value, Role.ADMIN.value):
+        raise AuthorizationError("Moderator or Administrator privileges required.")
+    return current_user
+
+
 async def require_admin(
     current_user: User = Depends(get_current_user),
 ) -> User:
