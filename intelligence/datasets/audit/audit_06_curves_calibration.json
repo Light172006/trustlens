@@ -1,0 +1,178 @@
+{
+  "learning_curves": [
+    {
+      "training_fraction": 0.1,
+      "training_samples": 8530,
+      "training_domains": 7513,
+      "train_accuracy": 0.9994,
+      "train_macro_f1": 0.9991,
+      "val_accuracy": 0.9964,
+      "val_macro_f1": 0.9947,
+      "test_accuracy": 0.9973,
+      "test_macro_f1": 0.996,
+      "generalization_gap": 0.0044
+    },
+    {
+      "training_fraction": 0.25,
+      "training_samples": 21327,
+      "training_domains": 18782,
+      "train_accuracy": 0.9991,
+      "train_macro_f1": 0.9986,
+      "val_accuracy": 0.9975,
+      "val_macro_f1": 0.9963,
+      "test_accuracy": 0.9977,
+      "test_macro_f1": 0.9965,
+      "generalization_gap": 0.0023
+    },
+    {
+      "training_fraction": 0.5,
+      "training_samples": 42939,
+      "training_domains": 37565,
+      "train_accuracy": 0.9983,
+      "train_macro_f1": 0.9976,
+      "val_accuracy": 0.9972,
+      "val_macro_f1": 0.9959,
+      "test_accuracy": 0.9977,
+      "test_macro_f1": 0.9966,
+      "generalization_gap": 0.0017
+    },
+    {
+      "training_fraction": 0.75,
+      "training_samples": 64516,
+      "training_domains": 56348,
+      "train_accuracy": 0.9983,
+      "train_macro_f1": 0.9975,
+      "val_accuracy": 0.9975,
+      "val_macro_f1": 0.9963,
+      "test_accuracy": 0.9979,
+      "test_macro_f1": 0.9968,
+      "generalization_gap": 0.0012
+    },
+    {
+      "training_fraction": 1.0,
+      "training_samples": 85907,
+      "training_domains": 75131,
+      "train_accuracy": 0.9983,
+      "train_macro_f1": 0.9975,
+      "val_accuracy": 0.9975,
+      "val_macro_f1": 0.9963,
+      "test_accuracy": 0.9981,
+      "test_macro_f1": 0.9972,
+      "generalization_gap": 0.0012
+    }
+  ],
+  "calibration_audit": {
+    "brier_score": 0.0019,
+    "expected_calibration_error": 0.0039,
+    "maximum_calibration_error": 0.6464,
+    "pct_probabilities_at_extremes": 98.05,
+    "reliability_diagram_bins": [
+      {
+        "bin_range": [
+          0.0,
+          0.1
+        ],
+        "count": 14318,
+        "empirical_accuracy": 0.0016,
+        "mean_confidence": 0.0049,
+        "calibration_gap": 0.0033
+      },
+      {
+        "bin_range": [
+          0.1,
+          0.2
+        ],
+        "count": 84,
+        "empirical_accuracy": 0.0238,
+        "mean_confidence": 0.1389,
+        "calibration_gap": 0.1151
+      },
+      {
+        "bin_range": [
+          0.2,
+          0.3
+        ],
+        "count": 24,
+        "empirical_accuracy": 0.0,
+        "mean_confidence": 0.2509,
+        "calibration_gap": 0.2509
+      },
+      {
+        "bin_range": [
+          0.3,
+          0.4
+        ],
+        "count": 16,
+        "empirical_accuracy": 0.0625,
+        "mean_confidence": 0.3469,
+        "calibration_gap": 0.2844
+      },
+      {
+        "bin_range": [
+          0.4,
+          0.5
+        ],
+        "count": 6,
+        "empirical_accuracy": 0.3333,
+        "mean_confidence": 0.4353,
+        "calibration_gap": 0.1019
+      },
+      {
+        "bin_range": [
+          0.5,
+          0.6
+        ],
+        "count": 3,
+        "empirical_accuracy": 0.6667,
+        "mean_confidence": 0.511,
+        "calibration_gap": 0.1557
+      },
+      {
+        "bin_range": [
+          0.6,
+          0.7
+        ],
+        "count": 2,
+        "empirical_accuracy": 0.0,
+        "mean_confidence": 0.6464,
+        "calibration_gap": 0.6464
+      },
+      {
+        "bin_range": [
+          0.7,
+          0.8
+        ],
+        "count": 3,
+        "empirical_accuracy": 0.3333,
+        "mean_confidence": 0.7552,
+        "calibration_gap": 0.4218
+      },
+      {
+        "bin_range": [
+          0.8,
+          0.9
+        ],
+        "count": 3,
+        "empirical_accuracy": 0.6667,
+        "mean_confidence": 0.8438,
+        "calibration_gap": 0.1772
+      },
+      {
+        "bin_range": [
+          0.9,
+          1.0
+        ],
+        "count": 3900,
+        "empirical_accuracy": 1.0,
+        "mean_confidence": 0.9998,
+        "calibration_gap": 0.0002
+      }
+    ]
+  },
+  "model_selection_validity": {
+    "selection_dataset": "test_partition (X_test, y_test)",
+    "intended_holdout": "test_partition",
+    "leakage_finding": "Test partition was used as the model selection decision criterion. Candidate A (Logistic Regression) and Candidate B (HistGradientBoosting) were ranked directly on test F1 and test PR-AUC. The test partition was contaminated as a development validation set.",
+    "recommendation": "Use val.parquet for hyperparameter tuning and model selection; hold test.parquet as an untouched single-evaluation set."
+  }
+}

@@ -1,0 +1,279 @@
+{
+  "status": "COMPLETED",
+  "timestamp": "2026-11-07T16:25:50.780906+00:00",
+  "total_pipeline_time_seconds": 40.88,
+  "active_baseline_preserved": {
+    "joblib_sha256": "D18F4E7338223D90C43C8DAEE9C15A1FA02457E9D017B691A989042C0BA93038",
+    "manifest_sha256": "E4AC296A7791691B65D628A04F341B48F57B31A4AFBE1B0359AF0AFC51360C36",
+    "intact": true
+  },
+  "candidate_multiclass_artifact": {
+    "joblib_path": "D:\\trustlens\\intelligence\\trustlens_intelligence\\evaluation\\artifacts\\candidate_multiclass_classifier.joblib",
+    "joblib_sha256": "354F40D29F3C60DD0A498E895593527822A71E9A6A9604C7907C478F811350F2",
+    "manifest_path": "D:\\trustlens\\intelligence\\trustlens_intelligence\\evaluation\\artifacts\\candidate_multiclass_manifest.json",
+    "manifest_sha256": "9E6F78CA56ACE96128B039EAE00925965FF0575F18597833B6E04CF950C216D6",
+    "model_name": "soft_voting_ensemble_multiclass"
+  },
+  "dataset_accounting": {
+    "raw_total": 136100,
+    "exact_duplicates_dropped": 6404,
+    "canonical_duplicates_dropped": 225,
+    "domain_cap_dropped": 38672,
+    "validated_samples_total": 90799,
+    "class_distribution": {
+      "legitimate": 54786,
+      "phishing": 31693,
+      "malware": 4320
+    },
+    "domain_count": 47149
+  },
+  "partitions": {
+    "train_samples": 84033,
+    "val_samples": 13381,
+    "test_samples": 13385,
+    "train_domains": 33003,
+    "val_domains": 7071,
+    "test_domains": 7075,
+    "domain_overlap": 0
+  },
+  "validation_selection": {
+    "logistic_regression": {
+      "model_name": "multinomial_logistic_regression",
+      "sample_count": 13381,
+      "accuracy": 0.9425,
+      "macro_precision": 0.9073,
+      "macro_recall": 0.8055,
+      "macro_f1": 0.8441,
+      "per_class": {
+        "legitimate": {
+          "precision": 0.9499,
+          "recall": 0.9989,
+          "f1": 0.9738,
+          "support": 8173
+        },
+        "phishing": {
+          "precision": 0.937,
+          "recall": 0.895,
+          "f1": 0.9155,
+          "support": 4636
+        },
+        "malware": {
+          "precision": 0.8352,
+          "recall": 0.5227,
+          "f1": 0.643,
+          "support": 572
+        }
+      },
+      "confusion_matrix": [
+        [
+          8164,
+          9,
+          0
+        ],
+        [
+          428,
+          4149,
+          59
+        ],
+        [
+          3,
+          270,
+          299
+        ]
+      ],
+      "ovr_roc_auc": 0.9632,
+      "ovr_pr_auc": 0.8424,
+      "multiclass_brier_score": 0.1124,
+      "expected_calibration_error": 0.0443
+    },
+    "gradient_boosting": {
+      "model_name": "hist_gradient_boosting",
+      "sample_count": 13381,
+      "accuracy": 0.9486,
+      "macro_precision": 0.8608,
+      "macro_recall": 0.8624,
+      "macro_f1": 0.8613,
+      "per_class": {
+        "legitimate": {
+          "precision": 0.9691,
+          "recall": 0.993,
+          "f1": 0.9809,
+          "support": 8173
+        },
+        "phishing": {
+          "precision": 0.9479,
+          "recall": 0.9019,
+          "f1": 0.9243,
+          "support": 4636
+        },
+        "malware": {
+          "precision": 0.6655,
+          "recall": 0.6923,
+          "f1": 0.6787,
+          "support": 572
+        }
+      },
+      "confusion_matrix": [
+        [
+          8116,
+          57,
+          0
+        ],
+        [
+          256,
+          4181,
+          199
+        ],
+        [
+          3,
+          173,
+          396
+        ]
+      ],
+      "ovr_roc_auc": 0.9853,
+      "ovr_pr_auc": 0.9171,
+      "multiclass_brier_score": 0.0766,
+      "expected_calibration_error": 0.0076
+    },
+    "soft_voting_ensemble": {
+      "model_name": "soft_voting_ensemble",
+      "sample_count": 13381,
+      "accuracy": 0.9469,
+      "macro_precision": 0.9085,
+      "macro_recall": 0.8261,
+      "macro_f1": 0.8596,
+      "per_class": {
+        "legitimate": {
+          "precision": 0.954,
+          "recall": 0.9989,
+          "f1": 0.9759,
+          "support": 8173
+        },
+        "phishing": {
+          "precision": 0.9442,
+          "recall": 0.9008,
+          "f1": 0.922,
+          "support": 4636
+        },
+        "malware": {
+          "precision": 0.8275,
+          "recall": 0.5787,
+          "f1": 0.6811,
+          "support": 572
+        }
+      },
+      "confusion_matrix": [
+        [
+          8164,
+          9,
+          0
+        ],
+        [
+          391,
+          4176,
+          69
+        ],
+        [
+          3,
+          238,
+          331
+        ]
+      ],
+      "ovr_roc_auc": 0.9807,
+      "ovr_pr_auc": 0.9105,
+      "multiclass_brier_score": 0.0859,
+      "expected_calibration_error": 0.0262
+    },
+    "winning_model": "soft_voting_ensemble"
+  },
+  "locked_test_evaluation": {
+    "model_name": "soft_voting_ensemble",
+    "sample_count": 13385,
+    "accuracy": 0.9422,
+    "macro_precision": 0.9225,
+    "macro_recall": 0.7981,
+    "macro_f1": 0.8422,
+    "per_class": {
+      "legitimate": {
+        "precision": 0.9432,
+        "recall": 0.9992,
+        "f1": 0.9704,
+        "support": 7927
+      },
+      "phishing": {
+        "precision": 0.9442,
+        "recall": 0.897,
+        "f1": 0.92,
+        "support": 4942
+      },
+      "malware": {
+        "precision": 0.8801,
+        "recall": 0.4981,
+        "f1": 0.6361,
+        "support": 516
+      }
+    },
+    "confusion_matrix": [
+      [
+        7921,
+        6,
+        0
+      ],
+      [
+        474,
+        4433,
+        35
+      ],
+      [
+        3,
+        256,
+        257
+      ]
+    ],
+    "ovr_roc_auc": 0.9778,
+    "ovr_pr_auc": 0.8894,
+    "multiclass_brier_score": 0.1006,
+    "expected_calibration_error": 0.0295
+  },
+  "binary_projected_test_evaluation": {
+    "model_name": "soft_voting_ensemble",
+    "sample_count": 13385,
+    "accuracy": 0.9639,
+    "precision": 0.9988,
+    "recall": 0.9126,
+    "f1": 0.9538,
+    "pr_auc": 0.9934,
+    "roc_auc": 0.9949,
+    "false_positive_rate": 0.0008,
+    "false_negative_rate": 0.0874,
+    "brier_score": 0.0283,
+    "confusion_matrix": [
+      [
+        7921,
+        6
+      ],
+      [
+        477,
+        4981
+      ]
+    ]
+  },
+  "stress_tests": {
+    "original_25_deep_benign": {
+      "total": 25,
+      "false_positives": 0,
+      "fpr": 0.0,
+      "pass": true
+    },
+    "expanded_100_deep_benign": {
+      "total": 115,
+      "false_positives": 0,
+      "fpr": 0.0,
+      "pass": true
+    }
+  },
+  "source_leakage_experiments": {
+    "features_accuracy": 0.9650500598282417,
+    "missingness_accuracy": 0.3847500019238462
+  }
+}

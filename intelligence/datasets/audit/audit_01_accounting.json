@@ -1,0 +1,117 @@
+{
+  "dataset_name": "trustlens-tier2-production",
+  "version": "2.0.0",
+  "manifest_dedup_stats": {
+    "exact_duplicates_dropped": 109,
+    "canonical_duplicates_dropped": 168,
+    "domain_cap_dropped": 36558
+  },
+  "accounting_by_split": {
+    "full": {
+      "total_records": 122699,
+      "unique_urls": 122699,
+      "unique_canonical_urls": 122699,
+      "unique_registrable_domains": 107331,
+      "sources": {
+        "tranco": 96090,
+        "phishtank": 24602,
+        "urlhaus": 1837,
+        "openphish": 170
+      },
+      "labels": {
+        "legitimate": 96090,
+        "phishing": 24772,
+        "malware": 1837
+      },
+      "binary_labels": {
+        "0": 96090,
+        "1": 26609
+      }
+    },
+    "train": {
+      "total_records": 85907,
+      "unique_urls": 85907,
+      "unique_canonical_urls": 85907,
+      "unique_registrable_domains": 75131,
+      "sources": {
+        "tranco": 67257,
+        "phishtank": 17239,
+        "urlhaus": 1311,
+        "openphish": 100
+      },
+      "labels": {
+        "legitimate": 67257,
+        "phishing": 17339,
+        "malware": 1311
+      },
+      "binary_labels": {
+        "0": 67257,
+        "1": 18650
+      }
+    },
+    "val": {
+      "total_records": 18433,
+      "unique_urls": 18433,
+      "unique_canonical_urls": 18433,
+      "unique_registrable_domains": 16099,
+      "sources": {
+        "tranco": 14407,
+        "phishtank": 3748,
+        "urlhaus": 252,
+        "openphish": 26
+      },
+      "labels": {
+        "legitimate": 14407,
+        "phishing": 3774,
+        "malware": 252
+      },
+      "binary_labels": {
+        "0": 14407,
+        "1": 4026
+      }
+    },
+    "test": {
+      "total_records": 18359,
+      "unique_urls": 18359,
+      "unique_canonical_urls": 18359,
+      "unique_registrable_domains": 16101,
+      "sources": {
+        "tranco": 14426,
+        "phishtank": 3615,
+        "urlhaus": 274,
+        "openphish": 44
+      },
+      "labels": {
+        "legitimate": 14426,
+        "phishing": 3659,
+        "malware": 274
+      },
+      "binary_labels": {
+        "0": 14426,
+        "1": 3933
+      }
+    }
+  },
+  "source_metrics": {
+    "tranco": {
+      "final_samples": 96090,
+      "unique_domains": 94539,
+      "samples_per_domain_ratio": 1.016
+    },
+    "phishtank": {
+      "final_samples": 24602,
+      "unique_domains": 11520,
+      "samples_per_domain_ratio": 2.136
+    },
+    "urlhaus": {
+      "final_samples": 1837,
+      "unique_domains": 1731,
+      "samples_per_domain_ratio": 1.061
+    },
+    "openphish": {
+      "final_samples": 170,
+      "unique_domains": 103,
+      "samples_per_domain_ratio": 1.65
+    }
+  }
+}

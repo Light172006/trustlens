@@ -9,7 +9,7 @@ import unicodedata
 from urllib.parse import urlparse
 import idna
 
-from trustlens_intelligence.features.url_utils import (
+from trustlens_intelligence.common.url_utils import (
     extract_safe_hostname,
     has_userinfo_credentials,
     is_adversarial_or_standard_ip,
@@ -83,6 +83,10 @@ def has_homoglyphs_or_mixed_scripts(text: str) -> bool:
     return (has_latin and has_confusable) or (not inspect_text.isascii() and has_confusable)
 
 
+# Ports commonly observed in C2 beacons, reverse shells, and malicious drop sites
+C2_SUSPICIOUS_PORTS = frozenset([8080, 8000, 8888, 8443, 4444, 1337, 9999, 5555, 6666, 7777, 8889, 9000, 9090, 10000, 2222, 3333])
+
+
 def extract_structural_features(url: str, explicit_host: str | None = None) -> dict[str, int | bool]:
     """Extract structural domain and host features.
 
@@ -93,9 +97,20 @@ def extract_structural_features(url: str, explicit_host: str | None = None) -> d
     Returns:
         Dictionary of structural metrics.
     """
-    parsed = urlparse(url)
+    try:
+        parsed = urlparse(url)
+    except Exception:
+        parsed = None
+
     host = explicit_host or extract_safe_hostname(explicit_host or url)
-    port = parsed.port
+
+    port = None
+    if parsed is not None:
+        try:
+            port = parsed.port
+        except (ValueError, TypeError):
+            # Out-of-range or non-numeric port explicitly indicates non-standard port anomaly
+            port = -1
 
     is_ip = is_ip_address(host)
     subdomains = count_subdomains(host)
@@ -105,8 +120,11 @@ def extract_structural_features(url: str, explicit_host: str | None = None) -> d
 
     # Non-standard port: port explicitly set and not standard 80 or 443
     has_non_standard = False
+    has_c2 = False
     if port is not None and port not in (80, 443):
         has_non_standard = True
+        if port in C2_SUSPICIOUS_PORTS or (is_ip and port > 0):
+            has_c2 = True
 
     return {
         "subdomain_count": subdomains,
@@ -114,19 +132,8 @@ def extract_structural_features(url: str, explicit_host: str | None = None) -> d
         "is_punycode": is_puny,
         "has_homoglyphs": has_confusables,
         "has_non_standard_port": has_non_standard,
+        "has_c2_port": has_c2,
         "has_userinfo": has_credentials,
     }
 
-    # Non-standard port: port explicitly set and not standard 80 or 443
-    has_non_standard = False
-    if port is not None and port not in (80, 443):
-        has_non_standard = True
-
-    return {
-        "subdomain_count": subdomains,
-        "is_ip_host": is_ip,
-        "is_punycode": is_puny,
-        "has_homoglyphs": has_confusables,
-        "has_non_standard_port": has_non_standard,
-    }
 

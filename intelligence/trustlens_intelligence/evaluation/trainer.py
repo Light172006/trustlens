@@ -1,6 +1,7 @@
 """TrustLens Intelligence — Model Training and Benchmarking Pipeline."""
 
 from datetime import datetime, timezone
+import json
 import logging
 from pathlib import Path
 from typing import Any
@@ -88,6 +89,21 @@ class ModelTrainer:
         path.parent.mkdir(parents=True, exist_ok=True)
         joblib.dump(artifact, path)
         logger.info("Saved best model artifact (%s) to %s", best_name, path)
+
+        # Write human-readable companion manifest for auditability
+        manifest_path = path.with_name(f"{path.stem}_manifest.json")
+        manifest_data = {
+            "model_name": best_name,
+            "model_version": "1.0.0",
+            "schema_version": MODEL_SCHEMA_VERSION,
+            "feature_schema_version": FEATURE_SCHEMA_VERSION,
+            "num_features": len(self.splits.feature_names),
+            "feature_names": self.splits.feature_names,
+            "evaluation_metrics": best_metrics.to_dict(),
+            "created_at": artifact["created_at"],
+        }
+        with open(manifest_path, "w", encoding="utf-8") as f:
+            json.dump(manifest_data, f, indent=2)
 
         return artifact
 

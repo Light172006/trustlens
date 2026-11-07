@@ -80,6 +80,10 @@ def test_threat_classifier_graceful_failure():
     classifier = ThreatClassifier()
     assert classifier.is_loaded is False
 
+    # Loading non-existent path or directory returns False without crashing
+    assert classifier.load_artifact(Path(__file__).parent) is False
+    assert classifier.load_artifact("/path/that/does/not/exist.joblib") is False
+
     ev = ScanEvidence(original_url="https://example.com")
     features = FeatureExtractor().extract(ev)
     pred = classifier.predict(features)
@@ -90,7 +94,7 @@ def test_threat_classifier_bundled_default_model():
     """Verify that bundled default baseline model loads and produces calibrated prediction."""
     classifier = ThreatClassifier.load_default()
     assert classifier.is_loaded is True
-    assert classifier.model_name in ("logistic_regression", "random_forest")
+    assert classifier.model_name in ("logistic_regression", "random_forest", "gradient_boosting")
     assert len(classifier.feature_names) > 30
 
     ev = ScanEvidence(original_url="https://secure.banking-login-verify.com/account")

@@ -1,0 +1,81 @@
+{
+  "model_name": "gradient_boosting",
+  "model_version": "2.0.0",
+  "schema_version": "1.0.0",
+  "feature_schema_version": "1.0.0",
+  "num_features": 34,
+  "feature_names": [
+    "url_length",
+    "host_length",
+    "path_length",
+    "query_length",
+    "url_entropy",
+    "host_entropy",
+    "digit_count",
+    "special_char_count",
+    "suspicious_keyword_count",
+    "subdomain_count",
+    "is_ip_host",
+    "has_userinfo",
+    "is_punycode",
+    "has_homoglyphs",
+    "has_non_standard_port",
+    "is_https",
+    "redirect_count",
+    "has_cross_domain_redirect",
+    "http_to_https_redirect",
+    "has_hsts",
+    "has_csp",
+    "has_x_content_type_options",
+    "has_referrer_policy",
+    "has_permissions_policy",
+    "insecure_cookie_count",
+    "missing_httponly_cookie_count",
+    "missing_samesite_cookie_count",
+    "tls_valid",
+    "cert_chain_valid",
+    "cert_hostname_match",
+    "cert_is_expired",
+    "cert_days_until_expiry",
+    "is_legacy_tls",
+    "domain_age_days"
+  ],
+  "evaluation_metrics": {
+    "model_name": "gradient_boosting",
+    "sample_count": 18359,
+    "accuracy": 0.9981,
+    "precision": 0.9985,
+    "recall": 0.9929,
+    "f1": 0.9957,
+    "pr_auc": 0.998,
+    "roc_auc": 0.9987,
+    "false_positive_rate": 0.0004,
+    "false_negative_rate": 0.0071,
+    "brier_score": 0.0019,
+    "confusion_matrix": [
+      [
+        14420,
+        6
+      ],
+      [
+        28,
+        3905
+      ]
+    ]
+  },
+  "training_metadata": {
+    "dataset_version": "2.0.0",
+    "total_samples": 122699,
+    "train_samples": 85907,
+    "test_samples": 18359,
+    "train_domains": 75131,
+    "test_domains": 16101,
+    "source_attributions": [
+      "Tranco: A Research-Oriented Top Sites Ranking Hardened Against Manipulation (Pochat et al., NDSS 2019)",
+      "OpenPhish: Phishing Intelligence Feed (OpenPhish, 2026)",
+      "URLhaus by abuse.ch (CC BY 4.0)",
+      "Data provided by PhishTank (OpenDNS/Cisco)"
+    ]
+  },
+  "created_at": "2026-11-07T11:38:09.134263+00:00"
+}

@@ -1,0 +1,271 @@
+{
+  "multiclass_evaluation": {
+    "task": "3-class (legitimate, phishing, malware)",
+    "confusion_matrix": [
+      [
+        14416,
+        10,
+        0
+      ],
+      [
+        26,
+        3468,
+        165
+      ],
+      [
+        0,
+        23,
+        251
+      ]
+    ],
+    "classification_report": {
+      "legitimate": {
+        "precision": 0.9981996953330564,
+        "recall": 0.9993068071537502,
+        "f1-score": 0.9987529444367466,
+        "support": 14426.0
+      },
+      "phishing": {
+        "precision": 0.9905741216795202,
+        "recall": 0.9477999453402569,
+        "f1-score": 0.9687150837988827,
+        "support": 3659.0
+      },
+      "malware": {
+        "precision": 0.6033653846153846,
+        "recall": 0.916058394160584,
+        "f1-score": 0.7275362318840579,
+        "support": 274.0
+      },
+      "accuracy": 0.9877988997222071,
+      "macro avg": {
+        "precision": 0.8640464005426537,
+        "recall": 0.954388382218197,
+        "f1-score": 0.898334753373229,
+        "support": 18359.0
+      },
+      "weighted avg": {
+        "precision": 0.9907871687719729,
+        "recall": 0.9877988997222071,
+        "f1-score": 0.9887185247345089,
+        "support": 18359.0
+      }
+    },
+    "macro_f1": 0.898334753373229,
+    "weighted_f1": 0.9887185247345089,
+    "ovr_roc_auc": 0.9978076026970247,
+    "existing_binary_model_breakdown": {
+      "recall_on_phishing": 0.992347635966111,
+      "recall_on_malware": 1.0,
+      "phishing_sample_count": 3659,
+      "malware_sample_count": 274
+    }
+  },
+  "ablation_experiments": {
+    "1_all_34_intrinsic_features": {
+      "num_features": 34,
+      "features": [
+        "url_length",
+        "host_length",
+        "path_length",
+        "query_length",
+        "url_entropy",
+        "host_entropy",
+        "digit_count",
+        "special_char_count",
+        "suspicious_keyword_count",
+        "subdomain_count",
+        "is_ip_host",
+        "has_userinfo",
+        "is_punycode",
+        "has_homoglyphs",
+        "has_non_standard_port",
+        "is_https",
+        "redirect_count",
+        "has_cross_domain_redirect",
+        "http_to_https_redirect",
+        "has_hsts",
+        "has_csp",
+        "has_x_content_type_options",
+        "has_referrer_policy",
+        "has_permissions_policy",
+        "insecure_cookie_count",
+        "missing_httponly_cookie_count",
+        "missing_samesite_cookie_count",
+        "tls_valid",
+        "cert_chain_valid",
+        "cert_hostname_match",
+        "cert_is_expired",
+        "cert_days_until_expiry",
+        "is_legacy_tls",
+        "domain_age_days"
+      ],
+      "accuracy": 0.9981480472792635,
+      "precision": 0.9984658655075428,
+      "recall": 0.992880752606153,
+      "f1": 0.9956654767975522,
+      "roc_auc": 0.998677179016374,
+      "false_positive_rate": 0.000415915707749896
+    },
+    "2_url_lexical_only": {
+      "num_features": 9,
+      "features": [
+        "url_length",
+        "host_length",
+        "path_length",
+        "query_length",
+        "url_entropy",
+        "host_entropy",
+        "digit_count",
+        "special_char_count",
+        "suspicious_keyword_count"
+      ],
+      "accuracy": 0.9970041941282205,
+      "precision": 0.9938869077941925,
+      "recall": 0.9921179760996695,
+      "f1": 0.9930016541544726,
+      "roc_auc": 0.9988894550051926,
+      "false_positive_rate": 0.001663662830999584
+    },
+    "3_url_structural_only": {
+      "num_features": 6,
+      "features": [
+        "subdomain_count",
+        "is_ip_host",
+        "has_userinfo",
+        "is_punycode",
+        "has_homoglyphs",
+        "has_non_standard_port"
+      ],
+      "accuracy": 0.7962852007189934,
+      "precision": 0.8814229249011858,
+      "recall": 0.056699720315280956,
+      "f1": 0.10654562828475872,
+      "roc_auc": 0.5272158386087723,
+      "false_positive_rate": 0.0020795785387494803
+    },
+    "4_domain_features_only": {
+      "num_features": 1,
+      "features": [
+        "domain_age_days"
+      ],
+      "accuracy": 0.21422735443106922,
+      "precision": 0.21422735443106922,
+      "recall": 1.0,
+      "f1": 0.35286201327830613,
+      "roc_auc": 0.5,
+      "false_positive_rate": 1.0
+    },
+    "5_http_and_tls_only": {
+      "num_features": 18,
+      "features": [
+        "is_https",
+        "redirect_count",
+        "has_cross_domain_redirect",
+        "http_to_https_redirect",
+        "has_hsts",
+        "has_csp",
+        "has_x_content_type_options",
+        "has_referrer_policy",
+        "has_permissions_policy",
+        "insecure_cookie_count",
+        "missing_httponly_cookie_count",
+        "missing_samesite_cookie_count",
+        "tls_valid",
+        "cert_chain_valid",
+        "cert_hostname_match",
+        "cert_is_expired",
+        "cert_days_until_expiry",
+        "is_legacy_tls"
+      ],
+      "accuracy": 0.9777220981534942,
+      "precision": 1.0,
+      "recall": 0.8960081362827358,
+      "f1": 0.9451522059809575,
+      "roc_auc": 0.948004068141368,
+      "false_positive_rate": 0.0
+    },
+    "6_all_without_domain_age": {
+      "num_features": 33,
+      "features": [
+        "url_length",
+        "host_length",
+        "path_length",
+        "query_length",
+        "url_entropy",
+        "host_entropy",
+        "digit_count",
+        "special_char_count",
+        "suspicious_keyword_count",
+        "subdomain_count",
+        "is_ip_host",
+        "has_userinfo",
+        "is_punycode",
+        "has_homoglyphs",
+        "has_non_standard_port",
+        "is_https",
+        "redirect_count",
+        "has_cross_domain_redirect",
+        "http_to_https_redirect",
+        "has_hsts",
+        "has_csp",
+        "has_x_content_type_options",
+        "has_referrer_policy",
+        "has_permissions_policy",
+        "insecure_cookie_count",
+        "missing_httponly_cookie_count",
+        "missing_samesite_cookie_count",
+        "tls_valid",
+        "cert_chain_valid",
+        "cert_hostname_match",
+        "cert_is_expired",
+        "cert_days_until_expiry",
+        "is_legacy_tls"
+      ],
+      "accuracy": 0.9981480472792635,
+      "precision": 0.9984658655075428,
+      "recall": 0.992880752606153,
+      "f1": 0.9956654767975522,
+      "roc_auc": 0.998677179016374,
+      "false_positive_rate": 0.000415915707749896
+    },
+    "7_without_missingness_sentinels": {
+      "num_features": 27,
+      "features": [
+        "url_length",
+        "host_length",
+        "path_length",
+        "query_length",
+        "url_entropy",
+        "host_entropy",
+        "digit_count",
+        "special_char_count",
+        "suspicious_keyword_count",
+        "subdomain_count",
+        "is_ip_host",
+        "has_userinfo",
+        "is_punycode",
+        "has_homoglyphs",
+        "has_non_standard_port",
+        "is_https",
+        "redirect_count",
+        "has_cross_domain_redirect",
+        "http_to_https_redirect",
+        "has_hsts",
+        "has_csp",
+        "has_x_content_type_options",
+        "has_referrer_policy",
+        "has_permissions_policy",
+        "insecure_cookie_count",
+        "missing_httponly_cookie_count",
+        "missing_samesite_cookie_count"
+      ],
+      "accuracy": 0.9981480472792635,
+      "precision": 0.9984658655075428,
+      "recall": 0.992880752606153,
+      "f1": 0.9956654767975522,
+      "roc_auc": 0.998677179016374,
+      "false_positive_rate": 0.000415915707749896
+    }
+  }
+}

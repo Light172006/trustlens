@@ -231,3 +231,26 @@ def test_api_community_provider_check_propagation():
     assert comm_check.result_status == ProviderResultStatus.MATCH
 
 
+def test_threat_intel_manager_concurrent_thread_safety():
+    """Verify thread-safety of ThreatIntelManager in-memory cache under high concurrency."""
+    from concurrent.futures import ThreadPoolExecutor
+    from trustlens_intelligence.config.settings import ThreatFeedSettings
+
+    settings = ThreatFeedSettings(max_cache_size=20, provider_cache_ttl_seconds=3600)
+    manager = ThreatIntelManager(settings=settings, providers=[MockThreatProvider(name="mock")])
+
+    def worker(worker_id: int):
+        for i in range(50):
+            url = f"https://concurrent-test-{worker_id}-{i % 10}.example.com/"
+            res = manager.query_all(url, use_cache=True)
+            assert len(res) == 1
+
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        futures = [executor.submit(worker, w) for w in range(10)]
+        for f in futures:
+            f.result()
+
+    assert len(manager._cache) <= settings.max_cache_size
+
+
+

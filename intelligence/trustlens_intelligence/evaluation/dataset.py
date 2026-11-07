@@ -11,6 +11,7 @@ from urllib.parse import urlparse
 import numpy as np
 import pandas as pd
 
+from trustlens_intelligence.datasets.processing.allowlist import filter_allowlisted_features
 from trustlens_intelligence.features.extractor import FeatureExtractor
 from trustlens_intelligence.schemas.evidence import (
     CookieEvidence,
@@ -322,12 +323,15 @@ def seed_record_to_evidence(record: dict[str, Any]) -> ScanEvidence:
 def generate_benchmark_dataset(
     sample_multiplier: int = 10,
     seed: int = 42,
+    allowlisted_only: bool = True,
 ) -> tuple[pd.DataFrame, pd.Series, list[str]]:
     """Generate a reproducible benchmark dataset using feature extraction on seed URLs.
 
     Args:
         sample_multiplier: Multiplier to generate realistic variants with slight perturbations.
         seed: Random seed for reproducibility.
+        allowlisted_only: If True, filter features to retain only intrinsic features,
+            excluding external threat feed lookup flags to prevent target leakage.
 
     Returns:
         X (DataFrame), y (Series), domains (list[str])
@@ -351,6 +355,8 @@ def generate_benchmark_dataset(
         base_ev = seed_record_to_evidence(seed_item)
         features = extractor.extract(base_ev)
         feature_dict = features.to_ml_dict()
+        if allowlisted_only:
+            feature_dict = filter_allowlisted_features(feature_dict)
 
         rows.append(feature_dict)
         labels.append(seed_item["label"])
@@ -363,6 +369,8 @@ def generate_benchmark_dataset(
             mutated["url"] = f"{mutated['url']}{sep}v={i}"
             ev = seed_record_to_evidence(mutated)
             f_dict = extractor.extract(ev).to_ml_dict()
+            if allowlisted_only:
+                f_dict = filter_allowlisted_features(f_dict)
 
             rows.append(f_dict)
             labels.append(mutated["label"])

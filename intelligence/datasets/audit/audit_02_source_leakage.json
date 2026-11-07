@@ -1,0 +1,232 @@
+{
+  "source_labels": [
+    "openphish",
+    "phishtank",
+    "tranco",
+    "urlhaus"
+  ],
+  "full_source_classifier": {
+    "accuracy": 0.9695517185031864,
+    "macro_f1": 0.6834165869519451,
+    "weighted_f1": 0.9769913966973561,
+    "per_source_report": {
+      "openphish": {
+        "precision": 0.06143344709897611,
+        "recall": 0.4090909090909091,
+        "f1-score": 0.10682492581602374,
+        "support": 44.0
+      },
+      "phishtank": {
+        "precision": 0.9878805793674253,
+        "recall": 0.9244813278008299,
+        "f1-score": 0.9551300371534724,
+        "support": 3615.0
+      },
+      "tranco": {
+        "precision": 0.9982407993807614,
+        "recall": 0.9833633716900042,
+        "f1-score": 0.990746237385201,
+        "support": 14426.0
+      },
+      "urlhaus": {
+        "precision": 0.538135593220339,
+        "recall": 0.927007299270073,
+        "f1-score": 0.6809651474530831,
+        "support": 274.0
+      },
+      "accuracy": 0.9695517185031864,
+      "macro avg": {
+        "precision": 0.6464226047668755,
+        "recall": 0.810985726962954,
+        "f1-score": 0.6834165869519451,
+        "support": 18359.0
+      },
+      "weighted avg": {
+        "precision": 0.9870887461460228,
+        "recall": 0.9695517185031864,
+        "f1-score": 0.9769913966973561,
+        "support": 18359.0
+      }
+    },
+    "confusion_matrix": [
+      [
+        18,
+        22,
+        2,
+        2
+      ],
+      [
+        34,
+        3342,
+        23,
+        216
+      ],
+      [
+        239,
+        1,
+        14186,
+        0
+      ],
+      [
+        2,
+        18,
+        0,
+        254
+      ]
+    ],
+    "top_features_responsible": [
+      [
+        "url_length",
+        0.1587638708954505
+      ],
+      [
+        "path_length",
+        0.13895689938938902
+      ],
+      [
+        "url_entropy",
+        0.10096235456886087
+      ],
+      [
+        "special_char_count",
+        0.08793681769617911
+      ],
+      [
+        "host_length",
+        0.07845058337145934
+      ],
+      [
+        "host_entropy",
+        0.07790661963475141
+      ],
+      [
+        "is_legacy_tls",
+        0.05972491131368148
+      ],
+      [
+        "tls_valid",
+        0.05067689557353756
+      ],
+      [
+        "digit_count",
+        0.042319764241244257
+      ],
+      [
+        "is_ip_host",
+        0.03894624004678668
+      ]
+    ]
+  },
+  "missingness_source_classifier": {
+    "accuracy": 0.9130671605207256,
+    "macro_f1": 0.6716031278989746,
+    "weighted_f1": 0.9456088083537889,
+    "per_source_report": {
+      "openphish": {
+        "precision": 0.02112163146394756,
+        "recall": 0.6590909090909091,
+        "f1-score": 0.040931545518701484,
+        "support": 44.0
+      },
+      "phishtank": {
+        "precision": 0.9691709069140976,
+        "recall": 0.8957123098201937,
+        "f1-score": 0.9309948246118459,
+        "support": 3615.0
+      },
+      "tranco": {
+        "precision": 0.9905520011902991,
+        "recall": 0.9229862747816443,
+        "f1-score": 0.9555762882158748,
+        "support": 14426.0
+      },
+      "urlhaus": {
+        "precision": 0.8916256157635468,
+        "recall": 0.6605839416058394,
+        "f1-score": 0.7589098532494759,
+        "support": 274.0
+      },
+      "accuracy": 0.9130671605207256,
+      "macro avg": {
+        "precision": 0.7181175388329727,
+        "recall": 0.7845933588246466,
+        "f1-score": 0.6716031278989746,
+        "support": 18359.0
+      },
+      "weighted avg": {
+        "precision": 0.9825421192967667,
+        "recall": 0.9130671605207256,
+        "f1-score": 0.9456088083537889,
+        "support": 18359.0
+      }
+    },
+    "confusion_matrix": [
+      [
+        29,
+        9,
+        6,
+        0
+      ],
+      [
+        234,
+        3238,
+        121,
+        22
+      ],
+      [
+        1110,
+        1,
+        13315,
+        0
+      ],
+      [
+        0,
+        93,
+        0,
+        181
+      ]
+    ],
+    "top_missingness_features_responsible": [
+      [
+        "is_ip_host_is_missing",
+        0.24034850590601944
+      ],
+      [
+        "query_length_is_missing",
+        0.1257723499507122
+      ],
+      [
+        "digit_count_is_missing",
+        0.125032106705124
+      ],
+      [
+        "tls_valid_is_missing",
+        0.0929950891858562
+      ],
+      [
+        "is_legacy_tls_is_missing",
+        0.07261649325309794
+      ],
+      [
+        "suspicious_keyword_count_is_missing",
+        0.06427125625501885
+      ],
+      [
+        "is_https_is_missing",
+        0.06381491318086574
+      ],
+      [
+        "cert_days_until_expiry_is_missing",
+        0.06217582637511285
+      ],
+      [
+        "cert_hostname_match_is_missing",
+        0.05411147847048876
+      ],
+      [
+        "cert_is_expired_is_missing",
+        0.05167928867370361
+      ]
+    ]
+  }
+}

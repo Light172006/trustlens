@@ -1,0 +1,61 @@
+{
+  "milestone": "0 - Verify Forensic Audit",
+  "artifact_verification": {
+    "model_path": "D:\\trustlens\\intelligence\\trustlens_intelligence\\evaluation\\artifacts\\baseline_classifier.joblib",
+    "model_sha256": "D18F4E7338223D90C43C8DAEE9C15A1FA02457E9D017B691A989042C0BA93038",
+    "model_intact": true,
+    "manifest_path": "D:\\trustlens\\intelligence\\trustlens_intelligence\\evaluation\\artifacts\\baseline_classifier_manifest.json",
+    "manifest_sha256": "E4AC296A7791691B65D628A04F341B48F57B31A4AFBE1B0359AF0AFC51360C36",
+    "manifest_intact": true
+  },
+  "binary_model_reproduction": {
+    "test_sample_count": 18359,
+    "true_negatives": 14420,
+    "false_positives": 6,
+    "false_negatives": 28,
+    "true_positives": 3905,
+    "accuracy": 0.9981480472792635,
+    "fpr": 0.000415915707749896,
+    "fnr": 0.007119247393846936
+  },
+  "deep_benign_stress_test_reproduction": {
+    "total_tested": 25,
+    "false_positives": 25,
+    "false_positive_rate": 1.0,
+    "verdict": "CONFIRMED: 100% False Positive Rate on real benign deep URLs"
+  },
+  "matrix_discrepancy_reconciliation": {
+    "binary_model_matrix": {
+      "TN": 14420,
+      "FP": 6,
+      "FN": 28,
+      "TP": 3905
+    },
+    "three_class_model_matrix_collapsed": {
+      "TN": 14416,
+      "FP": 10,
+      "FN": 26,
+      "TP": 3907
+    },
+    "root_cause_explanation": "The active model (baseline_classifier.joblib) is a BINARY classifier trained on {0, 1} labels directly, producing 6 FP and 28 FN on test.parquet. The 3-class confusion matrix (audit_04_multiclass_ablation.json) comes from a SEPARATE multiclass HistGradientBoostingClassifier trained on {0, 1, 2} labels in Audit Module 4. The multiclass loss function (multinomial log_loss with 3 softmax heads) adjusted the decision boundaries differently than the binary model's single sigmoid head, resulting in 10 FP and 26 FN. Both numbers are completely accurate for their respective distinct models."
+  },
+  "urlhaus_inspection": {
+    "total_lines_sampled": 108975,
+    "lines_with_github": 48385,
+    "sample_github_lines": [
+      "||codeload.github.com/54n4l/mimikatzwindows/zip/refs/heads/master^$all",
+      "||codeload.github.com/caocaocc/yacd/zip/refs/heads/gh-pages^$all",
+      "||codeload.github.com/cirosantilli/china-dictatorship/zip/refs/heads/master^$all",
+      "||codeload.github.com/d-7uble/invoke-phant0m/zip/refs/heads/master^$all",
+      "||codeload.github.com/daneeltrevize/tabsat/legacy.tar.gz/refs/tags/0.10^$all"
+    ],
+    "sample_non_github_lines": [
+      "1.20.91.144",
+      "1.92.101.221",
+      "1.92.136.152",
+      "1.94.221.183",
+      "1.95.51.146"
+    ],
+    "syntax_defect": "The mirror provides uBlock Origin / adblock syntax: lines prefixed with '||' or ending with '^'. When train_tier2.py simply prepended 'http://' to '||github.com^...', the normalizer parsed the hostname as '||github.com', capturing thousands of releases from GitHub and causing the domain frequency cap to prune 22,860 entries."
+  }
+}
