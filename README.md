@@ -74,6 +74,12 @@ trustlens/
 
 ## Quickstart & Local Development
 
+> 📖 **Comprehensive Step-by-Step Guide:**  
+> For detailed instructions on running with Docker Compose, native local environments, Windows Celery flags (`-P solo`), troubleshooting, and curl verification scripts, see **[STARTUP_GUIDE.md](file:///d:/trustlens/STARTUP_GUIDE.md)**.
+>
+> 🎨 **Frontend Engineering Integration:**  
+> For React 19 / TypeScript schemas, token protocols, and polling state machines, see **[FRONTEND_REQUIREMENTS.md](file:///d:/trustlens/FRONTEND_REQUIREMENTS.md)**.
+
 ### Prerequisites
 - Python 3.11+ (or Python 3.12)
 - Docker & Docker Compose (optional for containerized setup)
@@ -112,9 +118,10 @@ docker compose logs -f api
 - Redis Health: `http://localhost:8000/health/redis`
 - Interactive OpenAPI Docs: `http://localhost:8000/docs`
 
-### 4. Running Tests
+### 4. Running Automated Tests (57 Tests)
 ```bash
 cd backend
-pytest -v
+python run_test.py
+# Or: pytest -v app/tests
 ```
 
