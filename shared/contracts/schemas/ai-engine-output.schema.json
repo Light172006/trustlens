@@ -1,0 +1,345 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://trustlens.internal/schemas/v1/ai-engine-output.schema.json",
+  "title": "TrustLens AI Engine Output Schema",
+  "description": "Authoritative threat intelligence assessment produced by the TrustLens Intelligence Engine. Owned by AI/ML Engineering.",
+  "version": "1.0.0",
+  "type": "object",
+  "$defs": {
+    "Verdict": {
+      "type": "string",
+      "enum": ["SAFE", "SUSPICIOUS", "MALICIOUS", "INCONCLUSIVE"],
+      "description": "Authoritative scan verdict values."
+    },
+    "FindingCategory": {
+      "type": "string",
+      "enum": ["threat_intel", "web_security", "certificate", "community", "domain_intelligence"],
+      "description": "Categories for scan and detection findings."
+    },
+    "FindingSeverity": {
+      "type": "string",
+      "enum": ["info", "low", "medium", "high", "critical"],
+      "description": "Severity levels for findings."
+    },
+    "Finding": {
+      "type": "object",
+      "description": "A structured finding representing an evaluated risk or security observation.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Finding UUID identifier"
+        },
+        "code": {
+          "type": "string",
+          "description": "Stable rule identifier (e.g. CERT_EXPIRED, CSP_MISSING, OPENPHISH_URL_MATCH)"
+        },
+        "category": {
+          "$ref": "#/$defs/FindingCategory",
+          "description": "Finding category"
+        },
+        "title": {
+          "type": "string",
+          "description": "Short human-readable finding title"
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description referencing observed facts"
+        },
+        "severity": {
+          "$ref": "#/$defs/FindingSeverity",
+          "description": "Finding severity level"
+        },
+        "points": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 0,
+          "description": "Risk point contribution (0-100)"
+        },
+        "evidence": {
+          "type": "object",
+          "default": {},
+          "description": "Observed facts and parameters that triggered the finding"
+        },
+        "remediation": {
+          "type": "string",
+          "description": "Actionable recommendation or safety guidance"
+        },
+        "source": {
+          "type": "string",
+          "description": "Attribution or detection rule engine source identifier"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "UTC detection timestamp"
+        }
+      },
+      "required": ["code", "category", "title", "description", "severity", "remediation", "source"],
+      "additionalProperties": false
+    },
+    "ProviderResultStatus": {
+      "type": "string",
+      "enum": ["match", "no_match", "unavailable", "not_configured", "skipped_sensitive_url", "stale_cache"],
+      "description": "Standardized result status from threat intelligence provider lookups."
+    },
+    "ProviderCheckResult": {
+      "type": "object",
+      "description": "Normalized result of querying an external or local threat intelligence provider.",
+      "properties": {
+        "provider": {
+          "type": "string",
+          "description": "Provider name (openphish, urlhaus, community)"
+        },
+        "result_status": {
+          "$ref": "#/$defs/ProviderResultStatus",
+          "description": "Standardized result status"
+        },
+        "matched": {
+          "type": "boolean",
+          "default": false,
+          "description": "True only if an active malicious match was verified"
+        },
+        "details": {
+          "type": "object",
+          "default": {},
+          "description": "Provider-specific facts and metadata"
+        },
+        "checked_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "UTC timestamp of the query"
+        },
+        "latency_ms": {
+          "type": ["number", "null"],
+          "minimum": 0.0,
+          "default": null,
+          "description": "Query latency in milliseconds"
+        }
+      },
+      "required": ["provider", "result_status", "matched", "checked_at"],
+      "additionalProperties": false
+    },
+    "LayerCoverage": {
+      "type": "string",
+      "enum": ["complete", "partial", "unavailable", "not_applicable"],
+      "description": "Layer coverage status."
+    },
+    "CoverageMap": {
+      "type": "object",
+      "description": "Status of analysis layers: threat_intel, web_security, certificate, community.",
+      "properties": {
+        "threat_intel": {
+          "$ref": "#/$defs/LayerCoverage",
+          "description": "Threat feed coverage status"
+        },
+        "web_security": {
+          "$ref": "#/$defs/LayerCoverage",
+          "description": "HTTP and header security coverage status"
+        },
+        "certificate": {
+          "$ref": "#/$defs/LayerCoverage",
+          "description": "TLS certificate coverage status"
+        },
+        "community": {
+          "$ref": "#/$defs/LayerCoverage",
+          "description": "Community intelligence coverage status"
+        }
+      },
+      "required": ["threat_intel", "web_security", "certificate", "community"],
+      "additionalProperties": false
+    },
+    "MLPrediction": {
+      "type": "object",
+      "description": "Optional machine learning classification inference result.",
+      "properties": {
+        "model_name": {
+          "type": "string",
+          "description": "Name of the classification model"
+        },
+        "model_version": {
+          "type": "string",
+          "description": "Version string of the model artifact"
+        },
+        "malicious_probability": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Predicted probability of maliciousness (0.0 to 1.0)"
+        },
+        "predicted_label": {
+          "type": "string",
+          "enum": ["legitimate", "suspicious", "malicious"],
+          "description": "Predicted classification label"
+        },
+        "calibrated_confidence": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Calibrated prediction confidence score (0.0 to 1.0)"
+        },
+        "top_contributing_features": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "feature": { "type": "string" },
+              "value": { "type": ["number", "string", "boolean", "null"] },
+              "importance": { "type": "number" }
+            },
+            "required": ["feature", "value"]
+          },
+          "default": [],
+          "description": "Features that contributed most strongly to this prediction"
+        }
+      },
+      "required": ["model_name", "model_version", "malicious_probability", "predicted_label", "calibrated_confidence"],
+      "additionalProperties": false
+    },
+    "ExtractedFeatures": {
+      "type": "object",
+      "description": "Normalized, typed feature vector extracted from scan evidence for scoring and ML models.",
+      "properties": {
+        "schema_version": { "type": "string", "default": "1.0.0" },
+        "url_length": { "type": "integer", "minimum": 0 },
+        "host_length": { "type": "integer", "minimum": 0 },
+        "path_length": { "type": "integer", "minimum": 0 },
+        "query_length": { "type": "integer", "minimum": 0 },
+        "url_entropy": { "type": "number", "minimum": 0.0 },
+        "host_entropy": { "type": "number", "minimum": 0.0 },
+        "digit_count": { "type": "integer", "minimum": 0 },
+        "special_char_count": { "type": "integer", "minimum": 0 },
+        "suspicious_keyword_count": { "type": "integer", "minimum": 0 },
+        "subdomain_count": { "type": "integer", "minimum": 0 },
+        "is_ip_host": { "type": "boolean" },
+        "has_userinfo": { "type": "boolean" },
+        "is_punycode": { "type": "boolean" },
+        "has_homoglyphs": { "type": "boolean" },
+        "has_non_standard_port": { "type": "boolean" },
+        "is_https": { "type": "boolean" },
+        "redirect_count": { "type": "integer", "minimum": 0 },
+        "has_cross_domain_redirect": { "type": "boolean" },
+        "http_to_https_redirect": { "type": "boolean" },
+        "has_hsts": { "type": "boolean" },
+        "has_csp": { "type": "boolean" },
+        "has_x_content_type_options": { "type": "boolean" },
+        "has_referrer_policy": { "type": "boolean" },
+        "has_permissions_policy": { "type": "boolean" },
+        "insecure_cookie_count": { "type": "integer", "minimum": 0 },
+        "missing_httponly_cookie_count": { "type": "integer", "minimum": 0 },
+        "missing_samesite_cookie_count": { "type": "integer", "minimum": 0 },
+        "tls_valid": { "type": ["boolean", "null"] },
+        "cert_chain_valid": { "type": ["boolean", "null"] },
+        "cert_hostname_match": { "type": ["boolean", "null"] },
+        "cert_is_expired": { "type": ["boolean", "null"] },
+        "cert_days_until_expiry": { "type": ["integer", "null"] },
+        "is_legacy_tls": { "type": ["boolean", "null"] },
+        "domain_age_days": { "type": ["integer", "null"] },
+        "openphish_match": { "type": "boolean" },
+        "urlhaus_match": { "type": "boolean" },
+        "urlhaus_online": { "type": "boolean" },
+        "community_confirmed_reports": { "type": "integer", "minimum": 0 },
+        "provenance": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Source observation mapping for auditability"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "scan_id": {
+      "type": "string",
+      "default": "",
+      "description": "Unique scan identifier (UUID string)"
+    },
+    "verdict": {
+      "$ref": "#/$defs/Verdict",
+      "description": "Authoritative overall threat verdict"
+    },
+    "risk_score": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "maximum": 100,
+      "default": null,
+      "description": "Deterministic risk score 0-100; null if inconclusive/failed without reliable score"
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Confidence in assessment based on evidence coverage and quality (0.0 to 1.0)"
+    },
+    "scoring_version": {
+      "type": "string",
+      "default": "trustlens-1.0",
+      "description": "Version of the scoring algorithm applied (e.g. 'trustlens-1.0')"
+    },
+    "checks_completed": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0,
+      "description": "Total count of security and intelligence checks completed"
+    },
+    "coverage": {
+      "$ref": "#/$defs/CoverageMap",
+      "description": "Coverage evaluation across all 4 core analysis layers"
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Finding"
+      },
+      "default": [],
+      "description": "Ordered list of security and threat findings"
+    },
+    "provider_checks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ProviderCheckResult"
+      },
+      "default": [],
+      "description": "Results of querying threat intelligence providers"
+    },
+    "features": {
+      "anyOf": [
+        { "$ref": "#/$defs/ExtractedFeatures" },
+        { "type": "null" }
+      ],
+      "default": null,
+      "description": "Extracted feature vector (internal intelligence signal)"
+    },
+    "ml_prediction": {
+      "anyOf": [
+        { "$ref": "#/$defs/MLPrediction" },
+        { "type": "null" }
+      ],
+      "default": null,
+      "description": "Optional ML classification signal"
+    },
+    "summary": {
+      "type": "string",
+      "description": "Human-readable executive narrative summary of assessment"
+    },
+    "evaluated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC timestamp when evaluation was completed"
+    }
+  },
+  "required": [
+    "verdict",
+    "confidence",
+    "scoring_version",
+    "checks_completed",
+    "coverage",
+    "findings",
+    "provider_checks",
+    "summary",
+    "evaluated_at"
+  ],
+  "additionalProperties": false
+}
+

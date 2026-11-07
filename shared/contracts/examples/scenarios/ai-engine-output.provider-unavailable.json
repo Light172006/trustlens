@@ -1,0 +1,192 @@
+{
+  "scan_id": "d78f341b-82a7-51eb-ace5-8d5aa0124004",
+  "verdict": "INCONCLUSIVE",
+  "risk_score": 8,
+  "confidence": 0.83,
+  "scoring_version": "trustlens-1.0",
+  "checks_completed": 3,
+  "coverage": {
+    "threat_intel": "partial",
+    "web_security": "complete",
+    "certificate": "complete",
+    "community": "complete"
+  },
+  "findings": [
+    {
+      "id": "e621af5e-0c36-4633-b94e-4baee3d6e475",
+      "code": "CSP_MISSING",
+      "category": "web_security",
+      "title": "Content Security Policy (CSP) missing",
+      "description": "The server does not define a Content-Security-Policy header to restrict content and script execution.",
+      "severity": "low",
+      "points": 4,
+      "evidence": {
+        "header": "content-security-policy",
+        "observed": false
+      },
+      "remediation": "Implement a Content Security Policy restricting script, object, frame, and other resource origins.",
+      "source": "trustlens_detection_rules_v1",
+      "created_at": "2026-11-07T08:01:56.260764Z"
+    },
+    {
+      "id": "12b53b05-44ae-43a4-8642-ecece9f7ef4c",
+      "code": "X_CONTENT_TYPE_OPTIONS_MISSING",
+      "category": "web_security",
+      "title": "X-Content-Type-Options header missing or invalid",
+      "description": "The response is missing 'X-Content-Type-Options: nosniff', which protects against MIME-type sniffing attacks.",
+      "severity": "low",
+      "points": 2,
+      "evidence": {
+        "header": "x-content-type-options",
+        "expected": "nosniff",
+        "observed": false
+      },
+      "remediation": "Add the 'X-Content-Type-Options: nosniff' HTTP header to all server responses.",
+      "source": "trustlens_detection_rules_v1",
+      "created_at": "2026-11-07T08:01:56.260764Z"
+    },
+    {
+      "id": "7e20e6a1-1e8a-47b9-aa11-a785afca952d",
+      "code": "PERMISSIONS_POLICY_MISSING",
+      "category": "web_security",
+      "title": "Permissions-Policy header missing",
+      "description": "The server does not define a Permissions-Policy header to restrict sensitive browser APIs.",
+      "severity": "low",
+      "points": 1,
+      "evidence": {
+        "header": "permissions-policy",
+        "observed": false
+      },
+      "remediation": "Add a Permissions-Policy header restricting sensitive browser features.",
+      "source": "trustlens_detection_rules_v1",
+      "created_at": "2026-11-07T08:01:56.260764Z"
+    },
+    {
+      "id": "ee1fe50d-26d1-419d-9186-fce2fe0c0018",
+      "code": "REFERRER_POLICY_MISSING",
+      "category": "web_security",
+      "title": "Referrer-Policy header missing",
+      "description": "The server does not specify a Referrer-Policy header to control referrer leakage.",
+      "severity": "low",
+      "points": 1,
+      "evidence": {
+        "header": "referrer-policy",
+        "observed": false
+      },
+      "remediation": "Configure Referrer-Policy to 'strict-origin-when-cross-origin' or 'no-referrer'.",
+      "source": "trustlens_detection_rules_v1",
+      "created_at": "2026-11-07T08:01:56.260764Z"
+    }
+  ],
+  "provider_checks": [
+    {
+      "provider": "openphish",
+      "result_status": "no_match",
+      "matched": false,
+      "details": {},
+      "checked_at": "2026-11-07T08:01:56.260764Z",
+      "latency_ms": null
+    },
+    {
+      "provider": "urlhaus",
+      "result_status": "unavailable",
+      "matched": false,
+      "details": {
+        "url_status": null
+      },
+      "checked_at": "2026-11-07T08:01:56.260764Z",
+      "latency_ms": null
+    }
+  ],
+  "features": {
+    "schema_version": "1.0.0",
+    "url_length": 30,
+    "host_length": 22,
+    "path_length": 0,
+    "query_length": 0,
+    "url_entropy": 3.9484,
+    "host_entropy": 3.6412,
+    "digit_count": 0,
+    "special_char_count": 5,
+    "suspicious_keyword_count": 0,
+    "subdomain_count": 1,
+    "is_ip_host": false,
+    "has_userinfo": false,
+    "is_punycode": false,
+    "has_homoglyphs": false,
+    "has_non_standard_port": false,
+    "is_https": true,
+    "redirect_count": 0,
+    "has_cross_domain_redirect": false,
+    "http_to_https_redirect": false,
+    "has_hsts": true,
+    "has_csp": false,
+    "has_x_content_type_options": false,
+    "has_referrer_policy": false,
+    "has_permissions_policy": false,
+    "insecure_cookie_count": 0,
+    "missing_httponly_cookie_count": 0,
+    "missing_samesite_cookie_count": 0,
+    "tls_valid": true,
+    "cert_chain_valid": true,
+    "cert_hostname_match": true,
+    "cert_is_expired": false,
+    "cert_days_until_expiry": 90,
+    "is_legacy_tls": false,
+    "domain_age_days": null,
+    "openphish_match": false,
+    "urlhaus_match": false,
+    "urlhaus_online": false,
+    "community_confirmed_reports": 0,
+    "provenance": {
+      "url_length": "canonical_url.length",
+      "host_length": "canonical_url.host.length",
+      "path_length": "canonical_url.path.length",
+      "query_length": "canonical_url.query.length",
+      "url_entropy": "canonical_url.entropy",
+      "host_entropy": "canonical_url.host.entropy",
+      "digit_count": "canonical_url.digits",
+      "special_char_count": "canonical_url.special_chars",
+      "suspicious_keyword_count": "canonical_url.keywords",
+      "subdomain_count": "host.subdomains",
+      "is_ip_host": "host.ip_detection",
+      "is_punycode": "host.idna_punycode",
+      "has_homoglyphs": "host.unicode_homoglyphs",
+      "has_non_standard_port": "canonical_url.port",
+      "has_userinfo": "inferred",
+      "is_https": "scheme",
+      "redirect_count": "http.redirect_count",
+      "has_cross_domain_redirect": "http.redirects.destination",
+      "http_to_https_redirect": "http.redirects.scheme_transition",
+      "has_hsts": "http.security_headers.strict-transport-security",
+      "has_csp": "http.security_headers.content-security-policy",
+      "has_x_content_type_options": "http.security_headers.x-content-type-options",
+      "has_referrer_policy": "http.security_headers.referrer-policy",
+      "has_permissions_policy": "http.security_headers.permissions-policy",
+      "insecure_cookie_count": "http.cookies.secure",
+      "missing_httponly_cookie_count": "http.cookies.httponly",
+      "missing_samesite_cookie_count": "http.cookies.samesite",
+      "tls_valid": "tls.valid",
+      "cert_chain_valid": "tls.chain_valid",
+      "cert_hostname_match": "tls.hostname_match",
+      "cert_is_expired": "tls.is_expired",
+      "cert_days_until_expiry": "tls.days_until_expiry",
+      "is_legacy_tls": "tls.protocol_version",
+      "domain_age_days": "domain_intelligence.domain_age_days",
+      "openphish_match": "threat_intelligence.openphish_match",
+      "urlhaus_match": "threat_intelligence.urlhaus_match",
+      "urlhaus_online": "threat_intelligence.urlhaus_url_status",
+      "community_confirmed_reports": "community_intelligence.confirmed_report_count"
+    }
+  },
+  "ml_prediction": {
+    "model_name": "logistic_regression",
+    "model_version": "1.0.0",
+    "malicious_probability": 0.0085,
+    "predicted_label": "legitimate",
+    "calibrated_confidence": 0.9829,
+    "top_contributing_features": []
+  },
+  "summary": "TrustLens could not collect sufficient reliable evidence to render a conclusive verdict. Do not interpret this result as safe. Incomplete or unavailable evidence layers: threat_intel.",
+  "evaluated_at": "2026-11-07T08:01:56.262763Z"
+}

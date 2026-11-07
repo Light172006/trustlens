@@ -1,0 +1,92 @@
+{
+  "scan_id": "e89a452c-93b8-62fc-bdf6-9e6bb1235005",
+  "original_url": "https://example.com/reset?token=supersecret123",
+  "canonical_url": "https://example.com/reset?token=supersecret123",
+  "host": "example.com",
+  "scheme": "https",
+  "is_sensitive": true,
+  "http": {
+    "status_code": 200,
+    "final_url": "https://example.com/reset?token=supersecret123",
+    "redirect_count": 0,
+    "redirects": [],
+    "security_headers": {
+      "strict-transport-security": "max-age=63072000"
+    },
+    "cookies": [],
+    "http_to_https_redirect": null,
+    "response_time_ms": 88.0,
+    "fetched_at": "2026-11-07T06:25:04Z"
+  },
+  "tls": {
+    "valid": true,
+    "chain_valid": true,
+    "hostname_match": true,
+    "days_until_expiry": 90,
+    "is_expired": false,
+    "expires_soon": false,
+    "protocol_version": "TLSv1.3",
+    "cipher_suite": null,
+    "subject_cn": "example.com",
+    "issuer": "CN=Example CA",
+    "san_dns": [
+      "example.com"
+    ],
+    "sct_present": false,
+    "certificate_details": null
+  },
+  "domain_intelligence": null,
+  "threat_intelligence": {
+    "openphish_match": false,
+    "openphish_status": "no_match",
+    "urlhaus_match": null,
+    "urlhaus_status": "skipped_sensitive_url",
+    "urlhaus_url_status": null,
+    "provider_checks": [
+      {
+        "provider": "openphish",
+        "result_status": "no_match",
+        "matched": false,
+        "details": {
+          "source": "local_feed_cache"
+        },
+        "checked_at": "2026-11-07T06:25:02Z",
+        "latency_ms": 5.0
+      },
+      {
+        "provider": "urlhaus",
+        "result_status": "skipped_sensitive_url",
+        "matched": false,
+        "details": {
+          "reason": "target_url_marked_sensitive"
+        },
+        "checked_at": "2026-11-07T06:25:02Z",
+        "latency_ms": 0.0
+      }
+    ]
+  },
+  "community_intelligence": null,
+  "scanner_execution": {
+    "status": "succeeded",
+    "started_at": "2026-11-07T06:25:00Z",
+    "completed_at": "2026-11-07T06:25:06Z",
+    "duration_ms": 6000.0,
+    "checks_attempted": [
+      "dns_resolution",
+      "http_fetch",
+      "tls_handshake",
+      "threat_feeds:local"
+    ],
+    "checks_completed": [
+      "dns_resolution",
+      "http_fetch",
+      "tls_handshake",
+      "threat_feeds:local"
+    ],
+    "checks_unavailable": [
+      "threat_feeds:external_skipped"
+    ],
+    "failure_code": null,
+    "failure_message": null
+  }
+}

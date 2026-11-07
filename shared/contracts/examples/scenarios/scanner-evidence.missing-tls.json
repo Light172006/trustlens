@@ -1,0 +1,68 @@
+{
+  "scan_id": "b56d12f9-60e5-4fc9-8ac3-6b3ee80f2002",
+  "original_url": "http://insecure-example.org/article",
+  "canonical_url": "http://insecure-example.org/article",
+  "host": "insecure-example.org",
+  "scheme": "http",
+  "is_sensitive": false,
+  "http": {
+    "status_code": 200,
+    "final_url": "http://insecure-example.org/article",
+    "redirect_count": 0,
+    "redirects": [],
+    "security_headers": {},
+    "cookies": [],
+    "http_to_https_redirect": false,
+    "response_time_ms": 150.0,
+    "fetched_at": "2026-11-07T05:55:05Z"
+  },
+  "tls": null,
+  "domain_intelligence": null,
+  "threat_intelligence": {
+    "openphish_match": false,
+    "openphish_status": "no_match",
+    "urlhaus_match": false,
+    "urlhaus_status": "no_match",
+    "urlhaus_url_status": null,
+    "provider_checks": [
+      {
+        "provider": "openphish",
+        "result_status": "no_match",
+        "matched": false,
+        "details": {},
+        "checked_at": "2026-11-07T05:55:02Z",
+        "latency_ms": 20.0
+      },
+      {
+        "provider": "urlhaus",
+        "result_status": "no_match",
+        "matched": false,
+        "details": {},
+        "checked_at": "2026-11-07T05:55:03Z",
+        "latency_ms": 35.0
+      }
+    ]
+  },
+  "community_intelligence": null,
+  "scanner_execution": {
+    "status": "succeeded",
+    "started_at": "2026-11-07T05:55:00Z",
+    "completed_at": "2026-11-07T05:55:08Z",
+    "duration_ms": 8000.0,
+    "checks_attempted": [
+      "dns_resolution",
+      "http_fetch",
+      "threat_feeds"
+    ],
+    "checks_completed": [
+      "dns_resolution",
+      "http_fetch",
+      "threat_feeds"
+    ],
+    "checks_unavailable": [
+      "tls_handshake"
+    ],
+    "failure_code": null,
+    "failure_message": null
+  }
+}

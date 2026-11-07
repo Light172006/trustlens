@@ -1,0 +1,268 @@
+{
+  "scan_id": "c67e230a-71f6-40da-9bd4-7c4ff9013003",
+  "verdict": "MALICIOUS",
+  "risk_score": 100,
+  "confidence": 0.95,
+  "scoring_version": "trustlens-1.0",
+  "checks_completed": 4,
+  "coverage": {
+    "threat_intel": "complete",
+    "web_security": "complete",
+    "certificate": "not_applicable",
+    "community": "complete"
+  },
+  "findings": [
+    {
+      "id": "ebd4291c-185e-41d1-85ac-3449853a17fa",
+      "code": "OPENPHISH_URL_MATCH",
+      "category": "threat_intel",
+      "title": "Known phishing URL verified by OpenPhish",
+      "description": "The submitted URL matches an active phishing indicator catalogued in the OpenPhish threat intelligence feed.",
+      "severity": "critical",
+      "points": 100,
+      "evidence": {
+        "provider": "openphish",
+        "matched": true,
+        "url": "http://secure-paypal-login-verify.com/account/login"
+      },
+      "remediation": "Do not visit, submit credentials, or interact with this URL. It is an active phishing threat.",
+      "source": "trustlens_detection_rules_v1",
+      "created_at": "2026-11-07T08:01:56.256763Z"
+    },
+    {
+      "id": "7fbdb417-61e3-4523-8d28-28a2f221cbda",
+      "code": "DOMAIN_RECENTLY_REGISTERED",
+      "category": "domain_intelligence",
+      "title": "Recently registered domain",
+      "description": "The domain was registered 2 days ago. Newly registered domains are disproportionately leveraged for rapid phishing campaigns.",
+      "severity": "high",
+      "points": 15,
+      "evidence": {
+        "domain_age_days": 2
+      },
+      "remediation": "Verify the organization through independent channels before entering credentials or making payments.",
+      "source": "trustlens_detection_rules_v1",
+      "created_at": "2026-11-07T08:01:56.256763Z"
+    },
+    {
+      "id": "7f1905ac-dcce-4601-b46f-3cf7bd1f4375",
+      "code": "HTTP_NO_HTTPS_REDIRECT",
+      "category": "web_security",
+      "title": "Plain HTTP target does not redirect to HTTPS",
+      "description": "The website serves content over unencrypted HTTP without redirecting to HTTPS.",
+      "severity": "low",
+      "points": 5,
+      "evidence": {
+        "initial_scheme": "http",
+        "redirect_to_https": false,
+        "final_url": "http://secure-paypal-login-verify.com/account/login"
+      },
+      "remediation": "Enforce an immediate HTTP 301 redirect to HTTPS for all web traffic.",
+      "source": "trustlens_detection_rules_v1",
+      "created_at": "2026-11-07T08:01:56.256763Z"
+    },
+    {
+      "id": "9aadd8f0-bcf5-4299-94be-6256babea56f",
+      "code": "HSTS_MISSING",
+      "category": "web_security",
+      "title": "HTTP Strict Transport Security (HSTS) missing",
+      "description": "The server does not send a Strict-Transport-Security response header, allowing potential protocol downgrade attacks.",
+      "severity": "low",
+      "points": 5,
+      "evidence": {
+        "header": "strict-transport-security",
+        "observed": false
+      },
+      "remediation": "Configure the Strict-Transport-Security header with max-age of at least 31536000 seconds.",
+      "source": "trustlens_detection_rules_v1",
+      "created_at": "2026-11-07T08:01:56.256763Z"
+    },
+    {
+      "id": "e993d410-7f17-4ab0-9d9e-29a4664e7823",
+      "code": "CSP_MISSING",
+      "category": "web_security",
+      "title": "Content Security Policy (CSP) missing",
+      "description": "The server does not define a Content-Security-Policy header to restrict content and script execution.",
+      "severity": "low",
+      "points": 4,
+      "evidence": {
+        "header": "content-security-policy",
+        "observed": false
+      },
+      "remediation": "Implement a Content Security Policy restricting script, object, frame, and other resource origins.",
+      "source": "trustlens_detection_rules_v1",
+      "created_at": "2026-11-07T08:01:56.256763Z"
+    },
+    {
+      "id": "65382486-d7bb-489c-8e87-1ac0553202d8",
+      "code": "X_CONTENT_TYPE_OPTIONS_MISSING",
+      "category": "web_security",
+      "title": "X-Content-Type-Options header missing or invalid",
+      "description": "The response is missing 'X-Content-Type-Options: nosniff', which protects against MIME-type sniffing attacks.",
+      "severity": "low",
+      "points": 2,
+      "evidence": {
+        "header": "x-content-type-options",
+        "expected": "nosniff",
+        "observed": false
+      },
+      "remediation": "Add the 'X-Content-Type-Options: nosniff' HTTP header to all server responses.",
+      "source": "trustlens_detection_rules_v1",
+      "created_at": "2026-11-07T08:01:56.256763Z"
+    },
+    {
+      "id": "9902b553-09fb-457e-a8b9-5edd19fe4808",
+      "code": "PERMISSIONS_POLICY_MISSING",
+      "category": "web_security",
+      "title": "Permissions-Policy header missing",
+      "description": "The server does not define a Permissions-Policy header to restrict sensitive browser APIs.",
+      "severity": "low",
+      "points": 1,
+      "evidence": {
+        "header": "permissions-policy",
+        "observed": false
+      },
+      "remediation": "Add a Permissions-Policy header restricting sensitive browser features.",
+      "source": "trustlens_detection_rules_v1",
+      "created_at": "2026-11-07T08:01:56.256763Z"
+    },
+    {
+      "id": "a84e059b-c239-4e24-aa00-0e06d1b94156",
+      "code": "REFERRER_POLICY_MISSING",
+      "category": "web_security",
+      "title": "Referrer-Policy header missing",
+      "description": "The server does not specify a Referrer-Policy header to control referrer leakage.",
+      "severity": "low",
+      "points": 1,
+      "evidence": {
+        "header": "referrer-policy",
+        "observed": false
+      },
+      "remediation": "Configure Referrer-Policy to 'strict-origin-when-cross-origin' or 'no-referrer'.",
+      "source": "trustlens_detection_rules_v1",
+      "created_at": "2026-11-07T08:01:56.256763Z"
+    }
+  ],
+  "provider_checks": [
+    {
+      "provider": "openphish",
+      "result_status": "match",
+      "matched": true,
+      "details": {},
+      "checked_at": "2026-11-07T08:01:56.256763Z",
+      "latency_ms": null
+    },
+    {
+      "provider": "urlhaus",
+      "result_status": "no_match",
+      "matched": false,
+      "details": {
+        "url_status": null
+      },
+      "checked_at": "2026-11-07T08:01:56.256763Z",
+      "latency_ms": null
+    }
+  ],
+  "features": {
+    "schema_version": "1.0.0",
+    "url_length": 51,
+    "host_length": 30,
+    "path_length": 14,
+    "query_length": 0,
+    "url_entropy": 4.2991,
+    "host_entropy": 4.0566,
+    "digit_count": 0,
+    "special_char_count": 8,
+    "suspicious_keyword_count": 5,
+    "subdomain_count": 0,
+    "is_ip_host": false,
+    "has_userinfo": false,
+    "is_punycode": false,
+    "has_homoglyphs": false,
+    "has_non_standard_port": false,
+    "is_https": false,
+    "redirect_count": 0,
+    "has_cross_domain_redirect": false,
+    "http_to_https_redirect": false,
+    "has_hsts": false,
+    "has_csp": false,
+    "has_x_content_type_options": false,
+    "has_referrer_policy": false,
+    "has_permissions_policy": false,
+    "insecure_cookie_count": 0,
+    "missing_httponly_cookie_count": 0,
+    "missing_samesite_cookie_count": 0,
+    "tls_valid": null,
+    "cert_chain_valid": null,
+    "cert_hostname_match": null,
+    "cert_is_expired": null,
+    "cert_days_until_expiry": null,
+    "is_legacy_tls": null,
+    "domain_age_days": 2,
+    "openphish_match": true,
+    "urlhaus_match": false,
+    "urlhaus_online": false,
+    "community_confirmed_reports": 0,
+    "provenance": {
+      "url_length": "canonical_url.length",
+      "host_length": "canonical_url.host.length",
+      "path_length": "canonical_url.path.length",
+      "query_length": "canonical_url.query.length",
+      "url_entropy": "canonical_url.entropy",
+      "host_entropy": "canonical_url.host.entropy",
+      "digit_count": "canonical_url.digits",
+      "special_char_count": "canonical_url.special_chars",
+      "suspicious_keyword_count": "canonical_url.keywords",
+      "subdomain_count": "host.subdomains",
+      "is_ip_host": "host.ip_detection",
+      "is_punycode": "host.idna_punycode",
+      "has_homoglyphs": "host.unicode_homoglyphs",
+      "has_non_standard_port": "canonical_url.port",
+      "has_userinfo": "inferred",
+      "is_https": "scheme",
+      "redirect_count": "http.redirect_count",
+      "has_cross_domain_redirect": "http.redirects.destination",
+      "http_to_https_redirect": "http.redirects.scheme_transition",
+      "has_hsts": "http.security_headers.strict-transport-security",
+      "has_csp": "http.security_headers.content-security-policy",
+      "has_x_content_type_options": "http.security_headers.x-content-type-options",
+      "has_referrer_policy": "http.security_headers.referrer-policy",
+      "has_permissions_policy": "http.security_headers.permissions-policy",
+      "insecure_cookie_count": "http.cookies.secure",
+      "missing_httponly_cookie_count": "http.cookies.httponly",
+      "missing_samesite_cookie_count": "http.cookies.samesite",
+      "tls_valid": "tls.valid",
+      "cert_chain_valid": "tls.chain_valid",
+      "cert_hostname_match": "tls.hostname_match",
+      "cert_is_expired": "tls.is_expired",
+      "cert_days_until_expiry": "tls.days_until_expiry",
+      "is_legacy_tls": "tls.protocol_version",
+      "domain_age_days": "domain_intelligence.domain_age_days",
+      "openphish_match": "threat_intelligence.openphish_match",
+      "urlhaus_match": "threat_intelligence.urlhaus_match",
+      "urlhaus_online": "threat_intelligence.urlhaus_url_status",
+      "community_confirmed_reports": "community_intelligence.confirmed_report_count"
+    }
+  },
+  "ml_prediction": {
+    "model_name": "logistic_regression",
+    "model_version": "1.0.0",
+    "malicious_probability": 0.996,
+    "predicted_label": "malicious",
+    "calibrated_confidence": 0.992,
+    "top_contributing_features": [
+      {
+        "feature": "openphish_match",
+        "value": true,
+        "impact": "critical"
+      },
+      {
+        "feature": "suspicious_keyword_count",
+        "value": 5,
+        "impact": "medium"
+      }
+    ]
+  },
+  "summary": "Do not visit, download files, execute payments, or enter credentials on this URL. Active threat intelligence or verified community reports confirmed this site as malicious. Key reason(s): Known phishing URL verified by OpenPhish.",
+  "evaluated_at": "2026-11-07T08:01:56.258765Z"
+}

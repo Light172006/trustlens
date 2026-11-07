@@ -1,0 +1,36 @@
+{
+  "evidence": {
+    "scan_id": "c67e230a-71f6-40da-9bd4-7c4ff9013003",
+    "original_url": "http://secure-paypal-login-verify.com/account/login",
+    "canonical_url": "http://secure-paypal-login-verify.com/account/login",
+    "host": "secure-paypal-login-verify.com",
+    "scheme": "http",
+    "is_sensitive": false,
+    "http": {
+      "status_code": 200,
+      "final_url": "http://secure-paypal-login-verify.com/account/login",
+      "redirect_count": 0,
+      "redirects": [],
+      "security_headers": {},
+      "cookies": [],
+      "response_time_ms": 210.0
+    },
+    "tls": null,
+    "domain_intelligence": {
+      "domain_age_days": 2,
+      "registrar": "NameCheap",
+      "created_date": null,
+      "nameservers": []
+    },
+    "threat_intelligence": {
+      "openphish_match": true,
+      "openphish_status": "match",
+      "urlhaus_match": false,
+      "urlhaus_status": "no_match",
+      "urlhaus_url_status": null
+    },
+    "community_intelligence": null
+  },
+  "query_providers": false,
+  "is_scan_failed": false
+}
