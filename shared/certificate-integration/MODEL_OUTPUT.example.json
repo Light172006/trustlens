@@ -1,0 +1,10 @@
+{
+  "predicted_class": "COMPLIANT",
+  "compliance_probability": 1.0,
+  "is_anomaly": false,
+  "anomaly_score": 0.1474,
+  "confidence": 1.0,
+  "advisory_notes": "Advisory signal: predicted COMPLIANT (100.0% probability). Standard structural profile. Note: This signal is advisory and does NOT supersede deterministic RFC validation.",
+  "model_version": "1.0.0",
+  "is_advisory": true
+}

@@ -1,0 +1,145 @@
+{
+  "model_name": "TrustLens-Certificate-Policy-Classifier",
+  "model_version": "1.0.0",
+  "model_type": "Advisory Surrogate / Policy Profile Classifier",
+  "champion_algorithm": "logistic_regression",
+  "trained_timestamp": "2026-11-08T10:12:17.943164+00:00",
+  "split_strategy": "spki_disjoint",
+  "zero_leakage_guarantee": "Zero SPKI public-key overlap and zero fingerprint overlap between train, val, and test splits.",
+  "feature_schema": {
+    "numeric_features": [
+      "key_size_bits",
+      "validity_duration_days",
+      "san_count",
+      "is_wildcard",
+      "has_scts",
+      "sct_count",
+      "extension_count",
+      "key_usage_count",
+      "extended_key_usage_count",
+      "is_ca",
+      "is_self_signed",
+      "subject_dn_length"
+    ],
+    "categorical_features": [
+      "key_algorithm",
+      "ec_curve",
+      "signature_algorithm"
+    ]
+  },
+  "candidate_comparisons": {
+    "logistic_regression": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "macro_f1": 1.0,
+      "weighted_f1": 1.0,
+      "confusion_matrix": {
+        "true_negative": 619,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_positive": 3262
+      },
+      "roc_auc": 1.0,
+      "pr_auc": 1.0,
+      "brier_score": 5.656851102291589e-06
+    },
+    "random_forest": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "macro_f1": 1.0,
+      "weighted_f1": 1.0,
+      "confusion_matrix": {
+        "true_negative": 619,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_positive": 3262
+      },
+      "roc_auc": 0.9999999999999999,
+      "pr_auc": 1.0,
+      "brier_score": 8.910023073678128e-06
+    },
+    "hist_gradient_boosting": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "macro_f1": 1.0,
+      "weighted_f1": 1.0,
+      "confusion_matrix": {
+        "true_negative": 619,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_positive": 3262
+      },
+      "roc_auc": 1.0,
+      "pr_auc": 1.0,
+      "brier_score": 4.796669026841464e-10
+    }
+  },
+  "champion_metrics": {
+    "train": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "macro_f1": 1.0,
+      "weighted_f1": 1.0,
+      "confusion_matrix": {
+        "true_negative": 2938,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_positive": 15158
+      },
+      "roc_auc": 1.0,
+      "pr_auc": 1.0,
+      "brier_score": 4.166005130103419e-06
+    },
+    "validation": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "macro_f1": 1.0,
+      "weighted_f1": 1.0,
+      "confusion_matrix": {
+        "true_negative": 619,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_positive": 3262
+      },
+      "roc_auc": 1.0,
+      "pr_auc": 1.0,
+      "brier_score": 5.656851102291589e-06
+    },
+    "locked_test": {
+      "accuracy": 0.9997405293201869,
+      "precision": 0.9996916435399321,
+      "recall": 1.0,
+      "macro_f1": 0.999514068253615,
+      "weighted_f1": 0.9997404432460452,
+      "confusion_matrix": {
+        "true_negative": 611,
+        "false_positive": 1,
+        "false_negative": 0,
+        "true_positive": 3242
+      },
+      "roc_auc": 0.9999994959941616,
+      "pr_auc": 0.9999999048869648,
+      "brier_score": 0.00021765399192460755
+    },
+    "generalization_gap": {
+      "train_to_val_macro_f1_gap": 0.0,
+      "train_to_test_macro_f1_gap": 0.00048593174638500436,
+      "val_to_test_macro_f1_gap": 0.00048593174638500436
+    }
+  },
+  "artifacts": {
+    "champion_model_file": "champion_model.joblib",
+    "anomaly_detector_file": "anomaly_detector.joblib"
+  },
+  "operational_role": "ADVISORY ONLY. Must NOT override deterministic PKI validation results (expired, untrusted root, hostname mismatch, revoked).",
+  "known_limitations": [
+    "Trained exclusively on raw structural parameters without target leakage.",
+    "Serves as a rapid auxiliary policy filter and anomalous profile detector.",
+    "Ground truth labels reflect CA/B Forum Baseline Requirements v2.0.8 policy rules."
+  ]
+}

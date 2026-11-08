@@ -1,0 +1,148 @@
+{
+  "certificate_sha256": "0a7976204137da6b50dbcff396ad5102a27b68d1820b29449dff352706782275",
+  "subject_dn": "2.5.4.5=1724531739798465,O=Google Certificate Transparency,L=London,C=GB",
+  "issuer_dn": "2.5.4.5=1724531739713559,O=Google Certificate Transparency (Precert Signing),L=London,C=GB",
+  "verdict": "DISTRUSTED",
+  "trust_score": 0,
+  "confidence": 0.7,
+  "scoring_version": "cert_v1.0.0",
+  "checks_completed": 6,
+  "findings": [
+    {
+      "code": "RULE_EXPIRED",
+      "title": "Certificate Has Expired",
+      "severity": "CRITICAL",
+      "description": "Certificate expired 92.41 days ago. Browsers will block connections with SEC_ERROR_EXPIRED_CERTIFICATE.",
+      "evidence": {
+        "days_expired": 92.41
+      },
+      "recommendation": "Renew and install an active certificate immediately.",
+      "score_deduction": 90
+    },
+    {
+      "code": "RULE_INCOMPLETE_CHAIN",
+      "title": "Incomplete Intermediate Certificate Chain",
+      "severity": "HIGH",
+      "description": "One or more intermediate CA certificates were omitted by the TLS server. Clients without cached intermediates will fail validation.",
+      "evidence": {
+        "chain_length": 1,
+        "validation_errors": [
+          "MISSING_INTERMEDIATE_CERTIFICATE"
+        ]
+      },
+      "recommendation": "Configure the TLS server to bundle all required intermediate certificates.",
+      "score_deduction": 45
+    },
+    {
+      "code": "RULE_CABF_MAX_VALIDITY_EXCEEDED",
+      "title": "Validity Duration Exceeds CA/Browser Forum Limit",
+      "severity": "MEDIUM",
+      "description": "Subscriber certificate validity duration (713 days) exceeds the applicable CA/B Forum Baseline Requirements limit (maximum 398 days for certificates issued on or after the relevant policy date).",
+      "evidence": {
+        "validity_duration_days": 713.2477,
+        "max_allowed_days": 398.0,
+        "policy_version": "2.3.1"
+      },
+      "recommendation": "Reissue certificate with validity duration <= 398 days.",
+      "score_deduction": 25
+    },
+    {
+      "code": "RULE_HOSTNAME_NOT_CHECKED",
+      "title": "Service Identity Not Evaluated",
+      "severity": "INFO",
+      "description": "No target hostname was supplied by the caller. Service identity authentication was skipped per RFC 9525.",
+      "evidence": null,
+      "recommendation": "Provide target_hostname context to authenticate certificate against the TLS endpoint domain.",
+      "score_deduction": 0
+    },
+    {
+      "code": "RULE_NO_EMBEDDED_SCTS",
+      "title": "No Embedded Certificate Transparency Timestamps",
+      "severity": "INFO",
+      "description": "Certificate does not contain embedded SCTs (may be delivered via TLS extension or OCSP staple).",
+      "evidence": null,
+      "recommendation": null,
+      "score_deduction": 0
+    },
+    {
+      "code": "RULE_REVOCATION_NOT_CHECKED",
+      "title": "Revocation Status Not Checked",
+      "severity": "INFO",
+      "description": "No live OCSP query or CRL check was performed for this certificate.",
+      "evidence": null,
+      "recommendation": "Enable OCSP / CRL validation to verify certificate has not been revoked.",
+      "score_deduction": 0
+    }
+  ],
+  "features": {
+    "public_key_algorithm": "RSA",
+    "key_size_bits": 2048,
+    "is_rsa": true,
+    "is_ecdsa": false,
+    "is_ed25519": false,
+    "is_weak_key": false,
+    "signature_algorithm": "sha256WithRSAEncryption",
+    "is_sha1_signature": false,
+    "is_md5_signature": false,
+    "is_secure_signature": true,
+    "validity_duration_days": 713.2477,
+    "days_since_issuance": 805.66,
+    "days_until_expiry": -92.41,
+    "is_expired": true,
+    "is_not_yet_valid": false,
+    "is_short_lived": false,
+    "has_san": true,
+    "san_count": 1,
+    "has_wildcard_san": false,
+    "has_ip_san": false,
+    "matches_tested_hostname": null,
+    "is_ca": false,
+    "is_self_signed": false,
+    "chain_length": 1,
+    "is_chain_complete": false,
+    "has_trusted_anchor": false,
+    "has_crl_distribution_points": false,
+    "has_ocsp_aia": false,
+    "has_scts": false,
+    "sct_count": 0,
+    "is_cabf_validity_compliant": false,
+    "cabf_max_allowed_validity_days": 398.0,
+    "policy_applicability": "APPLICABLE",
+    "is_ca_constraint_compliant": true,
+    "is_eku_compliant": true
+  },
+  "policy_evaluation": {
+    "policy_name": "CA/Browser Forum Baseline Requirements for TLS Server Certificates",
+    "policy_version": "2.3.1",
+    "certificate_profile": "TLS_SUBSCRIBER",
+    "applicability": "APPLICABLE",
+    "applicable_rule_id": "CABF_398_DAYS",
+    "certificate_issuance_date": "2024-08-24T20:35:39+00:00",
+    "evaluation_date": "2026-11-08T12:25:03.240853+00:00",
+    "max_validity_days_allowed": 398.0,
+    "actual_validity_days": 713.2477,
+    "validity_compliant": false,
+    "cryptographic_compliant": true,
+    "overall_compliant": false,
+    "evaluation_notes": "Subscriber certificate evaluated against CABF_398_DAYS (allowed: <= 398 days, actual: 713.2 days)."
+  },
+  "ml_advisory": {
+    "predicted_class": "NON_COMPLIANT",
+    "compliance_probability": 0.0004,
+    "is_anomaly": false,
+    "anomaly_score": 0.0472,
+    "confidence": 0.9993,
+    "advisory_notes": "Advisory signal: predicted NON_COMPLIANT (0.0% probability). Standard structural profile. Note: This signal is advisory and does NOT supersede deterministic RFC validation.",
+    "model_version": "1.0.0",
+    "is_advisory": true
+  },
+  "recommendations": [
+    "Renew and install an active certificate immediately.",
+    "Configure the TLS server to bundle all required intermediate certificates.",
+    "Reissue certificate with validity duration <= 398 days.",
+    "Provide target_hostname context to authenticate certificate against the TLS endpoint domain.",
+    "Enable OCSP / CRL validation to verify certificate has not been revoked."
+  ],
+  "summary": "Certificate '2.5.4.5=1724531739798465,O=Google Certificate Transparency,L=London,C=GB' is DISTRUSTED (Score: 0/100). 1 critical and 1 high-severity defect(s) identified. Primary issue: Certificate Has Expired.",
+  "evaluated_at": "2026-11-08T12:25:03.240853Z"
+}

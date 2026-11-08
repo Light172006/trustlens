@@ -1,0 +1,198 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://trustlens.io/schemas/certificate_record.schema.json",
+  "title": "TrustLensCertificateRecord",
+  "description": "Standardized canonical schema for parsed X.509 certificates and precertificates.",
+  "type": "object",
+  "required": [
+    "sha256_fingerprint",
+    "serial_number",
+    "version",
+    "certificate_type",
+    "subject_dn",
+    "issuer_dn",
+    "not_before",
+    "not_after",
+    "validity_duration_seconds",
+    "public_key_algorithm",
+    "key_size_bits",
+    "spki_sha256_fingerprint",
+    "signature_algorithm",
+    "source_name",
+    "dataset_ingestion_time",
+    "parsing_version",
+    "record_quality_status",
+    "data_origin"
+  ],
+  "properties": {
+    "sha256_fingerprint": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "sha1_fingerprint": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "serial_number": { "type": "string" },
+    "serial_number_int": { "type": "string" },
+    "der_base64": { "type": "string" },
+    "pem": { "type": "string" },
+    "version": { "type": "integer", "enum": [1, 2, 3] },
+    "certificate_type": {
+      "type": "string",
+      "enum": ["LEAF", "INTERMEDIATE", "ROOT", "PRECERTIFICATE", "UNKNOWN"]
+    },
+    "subject": {
+      "type": "object",
+      "properties": {
+        "common_name": { "type": ["string", "null"] },
+        "organization": { "type": ["string", "null"] },
+        "organizational_unit": { "type": ["string", "null"] },
+        "country": { "type": ["string", "null"] },
+        "state_or_province": { "type": ["string", "null"] },
+        "locality": { "type": ["string", "null"] },
+        "subject_dn": { "type": "string" }
+      },
+      "required": ["subject_dn"]
+    },
+    "subject_dn": { "type": "string" },
+    "issuer": {
+      "type": "object",
+      "properties": {
+        "common_name": { "type": ["string", "null"] },
+        "organization": { "type": ["string", "null"] },
+        "issuer_dn": { "type": "string" },
+        "issuer_sha256_fingerprint": { "type": ["string", "null"] },
+        "authority_key_identifier": { "type": ["string", "null"] }
+      },
+      "required": ["issuer_dn"]
+    },
+    "issuer_dn": { "type": "string" },
+    "domain_identity": {
+      "type": "object",
+      "properties": {
+        "subject_alternative_names": { "type": "array", "items": { "type": "string" } },
+        "dns_san_entries": { "type": "array", "items": { "type": "string" } },
+        "ip_san_entries": { "type": "array", "items": { "type": "string" } },
+        "email_san_entries": { "type": "array", "items": { "type": "string" } },
+        "wildcard_san_indicators": { "type": "array", "items": { "type": "string" } },
+        "has_wildcard": { "type": "boolean" },
+        "san_count": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "validity": {
+      "type": "object",
+      "properties": {
+        "not_before": { "type": "string", "format": "date-time" },
+        "not_after": { "type": "string", "format": "date-time" },
+        "issuance_timestamp": { "type": ["string", "null"] },
+        "validity_duration_seconds": { "type": "integer" },
+        "validity_duration_days": { "type": "number" },
+        "observation_timestamp": { "type": ["string", "null"] }
+      },
+      "required": ["not_before", "not_after", "validity_duration_seconds"]
+    },
+    "not_before": { "type": "string", "format": "date-time" },
+    "not_after": { "type": "string", "format": "date-time" },
+    "validity_duration_seconds": { "type": "integer" },
+    "validity_duration_days": { "type": "number" },
+    "public_key": {
+      "type": "object",
+      "properties": {
+        "algorithm": { "type": "string" },
+        "key_size_bits": { "type": "integer", "minimum": 0 },
+        "rsa_exponent": { "type": ["integer", "null"] },
+        "ec_curve": { "type": ["string", "null"] },
+        "spki_sha256_fingerprint": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "security_classification": {
+          "type": "string",
+          "enum": ["SECURE", "ACCEPTABLE", "DEPRECATED", "INSECURE"]
+        }
+      },
+      "required": ["algorithm", "key_size_bits", "spki_sha256_fingerprint", "security_classification"]
+    },
+    "public_key_algorithm": { "type": "string" },
+    "key_size_bits": { "type": "integer" },
+    "spki_sha256_fingerprint": { "type": "string" },
+    "signature": {
+      "type": "object",
+      "properties": {
+        "algorithm": { "type": "string" },
+        "hash_algorithm": { "type": ["string", "null"] },
+        "security_classification": {
+          "type": "string",
+          "enum": ["SECURE", "ACCEPTABLE", "DEPRECATED", "INSECURE"]
+        }
+      },
+      "required": ["algorithm", "security_classification"]
+    },
+    "signature_algorithm": { "type": "string" },
+    "extensions": {
+      "type": "object",
+      "properties": {
+        "basic_constraints": {
+          "type": "object",
+          "properties": {
+            "is_ca": { "type": "boolean" },
+            "path_length": { "type": ["integer", "null"] }
+          },
+          "required": ["is_ca"]
+        },
+        "key_usage": { "type": "array", "items": { "type": "string" } },
+        "extended_key_usage": { "type": "array", "items": { "type": "string" } },
+        "subject_key_identifier": { "type": ["string", "null"] },
+        "authority_key_identifier": { "type": ["string", "null"] },
+        "certificate_policies": { "type": "array", "items": { "type": "string" } },
+        "crl_distribution_points": { "type": "array", "items": { "type": "string" } },
+        "authority_information_access": {
+          "type": "object",
+          "properties": {
+            "ocsp_urls": { "type": "array", "items": { "type": "string" } },
+            "ca_issuers_urls": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "tls_features": { "type": "array", "items": { "type": "string" } },
+        "signed_certificate_timestamps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "log_id": { "type": "string" },
+              "timestamp": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "transparency": {
+      "type": "object",
+      "properties": {
+        "ct_log_id": { "type": ["string", "null"] },
+        "ct_entry_index": { "type": ["integer", "null"] },
+        "sct_timestamp": { "type": ["string", "null"] },
+        "entry_type": { "type": "string", "enum": ["CERTIFICATE", "PRECERTIFICATE", "NOT_LOGGED"] }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "properties": {
+        "source_name": { "type": "string" },
+        "source_record_id": { "type": "string" },
+        "original_retrieval_time": { "type": "string" },
+        "source_timestamp": { "type": "string" },
+        "dataset_ingestion_time": { "type": "string" },
+        "parsing_version": { "type": "string" },
+        "record_quality_status": { "type": "string" },
+        "data_origin": { "type": "string", "enum": ["REAL_WORLD_PRODUCTION", "SYNTHETIC_TEST_FIXTURE"] }
+      },
+      "required": ["source_name", "dataset_ingestion_time", "parsing_version", "data_origin"]
+    },
+    "source_name": { "type": "string" },
+    "dataset_ingestion_time": { "type": "string" },
+    "parsing_version": { "type": "string" },
+    "record_quality_status": {
+      "type": "string",
+      "enum": ["VALID_PARSED", "PARSE_WARNING", "MALFORMED"]
+    },
+    "data_origin": {
+      "type": "string",
+      "enum": ["REAL_WORLD_PRODUCTION", "SYNTHETIC_TEST_FIXTURE"]
+    }
+  },
+  "additionalProperties": false
+}
+

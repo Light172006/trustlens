@@ -1,0 +1,313 @@
+version: "1.0.0"
+retrieval_timestamp: "2026-11-08T13:45:00Z"
+
+sources:
+  - source_id: "google_ct_argon_2026"
+    source_name: "Google Argon 2026h2 Certificate Transparency Log"
+    official_website: "https://ct.googleapis.com/logs/us1/argon2026h2/"
+    data_type: "CERTIFICATE_TRANSPARENCY_LOG"
+    available_fields:
+      - "leaf_input"
+      - "extra_data"
+      - "sct_timestamp"
+      - "entry_type"
+      - "tree_size"
+    collection_method: "RFC_6962_GET_ENTRIES_HTTP"
+    format: "JSON_AND_BASE64_DER"
+    update_frequency: "REALTIME_STREAMING"
+    license_or_usage_terms: "Google Terms of Service and CT Operator Policy; open RFC 6962 API access"
+    attribution_requirements: "Attribution to Google Certificate Transparency log infrastructure"
+    bulk_retrieval_permitted: true
+    derived_dataset_creation_permitted: true
+    ml_research_permitted: true
+    known_limitations: "Rate limited to prevent DoS; returns precertificates and certificates mixed; shards by expiry year"
+    retrieval_timestamp: "2026-11-08T13:45:00Z"
+    verification_status: "VERIFIED_ACTIVE"
+
+  - source_id: "cloudflare_ct_nimbus_2026"
+    source_name: "Cloudflare Nimbus 2026 Certificate Transparency Log"
+    official_website: "https://ct.cloudflare.com/logs/nimbus2026/"
+    data_type: "CERTIFICATE_TRANSPARENCY_LOG"
+    available_fields:
+      - "leaf_input"
+      - "extra_data"
+      - "sct_timestamp"
+      - "entry_type"
+    collection_method: "RFC_6962_GET_ENTRIES_HTTP"
+    format: "JSON_AND_BASE64_DER"
+    update_frequency: "REALTIME_STREAMING"
+    license_or_usage_terms: "Cloudflare Acceptable Use Policy; public CT read endpoint"
+    attribution_requirements: "Attribution to Cloudflare CT Log Operator"
+    bulk_retrieval_permitted: true
+    derived_dataset_creation_permitted: true
+    ml_research_permitted: true
+    known_limitations: "Strict HTTP 429 backoff policy; entries must be chunk-retrieved"
+    retrieval_timestamp: "2026-11-08T13:45:00Z"
+    verification_status: "VERIFIED_ACTIVE"
+
+  - source_id: "letsencrypt_ct_oak_2026"
+    source_name: "Let's Encrypt Oak 2026 CT Log"
+    official_website: "https://oak.ct.letsencrypt.org/2026"
+    data_type: "CERTIFICATE_TRANSPARENCY_LOG"
+    available_fields:
+      - "leaf_input"
+      - "extra_data"
+      - "sct_timestamp"
+      - "entry_type"
+    collection_method: "RFC_6962_GET_ENTRIES_HTTP"
+    format: "JSON_AND_BASE64_DER"
+    update_frequency: "REALTIME_STREAMING"
+    license_or_usage_terms: "ISRG / Let's Encrypt Public CT Log Policy"
+    attribution_requirements: "Attribution to Internet Security Research Group (ISRG)"
+    bulk_retrieval_permitted: true
+    derived_dataset_creation_permitted: true
+    ml_research_permitted: true
+    known_limitations: "Geared towards high throughput; temporally bounded to 2026 certificate expiry"
+    retrieval_timestamp: "2026-11-08T13:45:00Z"
+    verification_status: "VERIFIED_ACTIVE"
+
+  - source_id: "google_chrome_ct_log_list"
+    source_name: "Chromium Official CT Log List"
+    official_website: "https://www.gstatic.com/ct/log_list/v3/log_list.json"
+    data_type: "CT_LOG_METADATA_DIRECTORY"
+    available_fields:
+      - "operator_name"
+      - "log_url"
+      - "log_id"
+      - "public_key"
+      - "state"
+      - "temporal_interval"
+    collection_method: "HTTPS_JSON_DOWNLOAD"
+    format: "JSON"
+    update_frequency: "WEEKLY"
+    license_or_usage_terms: "Chromium Open Source Project License (BSD-3-Clause)"
+    attribution_requirements: "Chromium Certificate Transparency Project"
+    bulk_retrieval_permitted: true
+    derived_dataset_creation_permitted: true
+    ml_research_permitted: true
+    known_limitations: "Specifies Chrome policy-qualified logs; does not prescribe global client behavior"
+    retrieval_timestamp: "2026-11-08T13:45:00Z"
+    verification_status: "VERIFIED_ACTIVE"
+
+  - source_id: "mozilla_ccadb_root_store"
+    source_name: "Mozilla Common CA Database (CCADB) Included CA Certificate List"
+    official_website: "https://wiki.mozilla.org/CA/Included_Certificates"
+    data_type: "ROOT_TRUST_STORE"
+    available_fields:
+      - "ca_owner"
+      - "certificate_name"
+      - "sha256_fingerprint"
+      - "trust_bits"
+      - "ev_policy_oids"
+      - "der_certificate"
+      - "pem_certificate"
+    collection_method: "HTTPS_CSV_AND_TXT_DOWNLOAD"
+    format: "CSV_AND_NSS_CERTDATA_TXT"
+    update_frequency: "MONTHLY_OR_SECURITY_EVENT"
+    license_or_usage_terms: "Mozilla Public License (MPL 2.0)"
+    attribution_requirements: "Mozilla Foundation and CCADB contributors"
+    bulk_retrieval_permitted: true
+    derived_dataset_creation_permitted: true
+    ml_research_permitted: true
+    known_limitations: "Trust bits reflect Mozilla NSS policy only; does not cover Windows/Apple trust stores"
+    retrieval_timestamp: "2026-11-08T13:45:00Z"
+    verification_status: "VERIFIED_ACTIVE"
+
+  - source_id: "ccadb_all_intermediates"
+    source_name: "CCADB Public Disclosed Intermediate Certificates"
+    official_website: "https://www.ccadb.org/resources"
+    data_type: "INTERMEDIATE_CA_REPOSITORY"
+    available_fields:
+      - "ca_owner"
+      - "certificate_name"
+      - "parent_ca_name"
+      - "sha256_fingerprint"
+      - "subject_dn"
+      - "issuer_dn"
+      - "pem_info"
+      - "revocation_status"
+    collection_method: "HTTPS_CSV_DOWNLOAD"
+    format: "CSV"
+    update_frequency: "DAILY"
+    license_or_usage_terms: "CCADB Open Data terms (Joint Mozilla/Cisco/Microsoft/Google initiative)"
+    attribution_requirements: "Common CA Database (CCADB)"
+    bulk_retrieval_permitted: true
+    derived_dataset_creation_permitted: true
+    ml_research_permitted: true
+    known_limitations: "Relies on CA self-reporting to CCADB; unconstrained intermediates may be incomplete"
+    retrieval_timestamp: "2026-11-08T13:45:00Z"
+    verification_status: "VERIFIED_ACTIVE"
+
+  - source_id: "crlite_aggregated_revocation"
+    source_name: "Mozilla CRLite Aggregated Certificate Revocation Dataset"
+    official_website: "https://crlite.services.mozilla.com"
+    data_type: "AGGREGATED_REVOCATION_DATASET"
+    available_fields:
+      - "issuer_spki_sha256"
+      - "revoked_serials"
+      - "revocation_reasons"
+      - "crl_validity"
+    collection_method: "HTTPS_BINARY_AND_CASCADE_FETCH"
+    format: "CUSTOM_CASCADE_BLOOM_FILTER_AND_RAW_CRL"
+    update_frequency: "HOURLY"
+    license_or_usage_terms: "Mozilla Public License (MPL 2.0)"
+    attribution_requirements: "Mozilla Security Engineering"
+    bulk_retrieval_permitted: true
+    derived_dataset_creation_permitted: true
+    ml_research_permitted: true
+    known_limitations: "Derived from known CCADB intermediates; does not cover unlogged private roots"
+    retrieval_timestamp: "2026-11-08T13:45:00Z"
+    verification_status: "VERIFIED_ACTIVE"
+
+  - source_id: "public_ca_crl_distribution_points"
+    source_name: "Public Certificate Authority CRL Endpoints (Let's Encrypt, DigiCert, Sectigo)"
+    official_website: "http://crl.identrust.com, http://crl3.digicert.com"
+    data_type: "CERTIFICATE_REVOCATION_LIST"
+    available_fields:
+      - "tbs_cert_list"
+      - "signature_algorithm"
+      - "this_update"
+      - "next_update"
+      - "revoked_certificates"
+      - "crl_extensions"
+    collection_method: "RESTRICTED_HTTP_DER_FETCH"
+    format: "ASN1_DER_CRL"
+    update_frequency: "DAILY_OR_PER_UPDATE_SCHEDULE"
+    license_or_usage_terms: "Public CA CPS (Certification Practice Statements) for CRL access"
+    attribution_requirements: "Respective Issuing Certificate Authorities"
+    bulk_retrieval_permitted: true
+    derived_dataset_creation_permitted: true
+    ml_research_permitted: true
+    known_limitations: "CRLs can be large (10MB-50MB); network timeouts and transient HTTP errors require caching"
+    retrieval_timestamp: "2026-11-08T13:45:00Z"
+    verification_status: "VERIFIED_ACTIVE"
+
+  - source_id: "mozilla_ca_incident_disclosures"
+    source_name: "Mozilla Bugzilla CA Certificate Incident Disclosures"
+    official_website: "https://bugzilla.mozilla.org/describecomponents.cgi?product=CA%20Program"
+    data_type: "SECURITY_INCIDENT_CORPUS"
+    available_fields:
+      - "incident_id"
+      - "ca_name"
+      - "misissuance_reason"
+      - "affected_serial_numbers"
+      - "affected_sha256_fingerprints"
+      - "incident_date"
+      - "remediation_status"
+    collection_method: "HTTPS_REST_API_AND_BUGZILLA_SCRAPE"
+    format: "JSON"
+    update_frequency: "ASYNCHRONOUS_PER_INCIDENT"
+    license_or_usage_terms: "Mozilla Open Source & Community Policies"
+    attribution_requirements: "Mozilla CA Program Bugzilla Incident Trackers"
+    bulk_retrieval_permitted: true
+    derived_dataset_creation_permitted: true
+    ml_research_permitted: true
+    known_limitations: "Certificates are reported asynchronously; some historical incidents lack raw DER captures"
+    retrieval_timestamp: "2026-11-08T13:45:00Z"
+    verification_status: "VERIFIED_ACTIVE"
+
+  - source_id: "historical_distrusted_root_corpus"
+    source_name: "Historical Distrusted Roots Corpus (DigiNotar, WoSign/StartCom, Symantec)"
+    official_website: "https://wiki.mozilla.org/CA/Disallowed_Certificates"
+    data_type: "DISTRUSTED_ROOT_ARCHIVE"
+    available_fields:
+      - "ca_name"
+      - "sha256_fingerprint"
+      - "distrust_date"
+      - "distrust_reason"
+      - "der_blob"
+    collection_method: "CURATED_REPOSITORY_RETRIEVAL"
+    format: "PEM_AND_DER"
+    update_frequency: "STATIC_HISTORICAL"
+    license_or_usage_terms: "Public Security Research Data (NSS Disallowlist)"
+    attribution_requirements: "Mozilla Security Research Community"
+    bulk_retrieval_permitted: true
+    derived_dataset_creation_permitted: true
+    ml_research_permitted: true
+    known_limitations: "Historical reference only; roots are permanently disallowed in modern TLS implementations"
+    retrieval_timestamp: "2026-11-08T13:45:00Z"
+    verification_status: "VERIFIED_ACTIVE"
+
+  - source_id: "sectigo_elephant_2026"
+    source_name: "Sectigo Elephant 2026h2 CT Log"
+    official_website: "https://elephant2026h2.ct.sectigo.com/"
+    data_type: "CERTIFICATE_TRANSPARENCY_LOG"
+    available_fields:
+      - "leaf_input"
+      - "extra_data"
+      - "sct_timestamp"
+      - "entry_type"
+    collection_method: "RFC_6962_GET_ENTRIES_HTTP"
+    format: "JSON_AND_BASE64_DER"
+    update_frequency: "REALTIME_STREAMING"
+    license_or_usage_terms: "Sectigo CT Log Policy & RFC 6962 API"
+    attribution_requirements: "Attribution to Sectigo CT Log Infrastructure"
+    bulk_retrieval_permitted: true
+    derived_dataset_creation_permitted: true
+    ml_research_permitted: true
+    known_limitations: "Rate-limited; sharded by 2026 expiry; serves high proportion of final x509 leaf entries"
+    retrieval_timestamp: "2026-11-08T14:45:00Z"
+    verification_status: "VERIFIED_ACTIVE"
+
+  - source_id: "digicert_wyvern_2026"
+    source_name: "DigiCert Wyvern 2026h2 CT Log"
+    official_website: "https://wyvern.ct.digicert.com/2026h2/"
+    data_type: "CERTIFICATE_TRANSPARENCY_LOG"
+    available_fields:
+      - "leaf_input"
+      - "extra_data"
+      - "sct_timestamp"
+      - "entry_type"
+    collection_method: "RFC_6962_GET_ENTRIES_HTTP"
+    format: "JSON_AND_BASE64_DER"
+    update_frequency: "REALTIME_STREAMING"
+    license_or_usage_terms: "DigiCert CT Operator Policy & RFC 6962 API"
+    attribution_requirements: "Attribution to DigiCert CT Operations"
+    bulk_retrieval_permitted: true
+    derived_dataset_creation_permitted: true
+    ml_research_permitted: true
+    known_limitations: "Batch size maximum 32; rate limited with 429 response"
+    retrieval_timestamp: "2026-11-08T14:45:00Z"
+    verification_status: "VERIFIED_ACTIVE"
+
+  - source_id: "digicert_sphinx_2026"
+    source_name: "DigiCert Sphinx 2026h2 CT Log"
+    official_website: "https://sphinx.ct.digicert.com/2026h2/"
+    data_type: "CERTIFICATE_TRANSPARENCY_LOG"
+    available_fields:
+      - "leaf_input"
+      - "extra_data"
+      - "sct_timestamp"
+      - "entry_type"
+    collection_method: "RFC_6962_GET_ENTRIES_HTTP"
+    format: "JSON_AND_BASE64_DER"
+    update_frequency: "REALTIME_STREAMING"
+    license_or_usage_terms: "DigiCert CT Operator Policy & RFC 6962 API"
+    attribution_requirements: "Attribution to DigiCert CT Operations"
+    bulk_retrieval_permitted: true
+    derived_dataset_creation_permitted: true
+    ml_research_permitted: true
+    known_limitations: "Batch size maximum 32; rate limited"
+    retrieval_timestamp: "2026-11-08T14:45:00Z"
+    verification_status: "VERIFIED_ACTIVE"
+
+  - source_id: "google_ct_xenon_2026"
+    source_name: "Google Xenon 2026h2 CT Log"
+    official_website: "https://ct.googleapis.com/logs/eu1/xenon2026h2/"
+    data_type: "CERTIFICATE_TRANSPARENCY_LOG"
+    available_fields:
+      - "leaf_input"
+      - "extra_data"
+      - "sct_timestamp"
+      - "entry_type"
+    collection_method: "RFC_6962_GET_ENTRIES_HTTP"
+    format: "JSON_AND_BASE64_DER"
+    update_frequency: "REALTIME_STREAMING"
+    license_or_usage_terms: "Google Terms of Service / RFC 6962 CT API"
+    attribution_requirements: "Attribution to Google Certificate Transparency infrastructure"
+    bulk_retrieval_permitted: true
+    derived_dataset_creation_permitted: true
+    ml_research_permitted: true
+    known_limitations: "Rate limited; European CT shard; serves balanced mix of European and global CAs"
+    retrieval_timestamp: "2026-11-08T14:45:00Z"
+    verification_status: "VERIFIED_ACTIVE"

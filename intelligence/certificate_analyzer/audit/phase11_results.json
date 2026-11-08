@@ -1,0 +1,77 @@
+{
+  "logistic_regression": {
+    "name": "logistic_regression",
+    "fit_time_seconds": 0.06906529999832856,
+    "metrics": {
+      "accuracy": 0.9997405293201869,
+      "precision": 0.9996916435399321,
+      "recall": 1.0,
+      "macro_f1": 0.999514068253615,
+      "weighted_f1": 0.9997404432460452,
+      "confusion_matrix": {
+        "true_negative": 611,
+        "false_positive": 1,
+        "false_negative": 0,
+        "true_positive": 3242
+      },
+      "roc_auc": 0.9999994959941616,
+      "pr_auc": 0.9999999048869648,
+      "brier_score": 0.00021765399192460755
+    },
+    "single_sample_latency_microseconds": 3253.7480001337826,
+    "batch_latency_milliseconds": 5.642699998134049,
+    "artifact_size_kb": 4.7822265625,
+    "fp_sample_prediction": 0,
+    "fp_sample_probability": 3.453509428371659e-22
+  },
+  "random_forest": {
+    "name": "random_forest",
+    "fit_time_seconds": 0.2206813000011607,
+    "metrics": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "macro_f1": 1.0,
+      "weighted_f1": 1.0,
+      "confusion_matrix": {
+        "true_negative": 612,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_positive": 3242
+      },
+      "roc_auc": 1.0,
+      "pr_auc": 1.0,
+      "brier_score": 2.5183950949382864e-06
+    },
+    "single_sample_latency_microseconds": 21080.19499988586,
+    "batch_latency_milliseconds": 33.62310000011348,
+    "artifact_size_kb": 289.673828125,
+    "fp_sample_prediction": 0,
+    "fp_sample_probability": 0.0
+  },
+  "hist_gradient_boosting": {
+    "name": "hist_gradient_boosting",
+    "fit_time_seconds": 0.193924799998058,
+    "metrics": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "macro_f1": 1.0,
+      "weighted_f1": 1.0,
+      "confusion_matrix": {
+        "true_negative": 612,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_positive": 3242
+      },
+      "roc_auc": 1.0,
+      "pr_auc": 1.0,
+      "brier_score": 4.79666863947232e-10
+    },
+    "single_sample_latency_microseconds": 4524.428000077023,
+    "batch_latency_milliseconds": 7.195100002718391,
+    "artifact_size_kb": 68.9541015625,
+    "fp_sample_prediction": 0,
+    "fp_sample_probability": 2.190236258573506e-05
+  }
+}

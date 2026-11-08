@@ -1,0 +1,71 @@
+{
+  "rare_profiles": [
+    {
+      "name": "Cloudflare High-SAN CDN (SAN=100)",
+      "verdict": "ANOMALY",
+      "is_anomaly": true,
+      "decision_score": -0.10858820391974033,
+      "is_false_alarm": true
+    },
+    {
+      "name": "NIST P-384 High-Security Government (secp384r1)",
+      "verdict": "ANOMALY",
+      "is_anomaly": true,
+      "decision_score": -0.08169043141459986,
+      "is_false_alarm": true
+    },
+    {
+      "name": "Ultra-Short Lifespan (6-day automated leaf)",
+      "verdict": "NORMAL",
+      "is_anomaly": false,
+      "decision_score": 0.0016502521807221227,
+      "is_false_alarm": false
+    },
+    {
+      "name": "Enterprise Multi-Purpose EKU (serverAuth+clientAuth+emailProtection)",
+      "verdict": "ANOMALY",
+      "is_anomaly": true,
+      "decision_score": -0.09712578691516349,
+      "is_false_alarm": true
+    },
+    {
+      "name": "Typical Standard Let's Encrypt DV (Baseline Control)",
+      "verdict": "ANOMALY",
+      "is_anomaly": true,
+      "decision_score": -0.07468393683569652,
+      "is_false_alarm": true
+    }
+  ],
+  "sensitivity": {
+    "0.01": {
+      "contamination_parameter": 0.01,
+      "test_samples": 3242,
+      "flagged_as_anomaly": 38,
+      "empirical_false_alarm_rate": 0.011721159777914868,
+      "score_mean": 0.17007487097121599,
+      "score_std": 0.06722327206810415,
+      "score_min": -0.04998532317039517,
+      "score_max": 0.2742451097514602
+    },
+    "0.05": {
+      "contamination_parameter": 0.05,
+      "test_samples": 3242,
+      "flagged_as_anomaly": 174,
+      "empirical_false_alarm_rate": 0.05367057371992597,
+      "score_mean": 0.1290058548867107,
+      "score_std": 0.06722327206810415,
+      "score_min": -0.09105433925490047,
+      "score_max": 0.2331760936669549
+    },
+    "0.1": {
+      "contamination_parameter": 0.1,
+      "test_samples": 3242,
+      "flagged_as_anomaly": 356,
+      "empirical_false_alarm_rate": 0.10980876002467613,
+      "score_mean": 0.04139987251377831,
+      "score_std": 0.06722327206810415,
+      "score_min": -0.17866032162783285,
+      "score_max": 0.14557011129402253
+    }
+  }
+}

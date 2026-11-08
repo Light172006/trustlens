@@ -1,0 +1,87 @@
+version: "1.0.0"
+
+standards:
+  rfc5280:
+    name: "Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile"
+    publication_date: "2008-05-01"
+  rfc6960:
+    name: "X.509 Internet Public Key Infrastructure Online Certificate Status Protocol - OCSP"
+    publication_date: "2013-06-01"
+  rfc9162:
+    name: "Certificate Transparency Version 2.0"
+    publication_date: "2021-12-01"
+  cabf_baseline_requirements:
+    name: "CA/Browser Forum Baseline Requirements for the Issuance and Management of Publicly-Trusted TLS Server Certificates"
+    current_version: "2.0.8"
+
+validity_duration_rules:
+  - rule_id: "CABF_LEGACY_39_MONTHS"
+    description: "Max validity 39 months (1185 days) for certificates issued before March 1, 2018"
+    effective_start: "2015-03-01T00:00:00Z"
+    effective_end: "2018-02-28T23:59:59Z"
+    max_validity_days: 1185
+    max_validity_seconds: 102384000
+
+  - rule_id: "CABF_825_DAYS"
+    description: "Max validity 825 days for certificates issued between March 1, 2018 and August 31, 2020"
+    effective_start: "2018-03-01T00:00:00Z"
+    effective_end: "2020-08-31T23:59:59Z"
+    max_validity_days: 825
+    max_validity_seconds: 71280000
+
+  - rule_id: "CABF_398_DAYS"
+    description: "Max validity 398 days for certificates issued between September 1, 2020 and March 14, 2026"
+    effective_start: "2020-09-01T00:00:00Z"
+    effective_end: "2026-03-14T23:59:59Z"
+    max_validity_days: 398
+    max_validity_seconds: 34387200
+
+  - rule_id: "CABF_2026_200_DAYS"
+    description: "Max validity 200 days for subscriber certificates issued between March 15, 2026 and March 14, 2027"
+    effective_start: "2026-03-15T00:00:00Z"
+    effective_end: "2027-03-14T23:59:59Z"
+    max_validity_days: 200
+    max_validity_seconds: 17280000
+
+  - rule_id: "CABF_2027_100_DAYS"
+    description: "Max validity 100 days for subscriber certificates issued between March 15, 2027 and March 14, 2028"
+    effective_start: "2027-03-15T00:00:00Z"
+    effective_end: "2028-03-14T23:59:59Z"
+    max_validity_days: 100
+    max_validity_seconds: 8640000
+
+cryptographic_security_profiles:
+  rsa_key_sizes:
+    minimum_allowed_bits: 2048
+    deprecated_bits: [512, 768, 1024]
+    disallowed_cutoff_date: "2013-12-31T23:59:59Z"
+
+  elliptic_curves:
+    recommended:
+      - "secp256r1"
+      - "secp384r1"
+      - "secp521r1"
+      - "ed25519"
+    deprecated:
+      - "secp192r1"
+      - "sect163k1"
+
+  hash_algorithms:
+    secure:
+      - "SHA256"
+      - "SHA384"
+      - "SHA512"
+      - "SHA3-256"
+      - "SHA3-384"
+      - "SHA3-512"
+    deprecated:
+      - "SHA1"
+    insecure:
+      - "MD5"
+      - "MD2"
+    sha1_deprecation_effective: "2016-01-01T00:00:00Z"
+
+extensions_policy:
+  san_mandatory_effective: "2012-07-01T00:00:00Z"
+  common_name_deprecation_effective: "2016-01-01T00:00:00Z"
+

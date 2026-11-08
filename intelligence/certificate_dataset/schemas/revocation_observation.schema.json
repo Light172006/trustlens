@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://trustlens.io/schemas/revocation_observation.schema.json",
+  "title": "TrustLensRevocationObservation",
+  "description": "Standardized schema for certificate revocation observations from CRL, OCSP, and authoritative incident records.",
+  "type": "object",
+  "required": [
+    "observation_id",
+    "certificate_sha256_fingerprint",
+    "serial_number",
+    "issuer_dn",
+    "revocation_method",
+    "normalized_status",
+    "response_verification_result",
+    "retrieval_timestamp"
+  ],
+  "properties": {
+    "observation_id": { "type": "string" },
+    "certificate_sha256_fingerprint": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "serial_number": { "type": "string" },
+    "issuer_sha256_fingerprint": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+    "issuer_dn": { "type": "string" },
+    "revocation_method": {
+      "type": "string",
+      "enum": ["CRL", "OCSP", "CRLITE", "HISTORICAL_DISCLOSURE"]
+    },
+    "normalized_status": {
+      "type": "string",
+      "enum": ["GOOD", "REVOKED", "UNKNOWN", "NOT_CHECKED", "ERROR"]
+    },
+    "revocation_reason": {
+      "type": ["string", "null"],
+      "enum": [
+        "unspecified",
+        "keyCompromise",
+        "cACompromise",
+        "affiliationChanged",
+        "superseded",
+        "cessationOfOperation",
+        "certificateHold",
+        "removeFromCRL",
+        "privilegeWithdrawn",
+        "aACompromise",
+        null
+      ]
+    },
+    "revocation_timestamp": { "type": ["string", "null"], "format": "date-time" },
+    "this_update": { "type": ["string", "null"], "format": "date-time" },
+    "next_update": { "type": ["string", "null"], "format": "date-time" },
+    "responder_identity": { "type": ["string", "null"] },
+    "response_verification_result": {
+      "type": "string",
+      "enum": ["VERIFIED", "SIGNATURE_INVALID", "UNTRUSTED_RESPONDER", "PARSE_ERROR", "NOT_VERIFIED"]
+    },
+    "evidence_source_url": { "type": ["string", "null"] },
+    "retrieval_timestamp": { "type": "string", "format": "date-time" },
+    "raw_evidence_base64": { "type": ["string", "null"] },
+    "error_details": { "type": ["string", "null"] }
+  },
+  "additionalProperties": false
+}
+

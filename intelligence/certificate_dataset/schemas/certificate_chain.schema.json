@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://trustlens.io/schemas/certificate_chain.schema.json",
+  "title": "TrustLensCertificateChain",
+  "description": "Standardized schema for certificate chains, hierarchy links, and trust anchor resolution.",
+  "type": "object",
+  "required": [
+    "chain_id",
+    "leaf_sha256_fingerprint",
+    "intermediate_sha256_fingerprints",
+    "chain_length",
+    "chain_ordering",
+    "is_complete",
+    "has_trusted_anchor",
+    "trust_store_identifier",
+    "validation_result",
+    "verification_timestamp"
+  ],
+  "properties": {
+    "chain_id": { "type": "string" },
+    "leaf_sha256_fingerprint": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "intermediate_sha256_fingerprints": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+    },
+    "root_sha256_fingerprint": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+    "chain_length": { "type": "integer", "minimum": 1 },
+    "chain_ordering": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+    },
+    "is_complete": { "type": "boolean" },
+    "has_trusted_anchor": { "type": "boolean" },
+    "trust_anchor_name": { "type": ["string", "null"] },
+    "trust_store_identifier": { "type": "string" },
+    "trust_store_version": { "type": "string" },
+    "aki_ski_matches": { "type": "array", "items": { "type": "boolean" } },
+    "is_cross_signed": { "type": "boolean" },
+    "validation_result": {
+      "type": "string",
+      "enum": [
+        "VALID_TRUSTED",
+        "UNTRUSTED_ROOT",
+        "INCOMPLETE_CHAIN",
+        "EXPIRED_CHAIN_NODE",
+        "INVALID_SIGNATURE",
+        "BASIC_CONSTRAINTS_VIOLATION",
+        "NAME_CONSTRAINTS_VIOLATION",
+        "PATH_LENGTH_EXCEEDED"
+      ]
+    },
+    "validation_errors": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "verification_timestamp": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}
+

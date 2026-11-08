@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://trustlens.io/schemas/certificate_labels.schema.json",
+  "title": "TrustLensCertificateLabels",
+  "description": "Standardized schema for multi-dimensional, evidence-based security and policy findings evaluated at a specific reference timestamp.",
+  "type": "object",
+  "required": [
+    "certificate_sha256_fingerprint",
+    "reference_observation_timestamp",
+    "labels",
+    "policy_evaluation",
+    "labeling_version"
+  ],
+  "properties": {
+    "certificate_sha256_fingerprint": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "reference_observation_timestamp": { "type": "string", "format": "date-time" },
+    "labels": {
+      "type": "object",
+      "required": [
+        "PARSE_VALID",
+        "TIME_VALID",
+        "EXPIRED",
+        "NOT_YET_VALID",
+        "HOSTNAME_MATCH",
+        "CHAIN_TRUSTED",
+        "CHAIN_INCOMPLETE",
+        "SELF_SIGNED",
+        "REVOKED",
+        "REVOCATION_UNKNOWN",
+        "WEAK_PUBLIC_KEY",
+        "WEAK_SIGNATURE",
+        "SAN_PRESENT",
+        "CA_CONSTRAINT_VALID",
+        "EKU_PROFILE_VALID",
+        "POLICY_COMPLIANT"
+      ],
+      "properties": {
+        "PARSE_VALID": { "type": "string", "enum": ["PASS", "FAIL", "UNKNOWN"] },
+        "TIME_VALID": { "type": "string", "enum": ["PASS", "FAIL", "UNKNOWN"] },
+        "EXPIRED": { "type": "string", "enum": ["PASS", "FAIL", "UNKNOWN"] },
+        "NOT_YET_VALID": { "type": "string", "enum": ["PASS", "FAIL", "UNKNOWN"] },
+        "HOSTNAME_MATCH": { "type": "string", "enum": ["PASS", "FAIL", "NOT_CHECKED", "UNKNOWN"] },
+        "CHAIN_TRUSTED": { "type": "string", "enum": ["PASS", "FAIL", "NOT_CHECKED", "UNKNOWN"] },
+        "CHAIN_INCOMPLETE": { "type": "string", "enum": ["PASS", "FAIL", "NOT_CHECKED", "UNKNOWN"] },
+        "SELF_SIGNED": { "type": "string", "enum": ["PASS", "FAIL", "UNKNOWN"] },
+        "REVOKED": { "type": "string", "enum": ["PASS", "FAIL", "NOT_CHECKED", "UNKNOWN"] },
+        "REVOCATION_UNKNOWN": { "type": "string", "enum": ["PASS", "FAIL", "NOT_CHECKED"] },
+        "WEAK_PUBLIC_KEY": { "type": "string", "enum": ["PASS", "FAIL", "UNKNOWN"] },
+        "WEAK_SIGNATURE": { "type": "string", "enum": ["PASS", "FAIL", "UNKNOWN"] },
+        "SAN_PRESENT": { "type": "string", "enum": ["PASS", "FAIL", "UNKNOWN"] },
+        "CA_CONSTRAINT_VALID": { "type": "string", "enum": ["PASS", "FAIL", "UNKNOWN"] },
+        "EKU_PROFILE_VALID": { "type": "string", "enum": ["PASS", "FAIL", "UNKNOWN"] },
+        "POLICY_COMPLIANT": { "type": "string", "enum": ["PASS", "FAIL", "UNKNOWN"] }
+      }
+    },
+    "policy_evaluation": {
+      "type": "object",
+      "required": [
+        "applicable_policy_rule_id",
+        "policy_source",
+        "policy_version",
+        "certificate_issuance_date",
+        "evaluation_timestamp",
+        "max_validity_days_allowed",
+        "actual_validity_days",
+        "validity_period_compliant",
+        "cryptographic_profile_compliant"
+      ],
+      "properties": {
+        "applicable_policy_rule_id": { "type": "string" },
+        "policy_source": { "type": "string" },
+        "policy_version": { "type": "string" },
+        "certificate_issuance_date": { "type": "string", "format": "date-time" },
+        "evaluation_timestamp": { "type": "string", "format": "date-time" },
+        "max_validity_days_allowed": { "type": "number" },
+        "actual_validity_days": { "type": "number" },
+        "validity_period_compliant": { "type": "boolean" },
+        "cryptographic_profile_compliant": { "type": "boolean" }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "tested_hostname": { "type": ["string", "null"] },
+        "matched_san": { "type": ["string", "null"] },
+        "trust_store_used": { "type": ["string", "null"] },
+        "chain_validation_error": { "type": ["string", "null"] },
+        "revocation_reason": { "type": ["string", "null"] },
+        "key_security_reason": { "type": ["string", "null"] },
+        "signature_security_reason": { "type": ["string", "null"] }
+      }
+    },
+    "labeling_version": { "type": "string" }
+  },
+  "additionalProperties": false
+}
+

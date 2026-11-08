@@ -1,0 +1,49 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Isolated dependency cache
+.deps/
+.venv/
+
+# Un-ignore data directory for certificate_dataset so child rules apply
+!data/
+!data/**
+
+# Large dataset stores and raw artifacts (Section 14 & Boundaries)
+data/raw/*
+!data/raw/.gitkeep
+data/normalized/*
+!data/normalized/.gitkeep
+data/labeled/*
+!data/labeled/.gitkeep
+data/endpoint_observations/*
+!data/endpoint_observations/.gitkeep
+data/revocation/*
+!data/revocation/.gitkeep
+data/trust_stores/*
+!data/trust_stores/.gitkeep
+data/splits/*
+!data/splits/.gitkeep
+data/chains/*
+!data/chains/.gitkeep
+data/quarantine/*
+!data/quarantine/.gitkeep
+
+# Large analytical and raw binary artifacts
+*.parquet
+*.der
+*.pem
+*.tar.gz
+*.zip
+
+# Generated analytical reports (keep schemas and manifests in repo)
+reports/*.html
+reports/*.pdf
+
+# Keep manifests and test fixtures tracked
+!data/manifests/
+!data/manifests/*.json
+!tests/fixtures/**
