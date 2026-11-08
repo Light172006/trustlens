@@ -243,9 +243,102 @@ Returns paginated certificate analyses evaluated by the authenticated user.
 }
 ```
 
+### 4.5 Dedicated Web Security Posture Analysis Endpoints (`/api/v1/web-security` & `/api/v1/analyze/web-security`)
+
+#### `POST /api/v1/web-security/analyze` and `POST /api/v1/analyze/web-security` (Handoff Alias)
+Executes safe passive telemetry extraction, evaluates 22 deterministic security rules, runs calibrated ML posture classification with abstention, aggregates risk, and produces evidence-backed remediation guidance.
+- **Access:** Public or Authenticated (if authenticated, binds to user history)
+- **Request:**
+```json
+{
+  "url": "https://example.com",
+  "force_fresh": false
+}
+```
+- **Response (HTTP 200 OK):**
+```json
+{
+  "id": "e96b7834-8c03-4f98-9008-011242bbcc44",
+  "target_url": "https://example.com",
+  "normalized_domain": "example.com",
+  "registrable_domain": "example.com",
+  "scan_timestamp": "2026-11-08T22:30:00Z",
+  "scanner_version": "1.0.0",
+  "posture": "GOOD",
+  "security_score": 88.5,
+  "deterministic_posture": "GOOD",
+  "ml_prediction": {
+    "available": true,
+    "predicted_posture": "GOOD",
+    "probabilities": {
+      "GOOD": 0.88,
+      "MODERATE": 0.10,
+      "POOR": 0.02
+    },
+    "confidence": 0.88,
+    "margin": 0.78,
+    "abstained": false,
+    "model_name": "HistGradientBoosting",
+    "model_version": "1.0.0"
+  },
+  "consensus": {
+    "status": "CONSENSUS",
+    "discrepancy_explanation": null
+  },
+  "findings_summary": {
+    "total_findings": 6,
+    "critical_count": 0,
+    "high_count": 0,
+    "medium_count": 1,
+    "low_count": 2,
+    "pass_count": 3,
+    "affected_categories": ["HTTP_HEADERS", "TLS_SECURITY"]
+  },
+  "findings": [
+    {
+      "finding_id": "HDR-HSTS-PASS",
+      "category": "HTTP_HEADERS",
+      "name": "Strict-Transport-Security Configured",
+      "severity": "PASS",
+      "status": "COMPLIANT",
+      "evidence": "max-age=31536000; includeSubDomains; preload",
+      "detection_method": "DETERMINISTIC_RULE_INSPECTION",
+      "confidence": 1.0,
+      "guidance": "RFC 6797",
+      "recommendation": null
+    }
+  ],
+  "remediations": [
+    {
+      "finding_id": "HDR-CSP-LOW",
+      "severity": "LOW",
+      "category": "HTTP_HEADERS",
+      "recommendation": "Configure a restrictive Content-Security-Policy header."
+    }
+  ],
+  "telemetry": {
+    "status_code": 200,
+    "hsts_present": true
+  },
+  "summary_text": "Executive assessment summary text...",
+  "scanned_at": "2026-11-08T22:30:00Z"
+}
+```
+
+#### `GET /api/v1/web-security/{id}`
+Retrieves a stored web security posture assessment by ID.
+- **Status:** 200 OK
+- **Response:** `WebSecurityAssessmentResponse`
+
+#### `GET /api/v1/web-security`
+Returns paginated web security assessments with optional domain and posture filtering.
+- **Query Parameters:** `domain` (string), `posture` (GOOD, MODERATE, POOR), `page` (default 1), `limit` (default 20)
+- **Status:** 200 OK
+- **Response:** `WebSecurityScanListResponse`
+
 ---
 
-### 4.5 Dashboard Endpoints (`/api/v1/dashboard`)
+### 4.6 Dashboard Endpoints (`/api/v1/dashboard`)
 
 #### `GET /api/v1/dashboard/summary`
 Returns user-scoped security scan statistics, verdict distributions, and the 10 most recent scans.

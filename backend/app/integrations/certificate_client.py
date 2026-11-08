@@ -25,7 +25,9 @@ class CertificateAnalyzerClient:
         self._engine = None
         self._available = False
         try:
-            from certificate_analyzer.engine.analyzer import CertificateAnalyzerEngine
+            from certificate_analyzer.engine.analyzer import (  # type: ignore
+                CertificateAnalyzerEngine,
+            )
 
             global _ENGINE_INSTANCE
             if _ENGINE_INSTANCE is None:
@@ -71,7 +73,7 @@ class CertificateAnalyzerClient:
             )
 
         try:
-            from certificate_analyzer.api import analyze_endpoint_tls
+            from certificate_analyzer.api import analyze_endpoint_tls  # type: ignore
 
             effective_ml_advisory = (
                 include_ml_advisory
@@ -128,7 +130,7 @@ class CertificateAnalyzerClient:
             )
 
         try:
-            from certificate_analyzer.api import analyze_certificate
+            from certificate_analyzer.api import analyze_certificate  # type: ignore
 
             effective_ml_advisory = (
                 include_ml_advisory
@@ -173,9 +175,14 @@ class CertificateAnalyzerClient:
     ) -> Any:
         """Create a compliant assessment representing a resource limit rejection."""
         try:
-            from certificate_analyzer.constants import CertificateVerdict
-            from certificate_analyzer.schemas.assessment import CertificateAssessment
-            from certificate_analyzer.schemas.findings import CertificateFinding, FindingSeverity
+            from certificate_analyzer.constants import CertificateVerdict  # type: ignore
+            from certificate_analyzer.schemas.assessment import (  # type: ignore
+                CertificateAssessment,
+            )
+            from certificate_analyzer.schemas.findings import (  # type: ignore
+                CertificateFinding,
+                FindingSeverity,
+            )
 
             finding = CertificateFinding(
                 code="RULE_RESOURCE_LIMIT_EXCEEDED",
@@ -236,9 +243,14 @@ class CertificateAnalyzerClient:
     ) -> Any:
         """Create a compliant inconclusive assessment."""
         try:
-            from certificate_analyzer.constants import CertificateVerdict
-            from certificate_analyzer.schemas.assessment import CertificateAssessment
-            from certificate_analyzer.schemas.findings import CertificateFinding, FindingSeverity
+            from certificate_analyzer.constants import CertificateVerdict  # type: ignore
+            from certificate_analyzer.schemas.assessment import (  # type: ignore
+                CertificateAssessment,
+            )
+            from certificate_analyzer.schemas.findings import (  # type: ignore
+                CertificateFinding,
+                FindingSeverity,
+            )
 
             finding = CertificateFinding(
                 code="RULE_MALFORMED_CERTIFICATE",

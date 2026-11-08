@@ -71,25 +71,6 @@ def generate_test_certificate(
     return der, pem
 
 
-@pytest.fixture
-async def auth_user(client: AsyncClient) -> dict:
-    """Register a user and return authorization header."""
-    payload = {
-        "email": f"cert.tester.{uuid.uuid4().hex[:8]}@example.com",
-        "password": "CertPassword123!",
-        "display_name": "Certificate Tester",
-    }
-    resp = await client.post("/api/v1/auth/register", json=payload)
-    assert resp.status_code == 201
-    token = resp.json()["tokens"]["access_token"]
-    user_id = resp.json()["user"]["id"]
-    return {
-        "headers": {"Authorization": f"Bearer {token}"},
-        "user_id": user_id,
-        "email": payload["email"],
-    }
-
-
 # ============================================================================
 # 1. Integration Client Unit Tests
 # ============================================================================

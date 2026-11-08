@@ -167,7 +167,7 @@ class TlsScanner:
 
         # Subject CN
         subject_cns = cert.subject.get_attributes_for_oid(NameOID.COMMON_NAME)
-        subject_cn = subject_cns[0].value if subject_cns else None
+        subject_cn = str(subject_cns[0].value) if subject_cns else None
 
         # Issuer
         issuer_str = cert.issuer.rfc4514_string()
@@ -176,7 +176,7 @@ class TlsScanner:
         san_dns: list[str] = []
         try:
             san_ext = cert.extensions.get_extension_for_oid(ExtensionOID.SUBJECT_ALTERNATIVE_NAME)
-            san_dns = san_ext.value.get_values_for_type(x509.DNSName)
+            san_dns = getattr(san_ext.value, "get_values_for_type", lambda _: [])(x509.DNSName)
         except x509.ExtensionNotFound:
             pass
 

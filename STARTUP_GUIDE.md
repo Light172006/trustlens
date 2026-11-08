@@ -220,6 +220,23 @@ curl -X POST http://localhost:8000/api/v1/certificates/analyze \
   }'
 ```
 
+### 7. Analyze Technical Web Security Posture
+```bash
+# Analyze website technical security posture and ML consensus
+curl -X POST http://localhost:8000/api/v1/web-security/analyze \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://example.com"
+  }'
+
+# Or use the direct handoff alias:
+curl -X POST http://localhost:8000/api/v1/analyze/web-security \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://example.com"
+  }'
+```
+
 ---
 
 ## 5. Running Automated Tests & Linting

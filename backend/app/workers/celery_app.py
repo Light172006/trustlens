@@ -1,6 +1,6 @@
 """Celery distributed task queue configuration."""
 
-from celery import Celery
+from celery import Celery  # type: ignore
 
 from app.config import settings
 

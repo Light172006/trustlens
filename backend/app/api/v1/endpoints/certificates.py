@@ -18,6 +18,7 @@ from app.schemas.certificate import (
 from app.services.certificate_service import certificate_service
 
 router = APIRouter()
+alias_router = APIRouter()
 
 
 @router.post(
@@ -87,3 +88,20 @@ async def list_certificate_assessments(
         limit=limit,
         offset=offset,
     )
+
+
+# Alias route matching FINAL_BACKEND_HANDOFF.md Section 7: POST /api/v1/analyze/certificate
+@alias_router.post(
+    "/analyze/certificate",
+    response_model=CertificateAssessmentResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Analyze Certificate (Handoff Alias)",
+    description="Direct compatibility alias for POST /api/v1/certificates/analyze.",
+)
+async def analyze_certificate_alias(
+    request: CertificateAnalyzeRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> CertificateAssessmentResponse:
+    """Alias for POST /api/v1/certificates/analyze."""
+    return await analyze_certificate(request=request, current_user=current_user, db=db)
