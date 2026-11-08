@@ -137,13 +137,19 @@ def canonicalize_url_strict(url: str) -> str:
         except (ValueError, TypeError):
             port = None
 
+        # Format host (bracket IPv6 if needed for RFC 3986 / RFC 2732 compliance)
+        if ":" in host and not host.startswith("["):
+            formatted_host = f"[{host}]"
+        else:
+            formatted_host = host
+
         # Strip default ports
         if (scheme == "http" and port == 80) or (scheme == "https" and port == 443):
-            netloc = host
+            netloc = formatted_host
         elif port:
-            netloc = f"{host}:{port}"
+            netloc = f"{formatted_host}:{port}"
         else:
-            netloc = host
+            netloc = formatted_host
 
         path = parsed.path or "/"
         return urlunparse((scheme, netloc, path, parsed.params, parsed.query, ""))

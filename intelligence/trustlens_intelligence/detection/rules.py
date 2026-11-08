@@ -110,8 +110,17 @@ class CommunityConfirmedMaliciousRule(DetectionRule):
 
     def evaluate(self, evidence: ScanEvidence, features: ExtractedFeatures) -> Finding | None:
         if evidence.community_intelligence:
-            confirmed = evidence.community_intelligence.confirmed_report_count
-            distinct = evidence.community_intelligence.distinct_reporter_count
+            comm = evidence.community_intelligence
+            confirmed = comm.confirmed_report_count
+            distinct = (
+                comm.distinct_reporter_count
+                if comm.distinct_reporter_count > 0
+                else (
+                    len({r.get("reporter_id") for r in comm.reports if r.get("reporter_id")})
+                    if comm.reports
+                    else confirmed
+                )
+            )
             if confirmed >= 2 and distinct >= 2:
                 return self._build_finding(
                     evidence={

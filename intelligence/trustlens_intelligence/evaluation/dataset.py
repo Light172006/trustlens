@@ -393,6 +393,11 @@ def create_domain_aware_splits(
 
     This prevents data leakage where a model simply memorizes a specific domain name.
     """
+    if not isinstance(df_y, pd.Series):
+        df_y = pd.Series(df_y)
+    if not isinstance(df_X, pd.DataFrame):
+        df_X = pd.DataFrame(df_X)
+
     random.seed(seed)
     unique_domains = list(set(domains))
     random.shuffle(unique_domains)
