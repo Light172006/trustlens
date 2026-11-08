@@ -4,12 +4,14 @@ import hashlib
 import socket
 import ssl
 from datetime import UTC, datetime
+from typing import Any
 
 from cryptography import x509
 from cryptography.x509.oid import ExtensionOID, NameOID
 from pydantic import BaseModel, Field
 
 from app.core.logging import logger
+from app.integrations.certificate_client import certificate_client
 
 
 class TlsCertificateDetails(BaseModel):
@@ -45,6 +47,9 @@ class TlsScanResult(BaseModel):
     protocol_version: str | None = None
     cipher_suite: str | None = None
     certificate: TlsCertificateDetails | None = None
+    raw_leaf_der: bytes | None = None
+    presented_intermediates_der: list[bytes] = Field(default_factory=list)
+    assessment: dict[str, Any] | None = None
     error_message: str | None = None
     completed: bool = False
 
@@ -78,7 +83,9 @@ class TlsScanner:
                     # Retrieve binary DER certificate for robust cryptography parsing
                     der_cert = ssock.getpeercert(binary_form=True)
                     if der_cert:
+                        result.raw_leaf_der = der_cert
                         result.certificate = self._parse_der_certificate(der_cert, host)
+                        self._evaluate_certificate_intelligence(result, host, port, der_cert)
                     result.completed = True
                     return result
 
@@ -95,7 +102,11 @@ class TlsScanner:
                 result.hostname_match = True
 
             # Attempt unverified connection to extract leaf certificate metadata for evidence
-            result.certificate = self._fetch_unverified_cert(connect_target, port, host)
+            cert_details, unverified_der = self._fetch_unverified_cert(connect_target, port, host)
+            result.certificate = cert_details
+            if unverified_der:
+                result.raw_leaf_der = unverified_der
+                self._evaluate_certificate_intelligence(result, host, port, unverified_der)
             result.completed = True
             return result
 
@@ -108,7 +119,7 @@ class TlsScanner:
 
     def _fetch_unverified_cert(
         self, target: str, port: int, hostname: str
-    ) -> TlsCertificateDetails | None:
+    ) -> tuple[TlsCertificateDetails | None, bytes | None]:
         """Fetch certificate without trust verification to record evidence for failed checks."""
         try:
             unverified_ctx = ssl._create_unverified_context()
@@ -116,10 +127,35 @@ class TlsScanner:
                 with unverified_ctx.wrap_socket(sock, server_hostname=hostname) as ssock:
                     der_cert = ssock.getpeercert(binary_form=True)
                     if der_cert:
-                        return self._parse_der_certificate(der_cert, hostname)
+                        return self._parse_der_certificate(der_cert, hostname), der_cert
         except Exception:
             pass
-        return None
+        return None, None
+
+    def _evaluate_certificate_intelligence(
+        self,
+        result: TlsScanResult,
+        host: str,
+        port: int,
+        der_cert: bytes,
+    ) -> None:
+        """Invokes Certificate Analyzer engine to assess trust, policy, and compliance."""
+        try:
+            assessment = certificate_client.analyze_endpoint_tls(
+                certificate_der=der_cert,
+                target_hostname=host,
+                port=port,
+                tls_protocol_version=result.protocol_version or "TLSv1.3",
+                cipher_suite=result.cipher_suite,
+                presented_intermediates=result.presented_intermediates_der,
+                include_ml_advisory=False,
+            )
+            if hasattr(assessment, "model_dump"):
+                result.assessment = assessment.model_dump(mode="json")
+            elif isinstance(assessment, dict):
+                result.assessment = assessment
+        except Exception as exc:
+            logger.debug(f"Failed to evaluate certificate intelligence for {host}: {exc}")
 
     def _parse_der_certificate(self, der_bytes: bytes, hostname: str) -> TlsCertificateDetails:
         """Parse raw DER X.509 certificate using cryptography library."""

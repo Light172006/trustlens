@@ -3,7 +3,7 @@
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, SmallInteger, String
+from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, SmallInteger, String
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -91,6 +91,34 @@ class Certificate(Base):
         Boolean,
         default=False,
         nullable=False,
+    )
+    trust_score: Mapped[int | None] = mapped_column(
+        SmallInteger,
+        nullable=True,
+    )
+    verdict: Mapped[str | None] = mapped_column(
+        String(20),
+        nullable=True,
+    )
+    confidence: Mapped[float | None] = mapped_column(
+        Float,
+        nullable=True,
+    )
+    checks_completed: Mapped[int | None] = mapped_column(
+        SmallInteger,
+        nullable=True,
+    )
+    policy_evaluation: Mapped[dict | None] = mapped_column(
+        JSON,
+        nullable=True,
+    )
+    ml_advisory: Mapped[dict | None] = mapped_column(
+        JSON,
+        nullable=True,
+    )
+    assessment_payload: Mapped[dict | None] = mapped_column(
+        JSON,
+        nullable=True,
     )
     fetched_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

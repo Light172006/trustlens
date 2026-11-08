@@ -43,6 +43,27 @@ class EntityNotFoundException(TrustLensException):
         )
 
 
+ResourceNotFoundException = EntityNotFoundException
+
+
+class ValidationError(TrustLensException):
+    """Raised when an application input fails semantic validation."""
+
+    def __init__(
+        self,
+        message: str = "Invalid request parameters.",
+        field: str | None = None,
+        issue: str | None = None,
+    ) -> None:
+        details = [{"field": field, "issue": issue or message}] if field else []
+        super().__init__(
+            message=message,
+            code="VALIDATION_ERROR",
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            details=details,
+        )
+
+
 class AuthenticationError(TrustLensException):
     """Raised when authentication fails or is missing."""
 

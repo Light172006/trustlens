@@ -2,6 +2,7 @@
 
 from app.models.audit_log import AuditEvent
 from app.models.certificate import Certificate
+from app.models.certificate_scan import CertificateScan
 from app.models.finding import Finding
 from app.models.provider_check import ProviderCheck
 from app.models.redirect import ScanRedirect
@@ -13,6 +14,7 @@ from app.models.user import User
 __all__ = [
     "AuditEvent",
     "Certificate",
+    "CertificateScan",
     "CommunityReport",
     "CommunityVote",
     "Finding",

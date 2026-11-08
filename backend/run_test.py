@@ -7,5 +7,7 @@ if __name__ == "__main__":
     repo_root = backend_dir.parent
     sys.path.insert(0, str(repo_root))
     sys.path.insert(0, str(backend_dir))
+    sys.path.insert(0, str(repo_root / "intelligence" / "certificate_analyzer" / "src"))
+    sys.path.insert(0, str(repo_root / "intelligence" / "certificate_dataset" / "src"))
     tests_dir = backend_dir / "app" / "tests"
     sys.exit(pytest.main(["-v", str(tests_dir)]))

@@ -115,6 +115,13 @@ class CertificateResponseItem(BaseModel):
     hostname_match: bool
     sct_present: bool
     revocation_status: str = "not_checked"
+    trust_score: int | None = None
+    verdict: str | None = None
+    confidence: float | None = None
+    checks_completed: int | None = None
+    policy_evaluation: dict[str, Any] | None = None
+    ml_advisory: dict[str, Any] | None = None
+    assessment_payload: dict[str, Any] | None = None
     fetched_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

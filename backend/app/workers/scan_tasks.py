@@ -31,10 +31,13 @@ from shared.contracts.ai_contracts import (
 logger = logging.getLogger("trustlens.workers.scan")
 
 
-async def run_scan_pipeline(scan_id: str, allow_private_for_tests: bool = False) -> None:
+async def run_scan_pipeline(
+    scan_id: str | uuid.UUID, allow_private_for_tests: bool = False
+) -> None:
     """Execute complete website scanning and threat intelligence assessment pipeline."""
+    parsed_scan_id = scan_id if isinstance(scan_id, uuid.UUID) else uuid.UUID(str(scan_id))
     async with AsyncSessionLocal() as db:
-        stmt = select(Scan).where(Scan.id == uuid.UUID(scan_id))
+        stmt = select(Scan).where(Scan.id == parsed_scan_id)
         result = await db.execute(stmt)
         scan = result.scalar_one_or_none()
 
@@ -211,6 +214,7 @@ async def run_scan_pipeline(scan_id: str, allow_private_for_tests: bool = False)
         # Persist certificate details
         if tls_result and tls_result.certificate:
             cert = tls_result.certificate
+            assessment_data = tls_result.assessment or {}
             cert_record = Certificate(
                 id=uuid.uuid4(),
                 scan_id=scan.id,
@@ -229,6 +233,13 @@ async def run_scan_pipeline(scan_id: str, allow_private_for_tests: bool = False)
                 chain_valid=tls_result.chain_valid,
                 hostname_match=tls_result.hostname_match,
                 sct_present=cert.sct_present,
+                trust_score=assessment_data.get("trust_score"),
+                verdict=assessment_data.get("verdict"),
+                confidence=assessment_data.get("confidence"),
+                checks_completed=assessment_data.get("checks_completed"),
+                policy_evaluation=assessment_data.get("policy_evaluation"),
+                ml_advisory=assessment_data.get("ml_advisory"),
+                assessment_payload=assessment_data if assessment_data else None,
                 fetched_at=cert.fetched_at,
             )
             db.add(cert_record)
