@@ -9,23 +9,22 @@ from typing import Any
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# Ensure intelligence modules are dynamically accessible
+# Ensure intelligence and shared modules are dynamically accessible across runtimes
 _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-_CERT_ANALYZER_SRC = _REPO_ROOT / "intelligence" / "certificate_analyzer" / "src"
-_CERT_DATASET_SRC = _REPO_ROOT / "intelligence" / "certificate_dataset" / "src"
-_INTELLIGENCE_SRC = _REPO_ROOT / "intelligence"
-_WEB_SECURITY_SRC = _REPO_ROOT / "intelligence" / "web_security_analysis"
-_WEB_SECURITY_ANALYZER_SRC = _REPO_ROOT / "intelligence" / "web_security_analysis" / "analyzer"
+_BACKEND_ROOT = Path(__file__).resolve().parent.parent
 
-for _src_path in [
-    _INTELLIGENCE_SRC,
-    _CERT_ANALYZER_SRC,
-    _CERT_DATASET_SRC,
-    _WEB_SECURITY_SRC,
-    _WEB_SECURITY_ANALYZER_SRC,
-]:
-    if _src_path.exists() and str(_src_path) not in sys.path:
-        sys.path.insert(0, str(_src_path))
+for _base in [_REPO_ROOT, _BACKEND_ROOT]:
+    for _sub in [
+        _base / "shared",
+        _base / "shared" / "contracts",
+        _base / "intelligence",
+        _base / "intelligence" / "certificate_analyzer" / "src",
+        _base / "intelligence" / "certificate_dataset" / "src",
+        _base / "intelligence" / "web_security_analysis",
+        _base / "intelligence" / "web_security_analysis" / "analyzer",
+    ]:
+        if _sub.exists() and str(_sub) not in sys.path:
+            sys.path.insert(0, str(_sub))
 
 
 class Settings(BaseSettings):
