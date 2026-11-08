@@ -72,7 +72,7 @@ class TrustLensIntelligenceEngine:
 
     def analyze(
         self,
-        evidence: ScanEvidence,
+        evidence: ScanEvidence | Any,
         query_providers: bool = False,
         is_scan_failed: bool = False,
     ) -> ThreatAssessment:
@@ -88,6 +88,9 @@ class TrustLensIntelligenceEngine:
         Returns:
             ThreatAssessment with verdict, score, confidence, findings, coverage, and summary.
         """
+        if not isinstance(evidence, ScanEvidence):
+            evidence = ScanEvidence.model_validate(evidence)
+
         target_url = evidence.canonical_url or evidence.original_url
         provider_checks: list[ProviderCheckResult] = []
 

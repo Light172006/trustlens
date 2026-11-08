@@ -1,0 +1,261 @@
+{
+  "total_raw": 16950,
+  "total_accepted": 10708,
+  "total_excluded": 6242,
+  "reasons_breakdown": {
+    "UNREACHABLE_HOST": 6240,
+    "INVALID_DOMAIN_SYNTAX": 2
+  },
+  "sample_exclusions": [
+    {
+      "domain": "ezviz7.com",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 3
+    },
+    {
+      "domain": "hicloudcam.com",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 9
+    },
+    {
+      "domain": "akamai.net",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 13
+    },
+    {
+      "domain": "akamaiedge.net",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 15
+    },
+    {
+      "domain": "gwfb.net",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 20
+    },
+    {
+      "domain": "akadns.net",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 21
+    },
+    {
+      "domain": "domaincontrol.com",
+      "reason": "UNREACHABLE_HOST: status=UNREACHABLE",
+      "line": 22
+    },
+    {
+      "domain": "gtld-servers.net",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 27
+    },
+    {
+      "domain": "cloudfront.net",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 28
+    },
+    {
+      "domain": "aaplimg.com",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 36
+    },
+    {
+      "domain": "trafficmanager.net",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 37
+    },
+    {
+      "domain": "apple-dns.net",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 42
+    },
+    {
+      "domain": "office.net",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 44
+    },
+    {
+      "domain": "w2rt6byl5nf1opmc-a.com",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 45
+    },
+    {
+      "domain": "pv-cdn.net",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 50
+    },
+    {
+      "domain": "microsoftonline.com",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 64
+    },
+    {
+      "domain": "h264.io",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 65
+    },
+    {
+      "domain": "windowsupdate.com",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 68
+    },
+    {
+      "domain": "gvt1.com",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 71
+    },
+    {
+      "domain": "edgekey.net",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 74
+    },
+    {
+      "domain": "tiktokcdn.com",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 76
+    },
+    {
+      "domain": "a2z.com",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 79
+    },
+    {
+      "domain": "3gppnetwork.org",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 88
+    },
+    {
+      "domain": "aws.dev",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 92
+    },
+    {
+      "domain": "akam.net",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 96
+    },
+    {
+      "domain": "cdn77.org",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 98
+    },
+    {
+      "domain": "dotaplabs.net",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 101
+    },
+    {
+      "domain": "virginm.net",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 104
+    },
+    {
+      "domain": "edgesuite.net",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 110
+    },
+    {
+      "domain": "2mdn.net",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 111
+    },
+    {
+      "domain": "cdninstagram.com",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 112
+    },
+    {
+      "domain": "gvt2.com",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 117
+    },
+    {
+      "domain": "fastly-edge.com",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 121
+    },
+    {
+      "domain": "azurefd.net",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 122
+    },
+    {
+      "domain": "amazon.dev",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 123
+    },
+    {
+      "domain": "root-servers.net",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 125
+    },
+    {
+      "domain": "yccdn.ru",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 131
+    },
+    {
+      "domain": "ytimg.com",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 137
+    },
+    {
+      "domain": "akamaized.net",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 140
+    },
+    {
+      "domain": "nflxso.net",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 141
+    },
+    {
+      "domain": "static.microsoft",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 144
+    },
+    {
+      "domain": "supertms.com",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 146
+    },
+    {
+      "domain": "dns-parking.com",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 148
+    },
+    {
+      "domain": "tm-azurefd.net",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 149
+    },
+    {
+      "domain": "azurewebsites.net",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 155
+    },
+    {
+      "domain": "jomodns.com",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 161
+    },
+    {
+      "domain": "dnsowl.com",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 163
+    },
+    {
+      "domain": "spo-msedge.net",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 164
+    },
+    {
+      "domain": "ax-msedge.net",
+      "reason": "UNREACHABLE_HOST: status=DNS_FAILURE",
+      "line": 172
+    },
+    {
+      "domain": "astrumu.io",
+      "reason": "UNREACHABLE_HOST: status=UNREACHABLE",
+      "line": 178
+    }
+  ]
+}

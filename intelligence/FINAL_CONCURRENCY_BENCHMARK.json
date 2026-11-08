@@ -1,0 +1,75 @@
+{
+  "timestamp": "2026-11-08T15:55:05Z",
+  "concurrency_benchmarks": {
+    "concurrency_1": {
+      "count": 200,
+      "mean_ms": 2.845,
+      "min_ms": 2.129,
+      "p50_ms": 2.633,
+      "p90_ms": 3.314,
+      "p95_ms": 3.581,
+      "p99_ms": 4.822,
+      "max_ms": 20.261,
+      "concurrency": 1,
+      "total_time_s": 0.576,
+      "throughput_qps": 347.46
+    },
+    "concurrency_5": {
+      "count": 200,
+      "mean_ms": 28.394,
+      "min_ms": 14.769,
+      "p50_ms": 28.655,
+      "p90_ms": 31.954,
+      "p95_ms": 33.094,
+      "p99_ms": 36.368,
+      "max_ms": 40.611,
+      "concurrency": 5,
+      "total_time_s": 1.147,
+      "throughput_qps": 174.38
+    },
+    "concurrency_10": {
+      "count": 200,
+      "mean_ms": 52.802,
+      "min_ms": 21.908,
+      "p50_ms": 52.728,
+      "p90_ms": 63.177,
+      "p95_ms": 65.42,
+      "p99_ms": 68.701,
+      "max_ms": 70.99,
+      "concurrency": 10,
+      "total_time_s": 1.078,
+      "throughput_qps": 185.54
+    },
+    "concurrency_25": {
+      "count": 200,
+      "mean_ms": 134.516,
+      "min_ms": 38.793,
+      "p50_ms": 137.853,
+      "p90_ms": 157.434,
+      "p95_ms": 160.024,
+      "p99_ms": 170.059,
+      "max_ms": 191.043,
+      "concurrency": 25,
+      "total_time_s": 1.137,
+      "throughput_qps": 175.83
+    },
+    "concurrency_50": {
+      "count": 200,
+      "mean_ms": 281.563,
+      "min_ms": 82.384,
+      "p50_ms": 300.221,
+      "p90_ms": 344.04,
+      "p95_ms": 354.904,
+      "p99_ms": 372.501,
+      "max_ms": 406.5,
+      "concurrency": 50,
+      "total_time_s": 1.277,
+      "throughput_qps": 156.57
+    }
+  },
+  "memory_stability": {
+    "iterations": 500,
+    "memory_delta_kb": 88.85,
+    "leak_detected": false
+  }
+}

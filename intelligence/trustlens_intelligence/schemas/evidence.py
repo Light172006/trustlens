@@ -6,7 +6,7 @@ The intelligence engine interprets this evidence without executing target fetche
 
 from typing import Any
 from urllib.parse import urlparse
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from trustlens_intelligence.common.url_utils import extract_safe_hostname
 
@@ -120,6 +120,46 @@ class ScanEvidence(BaseModel):
     domain_intelligence: DomainIntelligenceEvidence | None = Field(default=None, description="Domain metadata")
     threat_intelligence: ThreatIntelEvidence | None = Field(default=None, description="Threat feed match observations")
     community_intelligence: CommunityIntelligenceEvidence | None = Field(default=None, description="Community reports")
+
+    @model_validator(mode="before")
+    @classmethod
+    def adapt_contract_inputs(cls, data: Any) -> Any:
+        """Adapts shared contracts input structures (e.g. url, domain) into intelligence ScanEvidence fields."""
+        if hasattr(data, "model_dump"):
+            d = data.model_dump()
+        elif isinstance(data, dict):
+            d = data.copy()
+        else:
+            return data
+
+        # Map 'url' from shared contracts to 'original_url' / 'canonical_url'
+        if "url" in d:
+            if "original_url" not in d or not d["original_url"]:
+                d["original_url"] = d["url"]
+            if "canonical_url" not in d or not d["canonical_url"]:
+                d["canonical_url"] = d["url"]
+
+        # Map 'domain' to 'host'
+        if "domain" in d and ("host" not in d or not d["host"]):
+            d["host"] = d["domain"]
+
+        # Map threat_intelligence details from shared contracts
+        ti = d.get("threat_intelligence")
+        if isinstance(ti, dict):
+            ti_copy = ti.copy()
+            if "phishing_match" in ti_copy and "openphish_match" not in ti_copy:
+                ti_copy["openphish_match"] = ti_copy["phishing_match"]
+            if "malware_match" in ti_copy and "urlhaus_match" not in ti_copy:
+                ti_copy["urlhaus_match"] = ti_copy["malware_match"]
+            details = ti_copy.get("details")
+            if isinstance(details, dict):
+                if "url_status" in details and "urlhaus_url_status" not in ti_copy:
+                    ti_copy["urlhaus_url_status"] = details["url_status"]
+                if details.get("urlhaus_match") and "urlhaus_match" not in ti_copy:
+                    ti_copy["urlhaus_match"] = details["urlhaus_match"]
+            d["threat_intelligence"] = ti_copy
+
+        return d
 
     @field_validator("original_url")
     @classmethod

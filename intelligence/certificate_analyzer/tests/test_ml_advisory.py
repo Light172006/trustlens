@@ -37,7 +37,10 @@ def test_ml_advisor_inference_on_authentic_certificate():
     advisor = CertificateMLAdvisor()
     assert advisor.is_ready is True
 
-    raw_dir = Path("intelligence/certificate_dataset/data/raw")
+    # Robust resolution relative to test file location
+    raw_dir = Path(__file__).resolve().parents[2] / "certificate_dataset" / "data" / "raw"
+    if not raw_dir.exists():
+        raw_dir = Path("intelligence/certificate_dataset/data/raw")
     sample_der = next(raw_dir.glob("*.der"))
     with open(sample_der, "rb") as f:
         der_bytes = f.read()

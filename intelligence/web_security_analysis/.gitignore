@@ -1,0 +1,2 @@
+# Allow parquet files in web_security_analysis dataset
+!*.parquet

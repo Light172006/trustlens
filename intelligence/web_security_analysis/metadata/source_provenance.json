@@ -1,0 +1,72 @@
+{
+  "provenance_metadata_version": "1.0.0",
+  "project": "TrustLens Web Security Analyzer",
+  "created_at": "2026-11-08T19:56:00Z",
+  "primary_population_source": {
+    "source_id": "SRC-TRANCO-1M-RESEARCH",
+    "name": "Tranco Research-Grade Top 1M Sites List",
+    "provider": "TU Delft & Université Côte d'Azur (Victor Le Pochat, Tom Van Goethem, Samaneh Tajalizadehkhoob, Maciej Korczyński, Wouter Joosen)",
+    "homepage": "https://tranco-list.eu/",
+    "citation": "Tranco: A Research-Oriented Top Sites Ranking Hardened Against Manipulation (NDSS 2019)",
+    "license": "CC-BY-4.0",
+    "permitted_use": "Academic, research, measurement and benchmarking datasets with attribution.",
+    "role": "Authoritative population of globally ranked, active, non-manipulated registrable domains."
+  },
+  "measurement_engine": {
+    "engine_id": "ENG-TRUSTLENS-TELEMETRY-COLLECTOR",
+    "version": "1.0.0",
+    "methodology": "Passive, non-intrusive network observation adhering to ethical internet measurement practices.",
+    "network_probes": [
+      {
+        "probe": "DNS Resolution",
+        "protocol": "DNS UDP/TCP Port 53",
+        "description": "Standard recursive lookup for A, AAAA, CNAME, and CAA records."
+      },
+      {
+        "probe": "TLS Handshake",
+        "protocol": "TLS 1.2/1.3 TCP Port 443 with SNI",
+        "description": "Safe cryptographic handshake negotiation to inspect cipher suite, TLS version, and leaf X.509 certificate."
+      },
+      {
+        "probe": "HTTP/HTTPS Endpoint Probing",
+        "protocol": "HTTP/1.1 and HTTP/2 GET/HEAD on Ports 80 and 443",
+        "description": "Non-intrusive HTTP request to observe response status, redirect chain, headers, and cookie attributes."
+      }
+    ],
+    "ethical_and_safety_constraints": [
+      "No invasive vulnerability scanning or injection testing.",
+      "Strict exclusion of authentication bypass or credential submission.",
+      "Strict prohibition against collecting or storing raw cookie values, session tokens, or personal identifiers.",
+      "Polite concurrency rates with per-target timeouts (3.0-5.0s) and standard User-Agent identification.",
+      "Zero modification of remote server state."
+    ]
+  },
+  "standards_and_taxonomies": [
+    {
+      "name": "Mozilla CCADB Root Store",
+      "reference": "https://www.ccadb.org/",
+      "purpose": "Validation of public trust anchors for leaf TLS certificates."
+    },
+    {
+      "name": "OWASP Secure Headers Project",
+      "reference": "https://owasp.org/www-project-secure-headers/",
+      "purpose": "Baseline directives and evaluation rules for modern HTTP response security headers."
+    },
+    {
+      "name": "RFC 6797 (HSTS)",
+      "reference": "https://tools.ietf.org/html/rfc6797",
+      "purpose": "Strict-Transport-Security evaluation rules and max-age thresholds."
+    },
+    {
+      "name": "RFC 6265bis (Cookies)",
+      "reference": "https://tools.ietf.org/html/draft-ietf-httpbis-rfc6265bis",
+      "purpose": "Secure, HttpOnly, and SameSite cookie attribute security specifications."
+    },
+    {
+      "name": "W3C Content Security Policy Level 3",
+      "reference": "https://www.w3.org/TR/CSP3/",
+      "purpose": "Content-Security-Policy evaluation and unsafe directive detection."
+    }
+  ]
+}
+
