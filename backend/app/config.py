@@ -105,12 +105,30 @@ class Settings(BaseSettings):
     WEB_SECURITY_TIMEOUT_SECONDS: float = 8.0
     WEB_SECURITY_MAX_REDIRECTS: int = 5
 
+    @field_validator("DATABASE_URL", mode="before")
+    @classmethod
+    def normalize_database_url(cls, v: Any) -> str:
+        """Normalize standard postgres:// and postgresql:// URLs to postgresql+asyncpg:// for async engine."""
+        if isinstance(v, str):
+            s = v.strip()
+            if s.startswith("postgres://"):
+                return s.replace("postgres://", "postgresql+asyncpg://", 1)
+            if s.startswith("postgresql://") and not s.startswith("postgresql+"):
+                return s.replace("postgresql://", "postgresql+asyncpg://", 1)
+            return s
+        return str(v)
+
     @field_validator("DATABASE_SYNC_URL", mode="before")
     @classmethod
     def assemble_sync_db_url(cls, v: Any, info: Any) -> str:
         """Derive sync database URL from DATABASE_URL if omitted."""
         if isinstance(v, str) and v.strip():
-            return v
+            s = v.strip()
+            if s.startswith("postgres://"):
+                return s.replace("postgres://", "postgresql+psycopg://", 1)
+            if s.startswith("postgresql://") and not s.startswith("postgresql+"):
+                return s.replace("postgresql://", "postgresql+psycopg://", 1)
+            return s
         data = info.data
         async_url = str(data.get("DATABASE_URL", ""))
         if "postgresql+asyncpg://" in async_url:
