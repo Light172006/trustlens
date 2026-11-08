@@ -114,7 +114,7 @@ class ThreatIntelManager:
         canonical_target = canonicalize_url_strict(url) if url else ""
 
         for name, provider in self._providers.items():
-            cache_key = (name, canonical_target)
+            cache_key = (name, canonical_target, is_sensitive)
 
             if use_cache:
                 with self._lock:

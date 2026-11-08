@@ -1,0 +1,70 @@
+{
+  "submission_id": "f81d4fae-7dec-11d0-a765-00a0c91e6bf6",
+  "canonical_url": "https://secure-login.phishing-portal.com/auth/login.php?session=active",
+  "validation": {
+    "is_valid": true,
+    "errors": [],
+    "warnings": [
+      "URL fragment stripped from canonical representation."
+    ],
+    "normalized_url": "https://secure-login.phishing-portal.com/auth/login.php?session=active",
+    "canonical_host": "secure-login.phishing-portal.com",
+    "registrable_domain": "phishing-portal.com"
+  },
+  "deduplication": {
+    "is_duplicate": false,
+    "primary_submission_id": null,
+    "duplicate_matches": [],
+    "related_matches": []
+  },
+  "evidence_evaluation": {
+    "evidence_quality_score": 0.765,
+    "evidence_diversity_score": 0.6667,
+    "supporting_count": 2,
+    "contradicting_count": 0,
+    "inconclusive_count": 0,
+    "unverified_count": 1,
+    "distinct_fingerprints": [
+      "d7a8fbb307d7809469ca933b02b1f3ee8ce81235cb1e4f86151304c7fa918b67",
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    "explanations": [
+      "1 evidence item(s) are unverified community submissions. Unverified evidence penalty applied."
+    ]
+  },
+  "abuse_detection": {
+    "is_suspicious": false,
+    "manipulation_risk": "LOW",
+    "signals": [],
+    "reasons": [
+      "No coordination, Sybil, or flood patterns detected."
+    ]
+  },
+  "corroboration": {
+    "corroboration_level": "HIGH",
+    "independent_reporter_count": 3,
+    "total_reports_count": 3,
+    "evidence_quality_score": 0.765,
+    "evidence_diversity_score": 0.6667,
+    "temporal_relevance_score": 1.0,
+    "conflicting_evidence_count": 0,
+    "abuse_warnings": [],
+    "supporting_reasons": [
+      "High corroboration: 3 independent sources, diverse verified evidence, and zero contradictory observations.",
+      "Observations are fresh and temporally relevant (0.0 days old)."
+    ],
+    "weakening_reasons": [],
+    "recommended_review_priority": "URGENT"
+  },
+  "moderation_recommendation": {
+    "recommended_action": "ESCALATE_URGENT",
+    "recommended_report_status": "UNDER_REVIEW",
+    "review_priority": "URGENT",
+    "reasons": [
+      "High independent corroboration (3 sources) with diverse verified evidence for PHISHING."
+    ],
+    "warnings": [],
+    "requires_human_approval": true
+  }
+}
+

@@ -19,6 +19,19 @@ from trustlens_intelligence.schemas.features import ExtractedFeatures
 logger = logging.getLogger("trustlens.intelligence.evaluation.inference")
 
 
+def _sanitize_feature_value(val: Any) -> float:
+    """Sanitize feature value to prevent NaN/Inf crashes during scikit-learn inference."""
+    if val is None:
+        return 0.0
+    try:
+        f = float(val)
+        if np.isnan(f) or np.isinf(f):
+            return 0.0
+        return f
+    except (ValueError, TypeError):
+        return 0.0
+
+
 class ThreatClassifier:
     """Production ML inference interface for website threat probability estimation."""
 
@@ -110,8 +123,11 @@ class ThreatClassifier:
 
         try:
             feature_dict = features.to_ml_dict()
-            # Align features in the exact order the model expects
-            ordered_values = {f: [feature_dict.get(f, 0.0)] for f in self.feature_names}
+            # Align features in the exact order the model expects, sanitizing NaN/Inf
+            ordered_values = {
+                f: [_sanitize_feature_value(feature_dict.get(f, 0.0))]
+                for f in self.feature_names
+            }
             df = pd.DataFrame(ordered_values)
 
             # Predict probability
@@ -165,7 +181,10 @@ class ThreatClassifier:
 
         try:
             feature_dict = features.to_ml_dict()
-            ordered_values = {f: [feature_dict.get(f, 0.0)] for f in self.feature_names}
+            ordered_values = {
+                f: [_sanitize_feature_value(feature_dict.get(f, 0.0))]
+                for f in self.feature_names
+            }
             df = pd.DataFrame(ordered_values)
 
             if hasattr(self.model, "predict_proba"):
