@@ -58,5 +58,6 @@ class PaginatedResponse(BaseModel, Generic[T]):
     page: int = Field(..., ge=1, description="Current page number (1-indexed)")
     page_size: int = Field(..., ge=1, le=100, description="Items per page")
     total: int = Field(..., ge=0, description="Total matching items across all pages")
+    pages: int = Field(default=1, ge=1, description="Total pages available")
 
     model_config = ConfigDict(from_attributes=True)

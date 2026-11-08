@@ -1,0 +1,397 @@
+{
+  "model_name": "TrustLens-WebSecurity-HistGradientBoosting",
+  "model_version": "1.0.0",
+  "base_estimator": "HistGradientBoosting",
+  "calibration_applied": true,
+  "calibration_method": "sigmoid",
+  "trained_at": "2026-11-08T15:02:49.527913+00:00",
+  "random_seed": 42,
+  "classes": [
+    "GOOD",
+    "MODERATE",
+    "POOR"
+  ],
+  "feature_schema": {
+    "numerical_features": [
+      "url_length",
+      "subdomain_count",
+      "tls_cert_san_count",
+      "tls_cert_remaining_days",
+      "tls_cert_key_size",
+      "redirect_count",
+      "final_status_code",
+      "header_hsts_max_age",
+      "cookie_count",
+      "cookie_secure_count",
+      "cookie_httponly_count",
+      "cookie_samesite_strict_count",
+      "cookie_samesite_lax_count",
+      "cookie_samesite_none_count"
+    ],
+    "boolean_features": [
+      "is_idn",
+      "is_ip_host",
+      "domain_resolved",
+      "dns_has_ipv4",
+      "dns_has_ipv6",
+      "dns_has_caa",
+      "tls_supported",
+      "tls_cert_valid",
+      "tls_cert_expired",
+      "tls_cert_is_self_signed",
+      "tls_cert_hostname_match",
+      "http_available",
+      "https_available",
+      "http_to_https_redirect",
+      "https_downgrade",
+      "header_hsts_present",
+      "header_hsts_include_subdomains",
+      "header_hsts_preload",
+      "header_csp_present",
+      "header_csp_unsafe_inline",
+      "header_csp_unsafe_eval",
+      "header_xfo_present",
+      "header_xcto_present",
+      "header_referrer_policy_present",
+      "header_permissions_policy_present",
+      "header_coop_present",
+      "header_corp_present",
+      "header_coep_present",
+      "cookie_all_secure",
+      "cookie_all_httponly",
+      "server_version_exposed",
+      "x_powered_by_present"
+    ],
+    "categorical_features": [
+      "tls_version",
+      "final_scheme",
+      "server_vendor"
+    ],
+    "transformed_features_count": 62
+  },
+  "training_data": {
+    "train_samples": 7495,
+    "validation_samples": 1604,
+    "test_samples": 1609
+  },
+  "validation_comparison": {
+    "LogisticRegression": {
+      "accuracy": 0.9719,
+      "balanced_accuracy": 0.9623,
+      "macro_f1": 0.9615,
+      "weighted_f1": 0.972,
+      "macro_precision": 0.9607,
+      "macro_recall": 0.9623,
+      "per_class": {
+        "GOOD": {
+          "f1": 0.9568,
+          "precision": 0.9469,
+          "recall": 0.967,
+          "support": 424
+        },
+        "MODERATE": {
+          "f1": 0.9323,
+          "precision": 0.9366,
+          "recall": 0.9281,
+          "support": 334
+        },
+        "POOR": {
+          "f1": 0.9953,
+          "precision": 0.9988,
+          "recall": 0.9917,
+          "support": 846
+        }
+      },
+      "confusion_matrix": {
+        "labels": [
+          "GOOD",
+          "MODERATE",
+          "POOR"
+        ],
+        "matrix": [
+          [
+            410,
+            14,
+            0
+          ],
+          [
+            23,
+            310,
+            1
+          ],
+          [
+            0,
+            7,
+            839
+          ]
+        ]
+      },
+      "security_penalties": {
+        "false_good_on_poor_count": 0,
+        "false_good_on_poor_rate_pct": 0.0,
+        "false_poor_on_good_count": 0,
+        "false_poor_on_good_rate_pct": 0.0
+      },
+      "macro_roc_auc": 0.9953,
+      "log_loss": 0.1264,
+      "training_time_seconds": 0.164
+    },
+    "RandomForest": {
+      "accuracy": 0.9763,
+      "balanced_accuracy": 0.9688,
+      "macro_f1": 0.9676,
+      "weighted_f1": 0.9764,
+      "macro_precision": 0.9663,
+      "macro_recall": 0.9688,
+      "per_class": {
+        "GOOD": {
+          "f1": 0.9637,
+          "precision": 0.9559,
+          "recall": 0.9717,
+          "support": 424
+        },
+        "MODERATE": {
+          "f1": 0.9431,
+          "precision": 0.9431,
+          "recall": 0.9431,
+          "support": 334
+        },
+        "POOR": {
+          "f1": 0.9958,
+          "precision": 1.0,
+          "recall": 0.9917,
+          "support": 846
+        }
+      },
+      "confusion_matrix": {
+        "labels": [
+          "GOOD",
+          "MODERATE",
+          "POOR"
+        ],
+        "matrix": [
+          [
+            412,
+            12,
+            0
+          ],
+          [
+            19,
+            315,
+            0
+          ],
+          [
+            0,
+            7,
+            839
+          ]
+        ]
+      },
+      "security_penalties": {
+        "false_good_on_poor_count": 0,
+        "false_good_on_poor_rate_pct": 0.0,
+        "false_poor_on_good_count": 0,
+        "false_poor_on_good_rate_pct": 0.0
+      },
+      "macro_roc_auc": 0.998,
+      "log_loss": 0.0928,
+      "training_time_seconds": 0.363
+    },
+    "ExtraTrees": {
+      "accuracy": 0.9676,
+      "balanced_accuracy": 0.9559,
+      "macro_f1": 0.955,
+      "weighted_f1": 0.9677,
+      "macro_precision": 0.9543,
+      "macro_recall": 0.9559,
+      "per_class": {
+        "GOOD": {
+          "f1": 0.9476,
+          "precision": 0.9356,
+          "recall": 0.9599,
+          "support": 424
+        },
+        "MODERATE": {
+          "f1": 0.9217,
+          "precision": 0.9273,
+          "recall": 0.9162,
+          "support": 334
+        },
+        "POOR": {
+          "f1": 0.9958,
+          "precision": 1.0,
+          "recall": 0.9917,
+          "support": 846
+        }
+      },
+      "confusion_matrix": {
+        "labels": [
+          "GOOD",
+          "MODERATE",
+          "POOR"
+        ],
+        "matrix": [
+          [
+            407,
+            17,
+            0
+          ],
+          [
+            28,
+            306,
+            0
+          ],
+          [
+            0,
+            7,
+            839
+          ]
+        ]
+      },
+      "security_penalties": {
+        "false_good_on_poor_count": 0,
+        "false_good_on_poor_rate_pct": 0.0,
+        "false_poor_on_good_count": 0,
+        "false_poor_on_good_rate_pct": 0.0
+      },
+      "macro_roc_auc": 0.9971,
+      "log_loss": 0.0972,
+      "training_time_seconds": 0.316
+    },
+    "HistGradientBoosting": {
+      "accuracy": 0.9906,
+      "balanced_accuracy": 0.9897,
+      "macro_f1": 0.9879,
+      "weighted_f1": 0.9907,
+      "macro_precision": 0.9861,
+      "macro_recall": 0.9897,
+      "per_class": {
+        "GOOD": {
+          "f1": 0.9894,
+          "precision": 0.9905,
+          "recall": 0.9882,
+          "support": 424
+        },
+        "MODERATE": {
+          "f1": 0.9778,
+          "precision": 0.9677,
+          "recall": 0.988,
+          "support": 334
+        },
+        "POOR": {
+          "f1": 0.9964,
+          "precision": 1.0,
+          "recall": 0.9929,
+          "support": 846
+        }
+      },
+      "confusion_matrix": {
+        "labels": [
+          "GOOD",
+          "MODERATE",
+          "POOR"
+        ],
+        "matrix": [
+          [
+            419,
+            5,
+            0
+          ],
+          [
+            4,
+            330,
+            0
+          ],
+          [
+            0,
+            6,
+            840
+          ]
+        ]
+      },
+      "security_penalties": {
+        "false_good_on_poor_count": 0,
+        "false_good_on_poor_rate_pct": 0.0,
+        "false_poor_on_good_count": 0,
+        "false_poor_on_good_rate_pct": 0.0
+      },
+      "macro_roc_auc": 0.9983,
+      "log_loss": 0.0643,
+      "training_time_seconds": 1.901
+    }
+  },
+  "calibration_evaluation": {
+    "method": "sigmoid",
+    "pre_brier_score": 0.0058,
+    "post_brier_score": 0.0052,
+    "improvement": 0.0006
+  },
+  "test_evaluation": {
+    "accuracy": 0.9944,
+    "balanced_accuracy": 0.9929,
+    "macro_f1": 0.9928,
+    "weighted_f1": 0.9944,
+    "macro_precision": 0.9928,
+    "macro_recall": 0.9929,
+    "per_class": {
+      "GOOD": {
+        "f1": 0.9907,
+        "precision": 0.9816,
+        "recall": 1.0,
+        "support": 426
+      },
+      "MODERATE": {
+        "f1": 0.9895,
+        "precision": 0.997,
+        "recall": 0.9821,
+        "support": 336
+      },
+      "POOR": {
+        "f1": 0.9982,
+        "precision": 1.0,
+        "recall": 0.9965,
+        "support": 847
+      }
+    },
+    "confusion_matrix": {
+      "labels": [
+        "GOOD",
+        "MODERATE",
+        "POOR"
+      ],
+      "matrix": [
+        [
+          426,
+          0,
+          0
+        ],
+        [
+          6,
+          330,
+          0
+        ],
+        [
+          2,
+          1,
+          844
+        ]
+      ]
+    },
+    "security_penalties": {
+      "false_good_on_poor_count": 2,
+      "false_good_on_poor_rate_pct": 0.24,
+      "false_poor_on_good_count": 0,
+      "false_poor_on_good_rate_pct": 0.0
+    },
+    "macro_roc_auc": 0.9999,
+    "log_loss": 0.0192
+  },
+  "artifacts": {
+    "model_file": "model.joblib",
+    "model_sha256": "b3932e887a6f35c7fedc1216c8d6ee0ff0192d71aee2c09f41c75ee3cb77efc7",
+    "model_size_bytes": 2067353,
+    "preprocessor_file": "preprocessor.joblib",
+    "preprocessor_sha256": "0bd5e43c9e4514e8492982e4de3b0f3658fb58b5d9b358f13aaae2c7fa3112c3",
+    "preprocessor_size_bytes": 8412
+  }
+}

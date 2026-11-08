@@ -1,5 +1,6 @@
 """Domain service for website scan creation, deduplication, report retrieval, and findings."""
 
+import asyncio
 import uuid
 from datetime import UTC, datetime, timedelta
 
@@ -7,6 +8,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.config import settings
 from app.core.exceptions import EntityNotFoundException
 from app.core.logging import logger
 from app.core.permissions import verify_resource_ownership
@@ -26,7 +28,7 @@ from app.schemas.scan import (
     ScanRecordResponse,
     ScanSummaryItem,
 )
-from app.workers.scan_tasks import execute_scan_task
+from app.workers.scan_tasks import execute_scan_task, run_scan_pipeline
 
 
 class ScanService:
@@ -86,12 +88,24 @@ class ScanService:
         await db.commit()
         await db.refresh(new_scan)
 
-        # 4. Schedule background Celery task
-        try:
-            execute_scan_task.delay(scan_id=str(new_scan.id))
-        except Exception as exc:
-            logger.warning(f"Could not enqueue Celery task directly (broker offline?): {exc}")
-            # In testing or standalone development without Redis, scan remains queued or can be run in-process
+        # 4. Schedule background scan execution
+        enqueued = False
+        if getattr(settings, "CELERY_ENABLED", False):
+            try:
+                execute_scan_task.delay(scan_id=str(new_scan.id))
+                enqueued = True
+            except Exception as exc:
+                logger.warning(
+                    f"Could not enqueue Celery task directly (broker offline?): {exc}. "
+                    "Falling back to in-process background worker."
+                )
+
+        if not enqueued and settings.ENVIRONMENT != "test":
+            # Standalone / in-process execution (ideal for local development without Redis/Celery)
+            logger.info(f"Dispatching in-process background scan pipeline for scan {new_scan.id}")
+            asyncio.create_task(
+                run_scan_pipeline(scan_id=new_scan.id, allow_private_for_tests=allow_private_for_tests)
+            )
 
         return new_scan, False
 
@@ -260,7 +274,6 @@ class ScanService:
             scan_id=scan_id,
             available=True,
             certificate=CertificateResponseItem.model_validate(cert),
-            assessment=cert.assessment_payload,
         )
 
     async def delete_scan(

@@ -1,0 +1,66 @@
+# TrustLens Web Security Analyzer - Dataset Configuration
+project:
+  name: "TrustLens Web Security Analyzer Dataset"
+  version: "1.0.0"
+  target_unique_domains: 10000
+
+paths:
+  raw_dir: "dataset/raw/source-specific"
+  processed_dir: "dataset/processed"
+  splits_dir: "dataset/splits"
+  synthetic_dir: "dataset/synthetic"
+  metadata_dir: "metadata"
+  processed_parquet: "dataset/processed/web_security_dataset.parquet"
+  processed_csv: "dataset/processed/web_security_dataset.csv"
+  synthetic_parquet: "dataset/synthetic/lab_dataset.parquet"
+  manifest_json: "metadata/dataset_manifest.json"
+  data_dictionary_json: "metadata/data_dictionary.json"
+  source_provenance_json: "metadata/source_provenance.json"
+  label_taxonomy_json: "metadata/label_taxonomy.json"
+  collection_report_json: "metadata/collection_report.json"
+  quality_report_json: "metadata/quality_report.json"
+
+sources:
+  tranco:
+    name: "Tranco Research Top 1M"
+    url: "https://tranco-list.eu/top-1m.csv.zip"
+    cache_path: "dataset/raw/source-specific/tranco_top1m.zip"
+    license: "CC-BY-4.0"
+    description: "Vetted research-grade top site ranking corpus maintained by TU Delft and Université Côte d'Azur."
+    sample_pool_size: 15000
+    strata:
+      top_1k: 1000
+      top_1k_to_5k: 4000
+      top_5k_to_10k: 5000
+      top_10k_to_15k: 5000
+
+collection:
+  concurrency: 120
+  timeout_seconds: 5.0
+  dns_timeout_seconds: 2.5
+  tls_timeout_seconds: 3.5
+  http_timeout_seconds: 4.5
+  user_agent: "TrustLens-WebSecurity-Research/1.0 (+https://trustlens.ai/research; passive-measurement)"
+  checkpoint_interval: 500
+  max_redirects: 5
+
+scoring:
+  weights:
+    tls_security: 35
+    http_headers: 30
+    cookie_security: 15
+    redirect_integrity: 10
+    server_exposure: 5
+    dns_resilience: 5
+  thresholds:
+    good: 80
+    moderate: 50
+    poor: 0
+
+splits:
+  train_ratio: 0.70
+  validation_ratio: 0.15
+  test_ratio: 0.15
+  random_seed: 42
+  stratify_by: "website_posture_label"
+

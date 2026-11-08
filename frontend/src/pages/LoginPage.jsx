@@ -1,12 +1,12 @@
 /**
- * LoginPage Component
- * Minimal dark login interface with password visibility toggle,
- * demo credentials fill button, and clear authentication error states.
+ * TrustLens LoginPage Component
+ * Minimal dark cybersecurity login console with password visibility toggle,
+ * credential validation, and clear error extraction from backend response envelopes.
  */
 
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Shield, Lock, Mail, Eye, EyeOff, AlertCircle, ArrowRight, Zap } from 'lucide-react';
+import { Shield, Lock, Mail, Eye, EyeOff } from 'lucide-react';
 import { Input, Button, Alert } from 'antd';
 import { useAuth } from '../context/AuthContext';
 
@@ -17,11 +17,10 @@ export function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const { login, isMockMode } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Extract returnUrl from query params if available
   const query = new URLSearchParams(location.search);
   const returnUrl = query.get('returnUrl') || '/dashboard';
 
@@ -44,12 +43,6 @@ export function LoginPage() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleDemoFill = () => {
-    setEmail('analyst@trustlens.dev');
-    setPassword('SecurePassword123!');
-    setErrorMessage('');
   };
 
   return (
@@ -87,7 +80,7 @@ export function LoginPage() {
             TrustLens Console
           </h2>
           <p style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
-            Sign in to access web threat intelligence & scan reports
+            Sign in to access digital trust intelligence & investigation telemetry
           </p>
         </div>
 
@@ -119,16 +112,26 @@ export function LoginPage() {
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.775rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.4rem' }}>
-                EMAIL ADDRESS
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                  color: 'var(--text-secondary)',
+                  marginBottom: '0.4rem',
+                  letterSpacing: '0.04em',
+                }}
+              >
+                Email Address
               </label>
               <Input
                 size="large"
                 type="email"
-                placeholder="analyst@trustlens.dev"
+                placeholder="analyst@trustlens.internal"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                prefix={<Mail size={16} style={{ color: 'var(--text-muted)', marginRight: '6px' }} />}
+                prefix={<Mail size={16} style={{ color: 'var(--text-muted)' }} />}
                 disabled={isLoading}
                 required
                 style={{
@@ -141,8 +144,16 @@ export function LoginPage() {
 
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
-                <label style={{ fontSize: '0.775rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                  PASSWORD
+                <label
+                  style={{
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    color: 'var(--text-secondary)',
+                    letterSpacing: '0.04em',
+                  }}
+                >
+                  Password
                 </label>
               </div>
               <Input
@@ -151,12 +162,12 @@ export function LoginPage() {
                 placeholder="••••••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                prefix={<Lock size={16} style={{ color: 'var(--text-muted)', marginRight: '6px' }} />}
+                prefix={<Lock size={16} style={{ color: 'var(--text-muted)' }} />}
                 suffix={
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}
+                    style={{ color: 'var(--text-muted)', display: 'flex' }}
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -179,45 +190,35 @@ export function LoginPage() {
               style={{
                 backgroundColor: 'var(--color-accent)',
                 borderColor: 'var(--color-accent)',
-                fontWeight: 600,
                 color: '#101112',
+                fontWeight: 600,
                 marginTop: '0.5rem',
+                height: '42px',
               }}
             >
-              Sign In to Console
+              Sign In
             </Button>
-
-            {/* Quick Demo Credentials Autofill */}
-            <div style={{ paddingTop: '0.75rem', borderTop: '1px solid var(--border-color-subtle)' }}>
-              <Button
-                type="dashed"
-                block
-                size="middle"
-                icon={<Zap size={14} color="var(--color-accent)" />}
-                onClick={handleDemoFill}
-                style={{
-                  borderColor: 'var(--border-color-strong)',
-                  color: 'var(--text-secondary)',
-                  fontSize: '0.8rem',
-                }}
-              >
-                Autofill Demo Credentials
-              </Button>
-            </div>
           </form>
 
-          <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.825rem', color: 'var(--text-muted)' }}>
-            Don't have an account?{' '}
+          <div
+            style={{
+              marginTop: '1.5rem',
+              paddingTop: '1rem',
+              borderTop: '1px solid var(--border-color-subtle)',
+              textAlign: 'center',
+              fontSize: '0.8rem',
+              color: 'var(--text-secondary)',
+            }}
+          >
+            Don't have an analyst account?{' '}
             <Link to="/register" style={{ color: 'var(--color-accent)', fontWeight: 600 }}>
-              Create Account
+              Register here
             </Link>
           </div>
         </div>
 
-        <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
-          <Link to="/" style={{ fontSize: '0.775rem', color: 'var(--text-muted)' }}>
-            ← Back to public homepage
-          </Link>
+        <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+          TrustLens Security Intelligence Platform • Port 8000
         </div>
       </div>
     </div>

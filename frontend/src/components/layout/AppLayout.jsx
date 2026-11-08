@@ -1,32 +1,34 @@
 /**
- * AppLayout Component
- * Primary layout container with persistent sidebar, responsive navigation,
- * system status header, and consistent cybersecurity brand identity.
+ * TrustLens AppLayout Component
+ * Primary application shell featuring persistent sidebar navigation,
+ * role-aware sections, breadcrumbs, real-time health indicator, and user profile controls.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   Shield,
   LayoutDashboard,
   Search,
   History,
-  Lock,
+  ShieldCheck,
+  Globe,
+  Users,
+  ShieldAlert,
   LogOut,
   Menu,
   X,
-  ExternalLink,
-  Radio,
-  User,
   Activity,
-  ShieldCheck,
+  User as UserIcon,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { Button, Tooltip } from 'antd';
+import { healthService } from '../../services/health.service';
+import { Button, Tooltip, Tag } from 'antd';
 
 export function AppLayout() {
-  const { user, logout, isMockMode } = useAuth();
+  const { user, logout, isModerator } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [systemHealth, setSystemHealth] = useState({ status: 'checking', text: 'Connecting...' });
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -35,41 +37,79 @@ export function AppLayout() {
     navigate('/login');
   };
 
-  // Determine breadcrumb current label
+  useEffect(() => {
+    let isMounted = true;
+    const checkStatus = async () => {
+      try {
+        const res = await healthService.getHealth();
+        if (isMounted) {
+          if (res.status === 'alive') {
+            setSystemHealth({ status: 'online', text: `API v${res.version || '1.0'}` });
+          } else {
+            setSystemHealth({ status: 'degraded', text: 'Degraded' });
+          }
+        }
+      } catch {
+        if (isMounted) {
+          setSystemHealth({ status: 'offline', text: 'API Offline' });
+        }
+      }
+    };
+
+    checkStatus();
+    const timer = setInterval(checkStatus, 30000);
+    return () => {
+      isMounted = false;
+      clearInterval(timer);
+    };
+  }, []);
+
   const getBreadcrumbLabel = () => {
     const p = location.pathname;
     if (p === '/dashboard') return 'Overview';
-    if (p.startsWith('/scans/') && p.includes('/certificate')) return 'Certificate Intelligence';
-    if (p.startsWith('/scans/')) return 'Scan Report';
-    if (p === '/scan') return 'New Investigation';
-    if (p === '/certificates') return 'Certificate Analyzer';
-    if (p === '/history') return 'Scan History';
-    return 'Console';
+    if (p.startsWith('/scans/') && p.includes('/certificate')) return 'Scan Certificate Details';
+    if (p.startsWith('/scans/')) return 'Scan Assessment Report';
+    if (p === '/scan') return 'Asynchronous Web Scan';
+    if (p === '/web-security') return 'Web Security Posture';
+    if (p.startsWith('/web-security/')) return 'Posture Assessment Report';
+    if (p === '/certificates') return 'Certificate Intelligence';
+    if (p.startsWith('/certificates/')) return 'Certificate Report';
+    if (p === '/community') return 'Collaborative Threat Intelligence';
+    if (p.startsWith('/community/')) return 'Community Report';
+    if (p === '/history') return 'Historical Investigations';
+    if (p.startsWith('/admin')) return 'Moderation & Operations';
+    return 'Security Console';
   };
 
   const navItems = [
     { to: '/dashboard', label: 'Overview', icon: LayoutDashboard },
-    { to: '/scan', label: 'New Scan', icon: Search },
-    { to: '/certificates', label: 'Certificate Analyzer', icon: ShieldCheck },
+    { to: '/scan', label: 'Full Scan', icon: Search },
+    { to: '/web-security', label: 'Web Posture', icon: Globe },
+    { to: '/certificates', label: 'Certificates', icon: ShieldCheck },
+    { to: '/community', label: 'Community Intel', icon: Users },
     { to: '/history', label: 'Scan History', icon: History },
   ];
 
+  if (isModerator) {
+    navItems.push({ to: '/admin/moderation', label: 'Moderation Queue', icon: ShieldAlert });
+  }
+
   return (
     <div className="app-container">
-      {/* Sidebar Overlay on Mobile */}
+      {/* Mobile Drawer Overlay */}
       {mobileMenuOpen && (
         <div
           onClick={() => setMobileMenuOpen(false)}
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            backgroundColor: 'rgba(0, 0, 0, 0.75)',
             zIndex: 99,
           }}
         />
       )}
 
-      {/* Main Sidebar */}
+      {/* Main Persistent Sidebar */}
       <aside className={`app-sidebar ${mobileMenuOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
           <div className="sidebar-logo">
@@ -81,7 +121,7 @@ export function AppLayout() {
         </div>
 
         <nav className="sidebar-nav">
-          <div className="nav-section-title">Investigation</div>
+          <div className="nav-section-title">Security Modules</div>
           {navItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -97,13 +137,19 @@ export function AppLayout() {
             );
           })}
 
-          <div className="nav-section-title">Intelligence Feeds</div>
+          <div className="nav-section-title" style={{ marginTop: '0.75rem' }}>
+            System Integrity
+          </div>
           <div
             style={{
-              padding: '0.5rem 0.75rem',
+              padding: '0.6rem 0.75rem',
               display: 'flex',
               flexDirection: 'column',
-              gap: '0.4rem',
+              gap: '0.5rem',
+              backgroundColor: 'var(--bg-surface)',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border-color-subtle)',
+              margin: '0 0.5rem',
             }}
           >
             <div
@@ -112,13 +158,24 @@ export function AppLayout() {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 fontSize: '0.75rem',
-                color: 'var(--text-secondary)',
               }}
             >
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <Radio size={12} color="var(--color-safe-text)" /> OpenPhish Feed
+              <span style={{ color: 'var(--text-secondary)' }}>Status:</span>
+              <span
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '0.7rem',
+                  fontWeight: 600,
+                  color:
+                    systemHealth.status === 'online'
+                      ? 'var(--color-safe-text)'
+                      : systemHealth.status === 'degraded'
+                        ? 'var(--color-suspicious-text)'
+                        : 'var(--color-malicious-text)',
+                }}
+              >
+                {systemHealth.text}
               </span>
-              <span style={{ fontSize: '0.675rem', color: 'var(--color-safe-text)', fontFamily: 'var(--font-mono)' }}>ACTIVE</span>
             </div>
             <div
               style={{
@@ -126,13 +183,12 @@ export function AppLayout() {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 fontSize: '0.75rem',
-                color: 'var(--text-secondary)',
               }}
             >
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <Radio size={12} color="var(--color-safe-text)" /> URLhaus Intel
+              <span style={{ color: 'var(--text-secondary)' }}>Threat Feeds:</span>
+              <span style={{ color: 'var(--color-safe-text)', fontFamily: 'var(--font-mono)', fontSize: '0.7rem' }}>
+                ONLINE
               </span>
-              <span style={{ fontSize: '0.675rem', color: 'var(--color-safe-text)', fontFamily: 'var(--font-mono)' }}>ACTIVE</span>
             </div>
           </div>
         </nav>
@@ -141,14 +197,34 @@ export function AppLayout() {
           <div className="user-profile-pill">
             <div className="user-info">
               <div className="user-avatar">
-                {user?.display_name ? user.display_name.charAt(0).toUpperCase() : <User size={14} />}
+                {user?.display_name ? (
+                  user.display_name.charAt(0).toUpperCase()
+                ) : (
+                  <UserIcon size={14} />
+                )}
               </div>
               <div className="user-details">
-                <div className="user-name">{user?.display_name || 'Analyst'}</div>
-                <div className="user-email">{user?.email || 'analyst@trustlens.dev'}</div>
+                <div className="user-name" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <span>{user?.display_name || 'User'}</span>
+                  {user?.role && user.role !== 'user' && (
+                    <Tag
+                      color={user.role === 'admin' ? 'red' : 'gold'}
+                      style={{
+                        margin: 0,
+                        fontSize: '0.625rem',
+                        lineHeight: '14px',
+                        padding: '0 4px',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      {user.role}
+                    </Tag>
+                  )}
+                </div>
+                <div className="user-email">{user?.email || 'authenticated'}</div>
               </div>
             </div>
-            <Tooltip title="Log out">
+            <Tooltip title="Log out session">
               <Button
                 type="text"
                 size="small"
@@ -161,7 +237,7 @@ export function AppLayout() {
         </div>
       </aside>
 
-      {/* Main View Area */}
+      {/* Main Content Area */}
       <div className="app-main">
         <header className="app-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -180,17 +256,13 @@ export function AppLayout() {
           </div>
 
           <div className="header-actions">
-            {isMockMode ? (
-              <span className="mode-badge" title="Running in simulated offline/mock API mode for demonstration">
-                <Activity size={12} />
-                <span>DEMO / MOCK MODE</span>
-              </span>
-            ) : (
-              <span className="mode-badge connected" title="Connected to live FastAPI backend at http://localhost:8000/api/v1">
-                <Activity size={12} />
-                <span>API CONNECTED</span>
-              </span>
-            )}
+            <span
+              className={`mode-badge ${systemHealth.status === 'online' ? 'connected' : ''}`}
+              title="Connection status to the backend"
+            >
+              <Activity size={12} />
+              <span>{systemHealth.text}</span>
+            </span>
 
             <Button
               type="primary"
@@ -204,7 +276,7 @@ export function AppLayout() {
                 fontSize: '0.8rem',
               }}
             >
-              Quick Scan
+              New Scan
             </Button>
           </div>
         </header>
@@ -224,3 +296,4 @@ export function AppLayout() {
     </div>
   );
 }
+

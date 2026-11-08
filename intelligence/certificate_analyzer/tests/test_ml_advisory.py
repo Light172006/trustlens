@@ -37,25 +37,13 @@ def test_ml_advisor_inference_on_authentic_certificate():
     advisor = CertificateMLAdvisor()
     assert advisor.is_ready is True
 
-    raw_dir = Path("intelligence/certificate_dataset/data/raw")
-    ders = list(raw_dir.glob("*.der")) if raw_dir.exists() else []
-    if ders:
-        with open(ders[0], "rb") as f:
-            der_bytes = f.read()
-    else:
-        key = ec.generate_private_key(ec.SECP256R1())
-        now = datetime.now(timezone.utc)
-        cert = (
-            x509.CertificateBuilder()
-            .subject_name(x509.Name([x509.NameAttribute(x509.NameOID.COMMON_NAME, "example.com")]))
-            .issuer_name(x509.Name([x509.NameAttribute(x509.NameOID.COMMON_NAME, "example.com")]))
-            .public_key(key.public_key())
-            .serial_number(12345)
-            .not_valid_before(now - timedelta(days=1))
-            .not_valid_after(now + timedelta(days=90))
-            .sign(key, hashes.SHA256())
-        )
-        der_bytes = cert.public_bytes(serialization.Encoding.DER)
+    # Robust resolution relative to test file location
+    raw_dir = Path(__file__).resolve().parents[2] / "certificate_dataset" / "data" / "raw"
+    if not raw_dir.exists():
+        raw_dir = Path("intelligence/certificate_dataset/data/raw")
+    sample_der = next(raw_dir.glob("*.der"))
+    with open(sample_der, "rb") as f:
+        der_bytes = f.read()
 
     pred = advisor.predict(der_bytes)
     assert pred.predicted_class in ["COMPLIANT", "NON_COMPLIANT"]

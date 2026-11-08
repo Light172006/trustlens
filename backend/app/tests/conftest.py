@@ -13,13 +13,15 @@ os.environ["ENVIRONMENT"] = "test"
 os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///:memory:"
 os.environ["DATABASE_SYNC_URL"] = "sqlite:///:memory:"
 
+from typing import Any
+
 import app.database.session as session_module
-import app.models  # Register all ORM models on Base.metadata
+import app.models  # noqa: F401 - Register all ORM models on Base.metadata
 import app.workers.scan_tasks as scan_tasks_module
 from app.config import settings
 from app.database.base import Base
 from app.database.session import get_db
-from app.main import app
+from app.main import app as fastapi_app
 
 # Test SQLite in-memory engine with StaticPool so in-memory DB persists across connections
 test_async_engine = create_async_engine(
@@ -72,10 +74,31 @@ async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
     async def _get_test_db() -> AsyncGenerator[AsyncSession, None]:
         yield db_session
 
-    app.dependency_overrides[get_db] = _get_test_db
+    fastapi_app.dependency_overrides[get_db] = _get_test_db
 
-    transport = ASGITransport(app=app)
+    transport = ASGITransport(app=fastapi_app)
     async with AsyncClient(transport=transport, base_url="http://testserver") as test_client:
         yield test_client
 
-    app.dependency_overrides.clear()
+    fastapi_app.dependency_overrides.clear()
+
+
+@pytest.fixture
+async def auth_user(client: AsyncClient) -> dict[str, Any]:
+    """Register a test user and return authorization header and details."""
+    import uuid
+
+    payload = {
+        "email": f"test.user.{uuid.uuid4().hex[:8]}@example.com",
+        "password": "SecurePassword123!",
+        "display_name": "Test User",
+    }
+    resp = await client.post("/api/v1/auth/register", json=payload)
+    assert resp.status_code == 201
+    token = resp.json()["tokens"]["access_token"]
+    user_id = resp.json()["user"]["id"]
+    return {
+        "headers": {"Authorization": f"Bearer {token}"},
+        "user_id": user_id,
+        "email": payload["email"],
+    }

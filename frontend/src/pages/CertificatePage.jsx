@@ -534,8 +534,26 @@ export function CertificatePage() {
         </div>
       )}
 
+      {/* Availability Banner for Non-HTTPS Scans */}
+      {certData && certData.available === false && (
+        <div className="tl-card" style={{ marginBottom: '1.5rem', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-surface)' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem' }}>
+            <AlertTriangle size={22} color="var(--color-suspicious)" style={{ flexShrink: 0, marginTop: '2px' }} />
+            <div>
+              <h4 style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>
+                No X.509 Certificate Found for Target
+              </h4>
+              <p style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', margin: '0.35rem 0 0' }}>
+                Availability status: <code>{certData.reason || 'Target did not establish an HTTPS connection'}</code>.
+                The scanned target did not serve a parseable TLS certificate. Use the <strong>Direct Certificate Analyzer</strong> console above to query any live TLS endpoint or test a PEM certificate.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Analysis Display */}
-      {certData ? (
+      {certData && certData.available !== false ? (
         <>
           {/* Card 1: Header & Core Verdict Card */}
           <div className="tl-card" style={{ marginBottom: '1.5rem' }}>

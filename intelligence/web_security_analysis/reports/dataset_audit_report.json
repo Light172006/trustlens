@@ -1,0 +1,164 @@
+{
+  "audit_version": "1.0.0",
+  "audited_at": "2026-11-08T14:59:40.384810+00:00",
+  "status": "PASS",
+  "checks": {
+    "scale_and_uniqueness": {
+      "total_records": 10708,
+      "unique_registrable_domains": 10708,
+      "duplicate_count": 0,
+      "passed": true,
+      "details": "10708 unique registrable domains verified (scale >= 10,000 threshold)."
+    },
+    "psl_conformance": {
+      "sampled_count": 1000,
+      "mismatches": 0,
+      "passed": true
+    },
+    "schema_conformance": {
+      "total_columns": 80,
+      "missing_columns": [],
+      "unexpected_columns": [
+        "cookie_all_httponly",
+        "tls_cert_sans",
+        "pass_findings_count"
+      ],
+      "passed": true
+    },
+    "posture_distribution": {
+      "counts": {
+        "POOR": 5643,
+        "GOOD": 2832,
+        "MODERATE": 2233
+      },
+      "percentages": {
+        "POOR": 52.7,
+        "GOOD": 26.45,
+        "MODERATE": 20.85
+      },
+      "invalid_labels": [],
+      "passed": true
+    },
+    "finding_evidence": {
+      "sampled_fails_checked": 1592,
+      "missing_evidence_count": 0,
+      "passed": true
+    },
+    "split_isolation": {
+      "train_rows": 7495,
+      "val_rows": 1604,
+      "test_rows": 1609,
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "overlap_train_val": 0,
+      "overlap_train_test": 0,
+      "overlap_val_test": 0,
+      "passed": true
+    },
+    "synthetic_isolation": {
+      "lab_cases_count": 4,
+      "lab_in_train": 0,
+      "lab_in_test": 0,
+      "passed": true
+    },
+    "privacy_audit": {
+      "sensitive_token_leaks": 0,
+      "cookie_values_present": false,
+      "passed": true
+    },
+    "feature_availability": {
+      "total_columns": 80,
+      "target_columns": [
+        "website_posture_label",
+        "website_posture_score",
+        "findings",
+        "finding_ids",
+        "critical_findings_count",
+        "high_findings_count",
+        "medium_findings_count",
+        "low_findings_count",
+        "pass_findings_count",
+        "annotation_method",
+        "annotation_version"
+      ],
+      "provenance_columns": [
+        "sample_id",
+        "scan_timestamp",
+        "source_name",
+        "source_reference",
+        "collection_method",
+        "collection_status",
+        "dataset_version"
+      ],
+      "identifier_columns": [
+        "normalized_domain",
+        "registrable_domain",
+        "tls_cert_subject",
+        "tls_cert_sans",
+        "dns_ipv4_addresses"
+      ],
+      "candidate_model_features_count": 57,
+      "candidate_model_features": [
+        "url_scheme",
+        "url_length",
+        "subdomain_count",
+        "is_idn",
+        "is_ip_host",
+        "domain_resolved",
+        "dns_has_ipv4",
+        "dns_has_ipv6",
+        "dns_has_caa",
+        "tls_supported",
+        "tls_version",
+        "tls_cipher",
+        "tls_cert_valid",
+        "tls_cert_expired",
+        "tls_cert_not_before",
+        "tls_cert_not_after",
+        "tls_cert_remaining_days",
+        "tls_cert_issuer",
+        "tls_cert_san_count",
+        "tls_cert_is_self_signed",
+        "tls_cert_hostname_match",
+        "tls_cert_sig_alg",
+        "tls_cert_key_size",
+        "http_available",
+        "https_available",
+        "http_to_https_redirect",
+        "redirect_count",
+        "final_status_code",
+        "final_scheme",
+        "https_downgrade",
+        "header_xfo_present",
+        "header_xfo_value",
+        "header_xcto_present",
+        "header_referrer_policy_present",
+        "header_referrer_policy_value",
+        "header_permissions_policy_present",
+        "header_coop_present",
+        "header_corp_present",
+        "header_coep_present",
+        "server_header",
+        "server_version_exposed",
+        "x_powered_by_present",
+        "header_hsts_present",
+        "header_hsts_max_age",
+        "header_hsts_include_subdomains",
+        "header_hsts_preload",
+        "header_csp_present",
+        "header_csp_unsafe_inline",
+        "header_csp_unsafe_eval",
+        "cookie_count",
+        "cookie_secure_count",
+        "cookie_httponly_count",
+        "cookie_samesite_strict_count",
+        "cookie_samesite_lax_count",
+        "cookie_samesite_none_count",
+        "cookie_all_secure",
+        "cookie_all_httponly"
+      ],
+      "passed": true
+    }
+  }
+}

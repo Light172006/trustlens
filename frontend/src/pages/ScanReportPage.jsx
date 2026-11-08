@@ -27,13 +27,12 @@ import {
   ArrowLeft,
   Lock,
 } from 'lucide-react';
-import { Tabs, Tag, Button, Tooltip, Alert, message } from 'antd';
+import { Tabs, Tag, Button, Alert, message } from 'antd';
 import { scanService } from '../services/scan.service';
 import { certificateService } from '../services/certificate.service';
 import { ScanStatusStepper } from '../components/scanner/ScanStatusStepper';
 import { FindingCard } from '../components/report/FindingCard';
 import { RedirectExplorer } from '../components/report/RedirectExplorer';
-import { VerdictBadge } from '../components/common/VerdictBadge';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { RiskScoreGauge } from '../components/common/RiskScoreGauge';
 import { ErrorState } from '../components/common/ErrorState';
@@ -53,7 +52,7 @@ export function ScanReportPage() {
   const [selectedSeverityFilter, setSelectedSeverityFilter] = useState('all');
 
   const pollingTimerRef = useRef(null);
-  const pollStartTimeRef = useRef(Date.now());
+  const pollStartTimeRef = useRef(0);
   const isDocumentVisibleRef = useRef(true);
 
   // Fetch report data

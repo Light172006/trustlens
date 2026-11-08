@@ -28,4 +28,3 @@ async def get_dashboard_summary(
         db=db,
         user_id=current_user.id,
     )
-

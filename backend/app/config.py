@@ -6,19 +6,26 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-# Ensure shared contracts, intelligence packages, and certificate analyzer are resolvable
-_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-for _p in [
-    _REPO_ROOT,
-    _REPO_ROOT / "shared",
-    _REPO_ROOT / "intelligence" / "certificate_analyzer" / "src",
-    _REPO_ROOT / "intelligence" / "certificate_dataset" / "src",
-]:
-    if _p.exists() and str(_p) not in sys.path:
-        sys.path.insert(0, str(_p))
-
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Ensure intelligence modules are dynamically accessible
+_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+_CERT_ANALYZER_SRC = _REPO_ROOT / "intelligence" / "certificate_analyzer" / "src"
+_CERT_DATASET_SRC = _REPO_ROOT / "intelligence" / "certificate_dataset" / "src"
+_INTELLIGENCE_SRC = _REPO_ROOT / "intelligence"
+_WEB_SECURITY_SRC = _REPO_ROOT / "intelligence" / "web_security_analysis"
+_WEB_SECURITY_ANALYZER_SRC = _REPO_ROOT / "intelligence" / "web_security_analysis" / "analyzer"
+
+for _src_path in [
+    _INTELLIGENCE_SRC,
+    _CERT_ANALYZER_SRC,
+    _CERT_DATASET_SRC,
+    _WEB_SECURITY_SRC,
+    _WEB_SECURITY_ANALYZER_SRC,
+]:
+    if _src_path.exists() and str(_src_path) not in sys.path:
+        sys.path.insert(0, str(_src_path))
 
 
 class Settings(BaseSettings):
@@ -58,6 +65,7 @@ class Settings(BaseSettings):
     )
 
     # Redis & Celery
+    CELERY_ENABLED: bool = False
     REDIS_URL: str = "redis://localhost:6379/0"
     CELERY_BROKER_URL: str = "redis://localhost:6379/1"
     CELERY_RESULT_BACKEND: str = "redis://localhost:6379/2"
@@ -85,6 +93,18 @@ class Settings(BaseSettings):
     URLHAUS_AUTH_KEY: str = ""
     OPENPHISH_ENABLED: bool = True
 
+    # Certificate Analyzer Configuration
+    TRUSTLENS_ROOT_STORE_PATH: str | None = None
+    TRUSTLENS_CACHE_SIZE: int = 4096
+    TRUSTLENS_ENABLE_ML_ADVISORY: bool = False
+    TRUSTLENS_CERT_MAX_INPUT_BYTES: int = 10485760  # 10 MB limit
+    TRUSTLENS_CERT_MAX_BUNDLE_CERTS: int = 50
+    TRUSTLENS_CERT_MAX_SAN_COUNT: int = 10000
+
+    # Web Security Analyzer Configuration
+    WEB_SECURITY_TIMEOUT_SECONDS: float = 8.0
+    WEB_SECURITY_MAX_REDIRECTS: int = 5
+
     @field_validator("DATABASE_SYNC_URL", mode="before")
     @classmethod
     def assemble_sync_db_url(cls, v: Any, info: Any) -> str:
@@ -92,7 +112,7 @@ class Settings(BaseSettings):
         if isinstance(v, str) and v.strip():
             return v
         data = info.data
-        async_url = data.get("DATABASE_URL", "")
+        async_url = str(data.get("DATABASE_URL", ""))
         if "postgresql+asyncpg://" in async_url:
             return async_url.replace("postgresql+asyncpg://", "postgresql+psycopg://")
         elif "sqlite+aiosqlite://" in async_url:
@@ -107,7 +127,9 @@ class Settings(BaseSettings):
             v = v.strip()
             if v.startswith("[") and v.endswith("]"):
                 try:
-                    return json.loads(v)
+                    parsed: Any = json.loads(v)
+                    if isinstance(parsed, list):
+                        return [str(origin).strip() for origin in parsed if str(origin).strip()]
                 except json.JSONDecodeError:
                     pass
             return [origin.strip() for origin in v.split(",") if origin.strip()]

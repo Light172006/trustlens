@@ -115,18 +115,14 @@ class CertificateResponseItem(BaseModel):
     hostname_match: bool
     sct_present: bool
     revocation_status: str = "not_checked"
-    fetched_at: datetime
-
-    # Deep Certificate Analyzer fields
     trust_score: int | None = None
     verdict: str | None = None
     confidence: float | None = None
     checks_completed: int | None = None
     policy_evaluation: dict[str, Any] | None = None
     ml_advisory: dict[str, Any] | None = None
-    findings: list[dict[str, Any]] = Field(default_factory=list)
-    recommendations: list[str] = Field(default_factory=list)
     assessment_payload: dict[str, Any] | None = None
+    fetched_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -137,7 +133,6 @@ class CertificateDetailResponse(BaseModel):
     scan_id: uuid.UUID
     available: bool
     certificate: CertificateResponseItem | None = None
-    assessment: dict[str, Any] | None = None
     reason: str | None = None
 
 

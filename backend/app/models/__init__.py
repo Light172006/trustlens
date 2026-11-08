@@ -1,7 +1,8 @@
 """SQLAlchemy ORM models package."""
 
 from app.models.audit_log import AuditEvent
-from app.models.certificate import Certificate, CertificateScan
+from app.models.certificate import Certificate
+from app.models.certificate_scan import CertificateScan
 from app.models.finding import Finding
 from app.models.provider_check import ProviderCheck
 from app.models.redirect import ScanRedirect
@@ -9,6 +10,7 @@ from app.models.report import CommunityReport, CommunityVote
 from app.models.scan import Scan
 from app.models.session import UserSession
 from app.models.user import User
+from app.models.web_security_scan import WebSecurityScan
 
 __all__ = [
     "AuditEvent",
@@ -22,4 +24,5 @@ __all__ = [
     "ScanRedirect",
     "User",
     "UserSession",
+    "WebSecurityScan",
 ]

@@ -6,7 +6,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ShieldAlert, Lock, Info, ArrowRight, Loader2 } from 'lucide-react';
+import { Search, Info } from 'lucide-react';
 import { Input, Button, Checkbox, message, Alert } from 'antd';
 import { validateUrl } from '../../lib/utils';
 import { scanService } from '../../services/scan.service';

@@ -1,33 +1,22 @@
 /**
- * TrustLens Website Scan Service
+ * TrustLens Asynchronous Website Scan Service
  * Interacts with /api/v1/scans endpoints and findings.
  */
 
-import { apiClient, USE_MOCK_API } from './api';
-import {
-  mockSubmitScan,
-  mockListScans,
-  mockGetScan,
-  mockDeleteScan,
-} from '../mocks/mock-scans';
-import { mockGetFindings } from '../mocks/mock-findings';
+import { apiClient } from './api';
 
 export const scanService = {
   /**
-   * Submit a new URL target for security analysis
+   * Submit a new website URL target for asynchronous security analysis
    * @param {string} url 
    * @param {boolean} [treatAsSensitive=false] 
    * @returns {Promise<{ scan: object, deduplicated: boolean }>}
    */
   async submitScan(url, treatAsSensitive = false) {
-    if (USE_MOCK_API) {
-      return await mockSubmitScan(url, treatAsSensitive);
-    }
-
     return await apiClient('/scans', {
       method: 'POST',
       body: JSON.stringify({
-        url,
+        url: url.trim(),
         treat_as_sensitive: Boolean(treatAsSensitive),
       }),
     });
@@ -43,10 +32,6 @@ export const scanService = {
    * @returns {Promise<{ items: Array, total: number, page: number, page_size: number, pages: number }>}
    */
   async listScans({ page = 1, pageSize = 20, status = '', verdict = '' } = {}) {
-    if (USE_MOCK_API) {
-      return await mockListScans({ page, pageSize, status, verdict });
-    }
-
     const query = new URLSearchParams();
     if (page) query.set('page', page);
     if (pageSize) query.set('page_size', pageSize);
@@ -57,42 +42,39 @@ export const scanService = {
   },
 
   /**
-   * Get detailed scan report including coverage, provider checks, and redirects
+   * Get detailed scan assessment report including layer coverage, provider checks, and redirects
    * @param {string} scanId 
    * @returns {Promise<{ scan: object, coverage: object, provider_checks: Array, redirects: Array }>}
    */
   async getScan(scanId) {
-    if (USE_MOCK_API) {
-      return await mockGetScan(scanId);
-    }
-
     return await apiClient(`/scans/${scanId}`);
   },
 
   /**
-   * Get fine-grained heuristic findings that generated the risk score
+   * Get technical security findings discovered during the scan
    * @param {string} scanId 
-   * @returns {Promise<{ items: Array, total: number }>}
+   * @returns {Promise<{ scan_id: string, items: Array, total: number }>}
    */
   async getFindings(scanId) {
-    if (USE_MOCK_API) {
-      return await mockGetFindings(scanId);
-    }
-
     return await apiClient(`/scans/${scanId}/findings`);
   },
 
   /**
-   * Delete a scan record and cascade its findings
+   * Get leaf certificate analysis for HTTPS targets
    * @param {string} scanId 
-   * @returns {Promise<boolean>}
+   * @returns {Promise<{ scan_id: string, available: boolean, certificate: object | null, reason: string | null }>}
+   */
+  async getScanCertificate(scanId) {
+    return await apiClient(`/scans/${scanId}/certificate`);
+  },
+
+  /**
+   * Delete a scan record and cascade its child relations
+   * @param {string} scanId 
+   * @returns {Promise<void>}
    */
   async deleteScan(scanId) {
-    if (USE_MOCK_API) {
-      return await mockDeleteScan(scanId);
-    }
-
     await apiClient(`/scans/${scanId}`, { method: 'DELETE' });
-    return true;
   },
 };
+

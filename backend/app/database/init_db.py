@@ -2,7 +2,7 @@
 
 import asyncio
 
-import app.models  # Register all ORM models on Base.metadata
+import app.models  # noqa: F401
 from app.core.logging import logger
 from app.database.base import Base
 from app.database.session import async_engine

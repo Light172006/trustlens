@@ -1,0 +1,39 @@
+{
+  "manifest_version": "1.0.0",
+  "dataset_name": "TrustLens Web Security Analyzer Dataset",
+  "dataset_version": "1.0.0",
+  "generated_at": "2026-11-08T14:50:29.376990+00:00",
+  "cryptographic_algorithm": "SHA-256",
+  "files": {
+    "web_security_dataset.parquet": {
+      "relative_path": "dataset/processed/web_security_dataset.parquet",
+      "size_bytes": 4871194,
+      "sha256": "8c784d492796b714f67a83a85deca0f83fad1a3968b7792d5fcd04f59c461dd1"
+    },
+    "web_security_dataset.csv": {
+      "relative_path": "dataset/processed/web_security_dataset.csv",
+      "size_bytes": 50507346,
+      "sha256": "b28102a80489e27a2d1238cc7a091df3eea21ce9dbe10bff13f83b18a7894b06"
+    },
+    "splits/train.parquet": {
+      "relative_path": "dataset/splits/train.parquet",
+      "size_bytes": 3443565,
+      "sha256": "14546fc618cccbf1385feb4b4f9ce322944b1d91eb447fc8d92f5b2e4c8a68ab"
+    },
+    "splits/validation.parquet": {
+      "relative_path": "dataset/splits/validation.parquet",
+      "size_bytes": 680451,
+      "sha256": "1543a3e1bb4745522e21f128da60388e7d92e72ce31d798e09b984f07bf0b43d"
+    },
+    "splits/test.parquet": {
+      "relative_path": "dataset/splits/test.parquet",
+      "size_bytes": 665815,
+      "sha256": "6944b7f24184634165c7fc81895162b9ea486d283ace188b3383a2cc5dc0aeef"
+    },
+    "synthetic/lab_dataset.parquet": {
+      "relative_path": "dataset/synthetic/lab_dataset.parquet",
+      "size_bytes": 54087,
+      "sha256": "f9a7230148c49706eb41ca73277494e880c3462f6a22e4d2090cd2421e041fcf"
+    }
+  }
+}

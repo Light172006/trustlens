@@ -4,7 +4,6 @@ from cryptography import x509
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec
 from datetime import datetime, timezone, timedelta
-import pytest
 
 from certificate_analyzer.rules.ct_verifier import CertificateTransparencyVerifier
 from certificate_analyzer.rules.policy import PolicyRules
@@ -92,7 +91,6 @@ def test_ct_audit_on_real_corpus_certificate():
                 assert audit["presence_verified"] is True
                 found = True
                 break
-    if not found:
-        pytest.skip("Corpus raw files not bundled in checkout")
+    assert found, "Expected to find at least one real certificate with SCT extension in corpus"
 
 

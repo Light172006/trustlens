@@ -198,11 +198,50 @@ curl -X POST http://localhost:8000/api/v1/community/reports \
   }'
 ```
 
+### 6. Analyze Standalone Certificate / Endpoint TLS
+```bash
+# Analyze a live endpoint TLS certificate
+curl -X POST http://localhost:8000/api/v1/certificates/analyze \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>" \
+  -d '{
+    "target_hostname": "api.trustlens.io",
+    "port": 443,
+    "tls_protocol_version": "TLSv1.3"
+  }'
+
+# Or analyze PEM string directly
+curl -X POST http://localhost:8000/api/v1/certificates/analyze \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>" \
+  -d '{
+    "certificate_pem": "-----BEGIN CERTIFICATE-----\nMIIC...-----END CERTIFICATE-----",
+    "target_hostname": "api.trustlens.io"
+  }'
+```
+
+### 7. Analyze Technical Web Security Posture
+```bash
+# Analyze website technical security posture and ML consensus
+curl -X POST http://localhost:8000/api/v1/web-security/analyze \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://example.com"
+  }'
+
+# Or use the direct handoff alias:
+curl -X POST http://localhost:8000/api/v1/analyze/web-security \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://example.com"
+  }'
+```
+
 ---
 
 ## 5. Running Automated Tests & Linting
 
-### Run the Automated Test Suite (57 Tests)
+### Run the Automated Test Suite (68 Tests)
 From `backend/`:
 
 ```bash
@@ -210,7 +249,7 @@ python run_test.py
 ```
 *(Or `pytest -v app/tests`)*
 
-All 57 tests across Authentication, Scanning, Threat Intelligence, Dashboard, and Community Moderation will execute in isolated memory mode.
+All 68 tests across Authentication, Scanning, Certificate Intelligence, Threat Intelligence, Dashboard, and Community Moderation will execute in isolated memory mode.
 
 ### Code Style & Formatting
 ```bash

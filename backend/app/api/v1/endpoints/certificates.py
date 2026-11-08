@@ -1,195 +1,107 @@
-"""Direct Certificate Analyzer API endpoints."""
+"""REST API endpoints for Certificate Security Analysis and Assessment Queries."""
 
-import socket
-import ssl
+from __future__ import annotations
+
 import uuid
-from datetime import UTC, datetime
-from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import (
-    ConflictError,
-    TargetNotPublicException,
-    TrustLensException,
-)
-from app.core.logging import logger
-from app.core.permissions import get_current_user_optional
+from app.core.permissions import get_current_user
 from app.database.session import get_db
-from app.models.certificate import CertificateScan
 from app.models.user import User
-from app.scanners.url_validator import resolve_hostname_ips
 from app.schemas.certificate import (
     CertificateAnalyzeRequest,
     CertificateAssessmentResponse,
+    CertificateScanListResponse,
 )
+from app.services.certificate_service import certificate_service
 
-router = APIRouter(prefix="/certificates", tags=["Certificate Intelligence"])
+router = APIRouter()
+alias_router = APIRouter()
 
 
 @router.post(
     "/analyze",
-    response_model=dict[str, Any],
+    response_model=CertificateAssessmentResponse,
     status_code=status.HTTP_200_OK,
     summary="Analyze Certificate or Endpoint TLS",
     description=(
-        "Evaluates X.509 leaf/bundle certificates or performs an active TLS handshake "
-        "to deliver RFC 9525, RFC 5280, RFC 6962, CA/B Forum v2.3.1 compliance, "
-        "and deterministic Trust Scores."
+        "Executes authoritative digital trust evaluation on an X.509 certificate supplied "
+        "as raw DER (base64), PEM bundle string, or active TLS endpoint hostname. Returns "
+        "deterministic Trust Score (0-100), CA/B Forum policy evaluation, RFC 9525 hostname "
+        "verification, and optional ML compliance advisory."
     ),
 )
-async def analyze_certificate_endpoint(
-    payload: CertificateAnalyzeRequest,
+async def analyze_certificate(
+    request: CertificateAnalyzeRequest,
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-    current_user: User | None = Depends(get_current_user_optional),
-) -> dict[str, Any]:
-    """Execute direct cryptographic and trust evaluation."""
-    if not payload.hostname and not payload.pem:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Either 'hostname' or 'pem' must be provided for certificate evaluation.",
-        )
+) -> CertificateAssessmentResponse:
+    """Analyze a certificate and persist the assessment record."""
+    return await certificate_service.analyze_certificate_request(
+        db=db,
+        request=request,
+        user_id=current_user.id,
+    )
 
-    # 1. Evaluate PEM bundle or single PEM certificate if provided
-    if payload.pem:
-        pem_str = payload.pem.strip()
-        if len(pem_str.encode("utf-8")) > 10 * 1024 * 1024:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Certificate payload exceeds the 10 MB maximum size limit.",
-            )
 
-        try:
-            from certificate_analyzer.api import analyze_pem
+@router.get(
+    "/{certificate_scan_id}",
+    response_model=CertificateAssessmentResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get Certificate Assessment Details",
+    description="Retrieves a full certificate assessment record by its unique ID.",
+)
+async def get_certificate_assessment(
+    certificate_scan_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> CertificateAssessmentResponse:
+    """Fetch stored certificate assessment."""
+    return await certificate_service.get_certificate_scan(
+        db=db,
+        scan_id=certificate_scan_id,
+        user_id=current_user.id,
+        user_role=current_user.role,
+    )
 
-            assessment = analyze_pem(
-                pem_str=pem_str,
-                target_hostname=payload.hostname,
-                reference_time=datetime.now(UTC),
-                include_ml_advisory=payload.include_ml_advisory,
-            )
-            assessment_dict = assessment.model_dump(mode="json")
 
-            # Persist scan audit record
-            cert_scan = CertificateScan(
-                id=uuid.uuid4(),
-                target_hostname=payload.hostname or assessment_dict.get("subject_dn", "UNKNOWN"),
-                certificate_sha256=assessment_dict["certificate_sha256"],
-                trust_score=assessment_dict["trust_score"],
-                verdict=assessment_dict["verdict"],
-                confidence=assessment_dict["confidence"],
-                checks_completed=assessment_dict.get("checks_completed", 6),
-                policy_evaluation=assessment_dict.get("policy_evaluation"),
-                ml_advisory=assessment_dict.get("ml_advisory"),
-                assessment_payload=assessment_dict,
-                scanned_at=datetime.now(UTC),
-            )
-            db.add(cert_scan)
-            await db.commit()
+@router.get(
+    "",
+    response_model=CertificateScanListResponse,
+    status_code=status.HTTP_200_OK,
+    summary="List Certificate Assessments",
+    description="Lists previous certificate evaluations performed by the authenticated user.",
+)
+async def list_certificate_assessments(
+    limit: int = Query(20, ge=1, le=100, description="Items per page"),
+    offset: int = Query(0, ge=0, description="Pagination offset"),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> CertificateScanListResponse:
+    """List paginated certificate assessments."""
+    return await certificate_service.list_certificate_scans(
+        db=db,
+        user_id=current_user.id,
+        user_role=current_user.role,
+        limit=limit,
+        offset=offset,
+    )
 
-            return assessment_dict
 
-        except Exception as exc:
-            logger.exception(f"Error evaluating PEM certificate: {exc}")
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Certificate analysis failed: {str(exc)}",
-            )
-
-    # 2. Hostname-based TLS Endpoint Analysis
-    hostname = payload.hostname.strip().lower()
-    port = payload.port or 443
-
-    # SSRF Protection: verify destination hostname/IP resolves exclusively to public IPs
-    import ipaddress
-    from app.scanners.url_validator import is_ip_globally_routable
-
-    try:
-        direct_ip = ipaddress.ip_address(hostname)
-        resolved_ips = [str(direct_ip)]
-    except ValueError:
-        resolved_ips = resolve_hostname_ips(hostname)
-
-    if not resolved_ips:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Could not resolve hostname '{hostname}' via DNS.",
-        )
-
-    for ip_str in resolved_ips:
-        if not is_ip_globally_routable(ip_str):
-            raise TargetNotPublicException(
-                message=f"SSRF Protection: Hostname resolves to private/internal IP {ip_str}.",
-                issue=f"IP address {ip_str} is private, loopback, or non-public.",
-            )
-
-    # Perform active TLS handshake to retrieve peer certificate
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE  # Collect raw bytes even if invalid to audit failure
-
-    target_ip = resolved_ips[0]
-    leaf_der: bytes | None = None
-    tls_version: str | None = None
-    cipher_suite: str | None = None
-
-    try:
-        with socket.create_connection((target_ip, port), timeout=6.0) as sock:
-            with ctx.wrap_socket(sock, server_hostname=hostname) as ssock:
-                leaf_der = ssock.getpeercert(binary_form=True)
-                tls_version = ssock.version()
-                cipher_info = ssock.cipher()
-                cipher_suite = cipher_info[0] if cipher_info else None
-    except Exception as exc:
-        logger.debug(f"TLS connection to {hostname}:{port} failed: {exc}")
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"TLS handshake with {hostname}:{port} failed: {type(exc).__name__}",
-        )
-
-    if not leaf_der:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"TLS server at {hostname}:{port} did not provide a parseable leaf certificate.",
-        )
-
-    try:
-        from certificate_analyzer.api import analyze_endpoint_tls
-
-        assessment = analyze_endpoint_tls(
-            certificate_der=leaf_der,
-            target_hostname=hostname,
-            port=port,
-            tls_protocol_version=tls_version or "TLSv1.3",
-            cipher_suite=cipher_suite,
-            reference_time=datetime.now(UTC),
-            include_ml_advisory=payload.include_ml_advisory,
-        )
-        assessment_dict = assessment.model_dump(mode="json")
-
-        # Persist audit record
-        cert_scan = CertificateScan(
-            id=uuid.uuid4(),
-            target_hostname=hostname,
-            certificate_sha256=assessment_dict["certificate_sha256"],
-            trust_score=assessment_dict["trust_score"],
-            verdict=assessment_dict["verdict"],
-            confidence=assessment_dict["confidence"],
-            checks_completed=assessment_dict.get("checks_completed", 6),
-            policy_evaluation=assessment_dict.get("policy_evaluation"),
-            ml_advisory=assessment_dict.get("ml_advisory"),
-            assessment_payload=assessment_dict,
-            scanned_at=datetime.now(UTC),
-        )
-        db.add(cert_scan)
-        await db.commit()
-
-        return assessment_dict
-
-    except Exception as exc:
-        logger.exception(f"Certificate analysis failed for endpoint {hostname}: {exc}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Certificate Analyzer internal error: {str(exc)}",
-        )
+# Alias route matching FINAL_BACKEND_HANDOFF.md Section 7: POST /api/v1/analyze/certificate
+@alias_router.post(
+    "/analyze/certificate",
+    response_model=CertificateAssessmentResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Analyze Certificate (Handoff Alias)",
+    description="Direct compatibility alias for POST /api/v1/certificates/analyze.",
+)
+async def analyze_certificate_alias(
+    request: CertificateAnalyzeRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> CertificateAssessmentResponse:
+    """Alias for POST /api/v1/certificates/analyze."""
+    return await analyze_certificate(request=request, current_user=current_user, db=db)

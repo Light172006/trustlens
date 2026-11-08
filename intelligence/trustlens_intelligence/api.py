@@ -72,7 +72,7 @@ class TrustLensIntelligenceEngine:
 
     def analyze(
         self,
-        evidence: ScanEvidence,
+        evidence: ScanEvidence | Any,
         query_providers: bool = False,
         is_scan_failed: bool = False,
     ) -> ThreatAssessment:
@@ -88,6 +88,9 @@ class TrustLensIntelligenceEngine:
         Returns:
             ThreatAssessment with verdict, score, confidence, findings, coverage, and summary.
         """
+        if not isinstance(evidence, ScanEvidence):
+            evidence = ScanEvidence.model_validate(evidence)
+
         target_url = evidence.canonical_url or evidence.original_url
         provider_checks: list[ProviderCheckResult] = []
 
@@ -129,13 +132,26 @@ class TrustLensIntelligenceEngine:
                 )
 
         if evidence.community_intelligence is not None:
-            comm_matched = evidence.community_intelligence.confirmed_report_count >= 3
+            comm = evidence.community_intelligence
+            distinct = (
+                comm.distinct_reporter_count
+                if comm.distinct_reporter_count > 0
+                else (
+                    len({r.get("reporter_id") for r in comm.reports if r.get("reporter_id")})
+                    if comm.reports
+                    else comm.confirmed_report_count
+                )
+            )
+            comm_matched = bool(comm.confirmed_report_count >= 2 and distinct >= 2)
             provider_checks.append(
                 ProviderCheckResult(
                     provider="community",
                     result_status=ProviderResultStatus.MATCH if comm_matched else ProviderResultStatus.NO_MATCH,
                     matched=comm_matched,
-                    details={"confirmed_report_count": evidence.community_intelligence.confirmed_report_count},
+                    details={
+                        "confirmed_report_count": comm.confirmed_report_count,
+                        "distinct_reporter_count": distinct,
+                    },
                 )
             )
 

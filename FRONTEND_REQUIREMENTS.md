@@ -1,10 +1,10 @@
 # TrustLens — Frontend Response & API Integration Requirements
 
-**Document Version:** 2.0  
+**Document Version:** 2.1  
 **Target Audience:** UI/UX Engineer, Frontend Engineering Team (React 19 / TypeScript)  
 **Author:** Backend Architecture & Security Engineering Team  
-**Scope:** Phases 1 through 7 (Foundation, Authentication, Scanning Infrastructure, Background Workers, AI Integration, Dashboard & Analytics, Collaborative Threat Intelligence & Moderation)  
-**Status:** Implemented, Tested, and Verified (57/57 Automated Tests Passing)
+**Scope:** Phases 1 through 7 + Certificate Analyzer Integration (Foundation, Authentication, Scanning Infrastructure, Background Workers, AI Integration, PKI / Certificate Intelligence, Dashboard & Analytics, Collaborative Threat Intelligence & Moderation)  
+**Status:** Implemented, Tested, and Verified (68/68 Automated Tests Passing)
 
 ---
 
@@ -121,12 +121,224 @@ Returns top-level platform health.
 - `GET /api/v1/scans` (HTTP 200 OK, paginated user scans)
 - `GET /api/v1/scans/{scan_id}` (HTTP 200 OK, full report)
 - `GET /api/v1/scans/{scan_id}/findings` (HTTP 200 OK)
-- `GET /api/v1/scans/{scan_id}/certificate` (HTTP 200 OK)
+- `GET /api/v1/scans/{scan_id}/certificate` (HTTP 200 OK — Enriched with Certificate Intelligence Trust Score, Verdict, Policy Evaluation, ML Advisory, and Findings)
 - `DELETE /api/v1/scans/{scan_id}` (HTTP 204 No Content)
 
 ---
 
-### 4.4 Dashboard Endpoints (`/api/v1/dashboard`)
+### 4.4 Dedicated Certificate Intelligence Endpoints (`/api/v1/certificates`)
+
+#### `POST /api/v1/certificates/analyze` (Direct Certificate Analysis)
+Evaluates an X.509 certificate supplied as raw DER (`certificate_der_base64`), PEM bundle string (`certificate_pem`), or live TLS server probe (`target_hostname`).
+
+- **Request Schema (`CertificateAnalyzeRequest`):**
+```json
+{
+  "target_hostname": "api.trustlens.io",
+  "port": 443,
+  "tls_protocol_version": "TLSv1.3",
+  "cipher_suite": "TLS_AES_256_GCM_SHA384",
+  "reference_observation_timestamp": "2026-11-08T12:00:00Z",
+  "certificate_der_base64": "MIIB/DCCAY6gAwIBAgIUQzB4S...",
+  "presented_intermediates_base64": [
+    "MIIChzCCAi6gAwIBAgIQB1r3P..."
+  ],
+  "certificate_pem": null,
+  "revocation_observation": {
+    "source_url": "http://ocsp.pki.goog/gts1p5",
+    "observation_timestamp": "2026-11-08T11:58:30Z",
+    "status": "GOOD",
+    "responder_type": "OCSP",
+    "evidence_freshness_seconds": 90
+  },
+  "include_ml_advisory": true
+}
+```
+
+- **Response (HTTP 200 OK — `CertificateAssessmentResponse`):**
+```json
+{
+  "id": "c86e04bb-3031-419b-a3da-166fbbfbece6",
+  "target_hostname": "api.trustlens.io",
+  "certificate_sha256": "0a7976204137da6b50dbcff396ad5102a27b68d1820b29449dff352706782275",
+  "subject_dn": "CN=api.trustlens.io,O=TrustLens Security",
+  "issuer_dn": "CN=Let's Encrypt Authority X3,O=Let's Encrypt,C=US",
+  "verdict": "TRUSTED",
+  "trust_score": 95,
+  "confidence": 0.95,
+  "scoring_version": "cert_v1.0.0",
+  "checks_completed": 8,
+  "findings": [
+    {
+      "code": "RULE_TRUSTED_PATH_VERIFIED",
+      "title": "Certification Path Validated to Root Anchor",
+      "severity": "INFO",
+      "description": "Certification path successfully chains to trusted Mozilla root store.",
+      "evidence": null,
+      "recommendation": null,
+      "score_deduction": 0
+    },
+    {
+      "code": "RULE_HOSTNAME_MATCHED",
+      "title": "Service Identity Authenticated per RFC 9525",
+      "severity": "INFO",
+      "description": "Certificate matches target hostname via SAN extension.",
+      "evidence": null,
+      "recommendation": null,
+      "score_deduction": 0
+    }
+  ],
+  "features": {
+    "public_key_algorithm": "RSA",
+    "key_size_bits": 2048,
+    "validity_duration_days": 90.0,
+    "days_until_expiry": 45,
+    "is_expired": false
+  },
+  "policy_evaluation": {
+    "cabf_br_version": "2.3.1",
+    "compliant": true
+  },
+  "ml_advisory": {
+    "predicted_class": "COMPLIANT",
+    "compliance_probability": 0.98,
+    "is_anomaly": false,
+    "anomaly_score": 0.12,
+    "confidence": 0.96,
+    "advisory_notes": "Certificate profile aligns with authentic Web PKI distribution."
+  },
+  "recommendations": [],
+  "summary": "Valid and trusted Web PKI certificate chaining cleanly to Mozilla Root Store.",
+  "evaluated_at": "2026-11-08T13:45:00Z"
+}
+```
+
+#### `GET /api/v1/certificates/{id}` (Get Certificate Assessment)
+Retrieves a stored certificate assessment by ID.
+- **Status:** 200 OK
+- **Response:** `CertificateAssessmentResponse`
+
+#### `GET /api/v1/certificates` (List Certificate Assessments)
+Returns paginated certificate analyses evaluated by the authenticated user.
+- **Query Parameters:** `limit` (default 20, max 100), `offset` (default 0)
+- **Status:** 200 OK
+- **Response:**
+```json
+{
+  "items": [
+    {
+      "id": "c86e04bb-3031-419b-a3da-166fbbfbece6",
+      "target_hostname": "api.trustlens.io",
+      "certificate_sha256": "0a7976204137da6b50dbcff396ad5102a27b68d1820b29449dff352706782275",
+      "trust_score": 95,
+      "verdict": "TRUSTED",
+      "confidence": 0.95,
+      "checks_completed": 8,
+      "scanned_at": "2026-11-08T13:45:00Z"
+    }
+  ],
+  "total": 1,
+  "limit": 20,
+  "offset": 0
+}
+```
+
+### 4.5 Dedicated Web Security Posture Analysis Endpoints (`/api/v1/web-security` & `/api/v1/analyze/web-security`)
+
+#### `POST /api/v1/web-security/analyze` and `POST /api/v1/analyze/web-security` (Handoff Alias)
+Executes safe passive telemetry extraction, evaluates 22 deterministic security rules, runs calibrated ML posture classification with abstention, aggregates risk, and produces evidence-backed remediation guidance.
+- **Access:** Public or Authenticated (if authenticated, binds to user history)
+- **Request:**
+```json
+{
+  "url": "https://example.com",
+  "force_fresh": false
+}
+```
+- **Response (HTTP 200 OK):**
+```json
+{
+  "id": "e96b7834-8c03-4f98-9008-011242bbcc44",
+  "target_url": "https://example.com",
+  "normalized_domain": "example.com",
+  "registrable_domain": "example.com",
+  "scan_timestamp": "2026-11-08T22:30:00Z",
+  "scanner_version": "1.0.0",
+  "posture": "GOOD",
+  "security_score": 88.5,
+  "deterministic_posture": "GOOD",
+  "ml_prediction": {
+    "available": true,
+    "predicted_posture": "GOOD",
+    "probabilities": {
+      "GOOD": 0.88,
+      "MODERATE": 0.10,
+      "POOR": 0.02
+    },
+    "confidence": 0.88,
+    "margin": 0.78,
+    "abstained": false,
+    "model_name": "HistGradientBoosting",
+    "model_version": "1.0.0"
+  },
+  "consensus": {
+    "status": "CONSENSUS",
+    "discrepancy_explanation": null
+  },
+  "findings_summary": {
+    "total_findings": 6,
+    "critical_count": 0,
+    "high_count": 0,
+    "medium_count": 1,
+    "low_count": 2,
+    "pass_count": 3,
+    "affected_categories": ["HTTP_HEADERS", "TLS_SECURITY"]
+  },
+  "findings": [
+    {
+      "finding_id": "HDR-HSTS-PASS",
+      "category": "HTTP_HEADERS",
+      "name": "Strict-Transport-Security Configured",
+      "severity": "PASS",
+      "status": "COMPLIANT",
+      "evidence": "max-age=31536000; includeSubDomains; preload",
+      "detection_method": "DETERMINISTIC_RULE_INSPECTION",
+      "confidence": 1.0,
+      "guidance": "RFC 6797",
+      "recommendation": null
+    }
+  ],
+  "remediations": [
+    {
+      "finding_id": "HDR-CSP-LOW",
+      "severity": "LOW",
+      "category": "HTTP_HEADERS",
+      "recommendation": "Configure a restrictive Content-Security-Policy header."
+    }
+  ],
+  "telemetry": {
+    "status_code": 200,
+    "hsts_present": true
+  },
+  "summary_text": "Executive assessment summary text...",
+  "scanned_at": "2026-11-08T22:30:00Z"
+}
+```
+
+#### `GET /api/v1/web-security/{id}`
+Retrieves a stored web security posture assessment by ID.
+- **Status:** 200 OK
+- **Response:** `WebSecurityAssessmentResponse`
+
+#### `GET /api/v1/web-security`
+Returns paginated web security assessments with optional domain and posture filtering.
+- **Query Parameters:** `domain` (string), `posture` (GOOD, MODERATE, POOR), `page` (default 1), `limit` (default 20)
+- **Status:** 200 OK
+- **Response:** `WebSecurityScanListResponse`
+
+---
+
+### 4.6 Dashboard Endpoints (`/api/v1/dashboard`)
 
 #### `GET /api/v1/dashboard/summary`
 Returns user-scoped security scan statistics, verdict distributions, and the 10 most recent scans.

@@ -1,0 +1,9 @@
+{
+  "report_version": "1.0.0",
+  "generated_at": "2026-11-08T14:48:33.102557+00:00",
+  "total_attempted": 16950,
+  "total_successful": 10689,
+  "elapsed_seconds": 351.11,
+  "concurrency": 180,
+  "output_file": "D:\\trustlens\\intelligence\\web_security_analysis\\dataset\\raw\\source-specific\\raw_observations.jsonl"
+}

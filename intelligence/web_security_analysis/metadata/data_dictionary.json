@@ -1,0 +1,546 @@
+{
+  "dictionary_version": "1.0.0",
+  "project": "TrustLens Web Security Analyzer",
+  "columns": [
+    {
+      "name": "sample_id",
+      "type": "string",
+      "nullable": false,
+      "description": "Unique deterministic hex identifier generated from SHA-256 of registrable domain and observation timestamp.",
+      "category": "Identification"
+    },
+    {
+      "name": "normalized_domain",
+      "type": "string",
+      "nullable": false,
+      "description": "Normalized, lowercase FQDN evaluated during the measurement.",
+      "category": "Identification"
+    },
+    {
+      "name": "registrable_domain",
+      "type": "string",
+      "nullable": false,
+      "description": "Effective registrable domain extracted via the Public Suffix List (e.g., example.co.uk). Must be strictly unique across the primary dataset.",
+      "category": "Identification"
+    },
+    {
+      "name": "scan_timestamp",
+      "type": "string",
+      "nullable": false,
+      "description": "ISO 8601 UTC timestamp recording when the observation was initiated.",
+      "category": "Provenance"
+    },
+    {
+      "name": "source_name",
+      "type": "string",
+      "nullable": false,
+      "description": "Identifier of the population source (e.g. SRC-TRANCO-1M-RESEARCH).",
+      "category": "Provenance"
+    },
+    {
+      "name": "source_reference",
+      "type": "string",
+      "nullable": true,
+      "description": "Rank or external identifier in the primary population list.",
+      "category": "Provenance"
+    },
+    {
+      "name": "collection_method",
+      "type": "string",
+      "nullable": false,
+      "description": "Collection approach used (e.g., PASSIVE_PROBE, SYNTHETIC_LAB).",
+      "category": "Provenance"
+    },
+    {
+      "name": "collection_status",
+      "type": "string",
+      "nullable": false,
+      "description": "Collection outcome: SUCCESS, PARTIAL, UNREACHABLE, TIMEOUT, DNS_FAILURE.",
+      "category": "Provenance"
+    },
+    {
+      "name": "dataset_version",
+      "type": "string",
+      "nullable": false,
+      "description": "Semantic version of the dataset schema and pipeline.",
+      "category": "Provenance"
+    },
+    {
+      "name": "url_scheme",
+      "type": "string",
+      "nullable": false,
+      "description": "Initial URL scheme used for primary connection test (https or http).",
+      "category": "URL/Domain"
+    },
+    {
+      "name": "url_length",
+      "type": "int64",
+      "nullable": false,
+      "description": "Character length of the target URL.",
+      "category": "URL/Domain"
+    },
+    {
+      "name": "subdomain_count",
+      "type": "int64",
+      "nullable": false,
+      "description": "Number of subdomain labels preceding the registrable domain.",
+      "category": "URL/Domain"
+    },
+    {
+      "name": "is_idn",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether the domain is an Internationalized Domain Name (Punycode).",
+      "category": "URL/Domain"
+    },
+    {
+      "name": "is_ip_host",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether the host is an IPv4 or IPv6 address instead of a domain.",
+      "category": "URL/Domain"
+    },
+    {
+      "name": "domain_resolved",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether DNS resolution returned at least one valid IP address.",
+      "category": "DNS"
+    },
+    {
+      "name": "dns_has_ipv4",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether domain resolved one or more A records.",
+      "category": "DNS"
+    },
+    {
+      "name": "dns_has_ipv6",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether domain resolved one or more AAAA records.",
+      "category": "DNS"
+    },
+    {
+      "name": "dns_ipv4_addresses",
+      "type": "list<string>",
+      "nullable": true,
+      "description": "List of resolved IPv4 addresses.",
+      "category": "DNS"
+    },
+    {
+      "name": "dns_has_caa",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether domain publishes a Certification Authority Authorization record.",
+      "category": "DNS"
+    },
+    {
+      "name": "tls_supported",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether a direct TLS handshake was negotiated successfully on port 443.",
+      "category": "TLS"
+    },
+    {
+      "name": "tls_version",
+      "type": "string",
+      "nullable": true,
+      "description": "Negotiated TLS protocol version: TLSv1.3, TLSv1.2, TLSv1.1, TLSv1.0.",
+      "category": "TLS"
+    },
+    {
+      "name": "tls_cipher",
+      "type": "string",
+      "nullable": true,
+      "description": "Negotiated cryptographic cipher suite name.",
+      "category": "TLS"
+    },
+    {
+      "name": "tls_cert_valid",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether leaf certificate temporal validity is currently valid.",
+      "category": "TLS"
+    },
+    {
+      "name": "tls_cert_expired",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether leaf certificate expiration date is in the past.",
+      "category": "TLS"
+    },
+    {
+      "name": "tls_cert_not_before",
+      "type": "string",
+      "nullable": true,
+      "description": "Certificate validity commencement in ISO 8601 UTC.",
+      "category": "TLS"
+    },
+    {
+      "name": "tls_cert_not_after",
+      "type": "string",
+      "nullable": true,
+      "description": "Certificate validity expiration in ISO 8601 UTC.",
+      "category": "TLS"
+    },
+    {
+      "name": "tls_cert_remaining_days",
+      "type": "int64",
+      "nullable": true,
+      "description": "Days remaining until leaf certificate expiration.",
+      "category": "TLS"
+    },
+    {
+      "name": "tls_cert_issuer",
+      "type": "string",
+      "nullable": true,
+      "description": "Distinguished Name (RFC 4514) of the certificate issuer.",
+      "category": "TLS"
+    },
+    {
+      "name": "tls_cert_subject",
+      "type": "string",
+      "nullable": true,
+      "description": "Distinguished Name of the certificate subject.",
+      "category": "TLS"
+    },
+    {
+      "name": "tls_cert_san_count",
+      "type": "int64",
+      "nullable": false,
+      "description": "Number of Subject Alternative Names declared on the certificate.",
+      "category": "TLS"
+    },
+    {
+      "name": "tls_cert_is_self_signed",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether the leaf certificate is self-signed (subject equals issuer).",
+      "category": "TLS"
+    },
+    {
+      "name": "tls_cert_hostname_match",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether the requested domain matches at least one SAN entry or CN.",
+      "category": "TLS"
+    },
+    {
+      "name": "tls_cert_sig_alg",
+      "type": "string",
+      "nullable": true,
+      "description": "Signature algorithm used by issuer to sign certificate.",
+      "category": "TLS"
+    },
+    {
+      "name": "tls_cert_key_size",
+      "type": "int64",
+      "nullable": true,
+      "description": "Public key bit length (e.g. 2048, 4096, 256 for ECC).",
+      "category": "TLS"
+    },
+    {
+      "name": "http_available",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether plain HTTP (port 80) responds with an HTTP status code.",
+      "category": "HTTP"
+    },
+    {
+      "name": "https_available",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether HTTPS (port 443) responds with an HTTP status code.",
+      "category": "HTTP"
+    },
+    {
+      "name": "http_to_https_redirect",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether plain HTTP requests automatically redirect (301/302/308) to HTTPS.",
+      "category": "HTTP"
+    },
+    {
+      "name": "redirect_count",
+      "type": "int64",
+      "nullable": false,
+      "description": "Number of redirect hops followed before reaching final destination.",
+      "category": "HTTP"
+    },
+    {
+      "name": "final_status_code",
+      "type": "int64",
+      "nullable": true,
+      "description": "HTTP status code received at the terminal response.",
+      "category": "HTTP"
+    },
+    {
+      "name": "final_scheme",
+      "type": "string",
+      "nullable": true,
+      "description": "URL scheme of the terminal response (https or http).",
+      "category": "HTTP"
+    },
+    {
+      "name": "https_downgrade",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether the redirect sequence redirected an HTTPS URL to plain HTTP.",
+      "category": "HTTP"
+    },
+    {
+      "name": "header_hsts_present",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether Strict-Transport-Security header was returned over HTTPS.",
+      "category": "Headers"
+    },
+    {
+      "name": "header_hsts_max_age",
+      "type": "int64",
+      "nullable": true,
+      "description": "Declared max-age parameter in HSTS header in seconds.",
+      "category": "Headers"
+    },
+    {
+      "name": "header_hsts_include_subdomains",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether HSTS includes the includeSubDomains directive.",
+      "category": "Headers"
+    },
+    {
+      "name": "header_hsts_preload",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether HSTS declares the preload directive.",
+      "category": "Headers"
+    },
+    {
+      "name": "header_csp_present",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether Content-Security-Policy header is present in the response.",
+      "category": "Headers"
+    },
+    {
+      "name": "header_csp_unsafe_inline",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether CSP script-src includes 'unsafe-inline'.",
+      "category": "Headers"
+    },
+    {
+      "name": "header_csp_unsafe_eval",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether CSP script-src includes 'unsafe-eval'.",
+      "category": "Headers"
+    },
+    {
+      "name": "header_xfo_present",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether X-Frame-Options header is present.",
+      "category": "Headers"
+    },
+    {
+      "name": "header_xfo_value",
+      "type": "string",
+      "nullable": true,
+      "description": "Declared value of X-Frame-Options (e.g. DENY, SAMEORIGIN).",
+      "category": "Headers"
+    },
+    {
+      "name": "header_xcto_present",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether X-Content-Type-Options: nosniff is set.",
+      "category": "Headers"
+    },
+    {
+      "name": "header_referrer_policy_present",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether Referrer-Policy header is present.",
+      "category": "Headers"
+    },
+    {
+      "name": "header_referrer_policy_value",
+      "type": "string",
+      "nullable": true,
+      "description": "Declared value of Referrer-Policy.",
+      "category": "Headers"
+    },
+    {
+      "name": "header_permissions_policy_present",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether Permissions-Policy header is present.",
+      "category": "Headers"
+    },
+    {
+      "name": "header_coop_present",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether Cross-Origin-Opener-Policy header is present.",
+      "category": "Headers"
+    },
+    {
+      "name": "header_corp_present",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether Cross-Origin-Resource-Policy header is present.",
+      "category": "Headers"
+    },
+    {
+      "name": "header_coep_present",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether Cross-Origin-Embedder-Policy header is present.",
+      "category": "Headers"
+    },
+    {
+      "name": "cookie_count",
+      "type": "int64",
+      "nullable": false,
+      "description": "Total number of Set-Cookie directives observed.",
+      "category": "Cookies"
+    },
+    {
+      "name": "cookie_secure_count",
+      "type": "int64",
+      "nullable": false,
+      "description": "Number of cookies with the 'Secure' attribute.",
+      "category": "Cookies"
+    },
+    {
+      "name": "cookie_httponly_count",
+      "type": "int64",
+      "nullable": false,
+      "description": "Number of cookies with the 'HttpOnly' attribute.",
+      "category": "Cookies"
+    },
+    {
+      "name": "cookie_samesite_strict_count",
+      "type": "int64",
+      "nullable": false,
+      "description": "Number of cookies declaring SameSite=Strict.",
+      "category": "Cookies"
+    },
+    {
+      "name": "cookie_samesite_lax_count",
+      "type": "int64",
+      "nullable": false,
+      "description": "Number of cookies declaring SameSite=Lax.",
+      "category": "Cookies"
+    },
+    {
+      "name": "cookie_samesite_none_count",
+      "type": "int64",
+      "nullable": false,
+      "description": "Number of cookies declaring SameSite=None.",
+      "category": "Cookies"
+    },
+    {
+      "name": "cookie_all_secure",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether 100% of observed cookies carry the Secure attribute.",
+      "category": "Cookies"
+    },
+    {
+      "name": "server_header",
+      "type": "string",
+      "nullable": true,
+      "description": "Sanitized Server response header banner.",
+      "category": "Exposure"
+    },
+    {
+      "name": "server_version_exposed",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether server banner discloses specific version digits.",
+      "category": "Exposure"
+    },
+    {
+      "name": "x_powered_by_present",
+      "type": "bool",
+      "nullable": false,
+      "description": "Whether X-Powered-By header was exposed.",
+      "category": "Exposure"
+    },
+    {
+      "name": "findings",
+      "type": "string",
+      "nullable": false,
+      "description": "JSON-encoded array of detailed security finding objects.",
+      "category": "Annotations"
+    },
+    {
+      "name": "finding_ids",
+      "type": "list<string>",
+      "nullable": false,
+      "description": "List of active finding identifiers triggered for this endpoint.",
+      "category": "Annotations"
+    },
+    {
+      "name": "critical_findings_count",
+      "type": "int64",
+      "nullable": false,
+      "description": "Count of CRITICAL severity findings.",
+      "category": "Annotations"
+    },
+    {
+      "name": "high_findings_count",
+      "type": "int64",
+      "nullable": false,
+      "description": "Count of HIGH severity findings.",
+      "category": "Annotations"
+    },
+    {
+      "name": "medium_findings_count",
+      "type": "int64",
+      "nullable": false,
+      "description": "Count of MEDIUM severity findings.",
+      "category": "Annotations"
+    },
+    {
+      "name": "low_findings_count",
+      "type": "int64",
+      "nullable": false,
+      "description": "Count of LOW severity findings.",
+      "category": "Annotations"
+    },
+    {
+      "name": "website_posture_label",
+      "type": "string",
+      "nullable": false,
+      "description": "Categorical security posture rating: GOOD, MODERATE, POOR, INSUFFICIENT_EVIDENCE.",
+      "category": "Annotations"
+    },
+    {
+      "name": "website_posture_score",
+      "type": "float64",
+      "nullable": false,
+      "description": "Comprehensive numerical security posture score between 0.0 and 100.0.",
+      "category": "Annotations"
+    },
+    {
+      "name": "annotation_method",
+      "type": "string",
+      "nullable": false,
+      "description": "Methodology identifier used to generate labels (RULE_BASED_STANDARDS_V1).",
+      "category": "Annotations"
+    },
+    {
+      "name": "annotation_version",
+      "type": "string",
+      "nullable": false,
+      "description": "Version of the annotation logic applied.",
+      "category": "Annotations"
+    }
+  ]
+}
+

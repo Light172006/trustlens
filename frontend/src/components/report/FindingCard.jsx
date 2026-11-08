@@ -8,11 +8,8 @@ import React, { useState } from 'react';
 import {
   ChevronDown,
   ChevronUp,
-  ShieldAlert,
   Code,
   Wrench,
-  Tag,
-  HelpCircle,
 } from 'lucide-react';
 import { SeverityBadge } from '../common/SeverityBadge';
 import { Button } from 'antd';

@@ -1,0 +1,38 @@
+{
+  "submission_id": "f81d4fae-7dec-11d0-a765-00a0c91e6bf6",
+  "original_url": "https://secure-login.phishing-portal.com/auth/login.php?session=active#section",
+  "category": "PHISHING",
+  "description": "Deceptive portal impersonating Microsoft 365 login screen.",
+  "evidence_items": [
+    {
+      "evidence_id": "e001-evidence-uuid",
+      "evidence_type": "PHISHING_PAGE_ARTIFACT",
+      "stance": "SUPPORTS",
+      "source": "community_user_upload",
+      "description": "HTML form action submits password to external endpoint /drop.php",
+      "observed_at": "2026-11-08T12:00:00Z",
+      "reliability_score": 0.75,
+      "is_verified": false
+    },
+    {
+      "evidence_id": "e002-evidence-uuid",
+      "evidence_type": "CERTIFICATE_OBSERVATION",
+      "stance": "SUPPORTS",
+      "source": "automated_ct_log",
+      "description": "Self-signed certificate with invalid SAN for host.",
+      "observed_at": "2026-11-08T12:05:00Z",
+      "reliability_score": 0.90,
+      "is_verified": true
+    }
+  ],
+  "submitted_at": "2026-11-08T12:10:00Z",
+  "reporter": {
+    "reporter_id": "user_hash_9a8b7c",
+    "account_age_days": 180,
+    "previous_accepted_reports": 12,
+    "previous_rejected_reports": 1,
+    "is_trusted": true,
+    "is_restricted": false
+  }
+}
+

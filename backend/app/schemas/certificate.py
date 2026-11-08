@@ -1,119 +1,157 @@
-"""Pydantic schemas for the TrustLens Certificate Analyzer."""
+"""Pydantic v2 schemas for Certificate Analyzer requests and responses."""
 
-from datetime import datetime
+from __future__ import annotations
+
+import uuid
+from datetime import UTC, datetime
 from typing import Any
 
-from pydantic import BaseModel, Field
-
-
-class FindingEvidenceItem(BaseModel):
-    code: str
-    title: str
-    severity: str
-    description: str
-    evidence: dict[str, Any] | None = None
-    recommendation: str | None = None
-    score_deduction: int = 0
-
-
-class PolicyEvaluationSchema(BaseModel):
-    policy_name: str
-    policy_version: str
-    certificate_profile: str
-    applicability: str
-    applicable_rule_id: str
-    certificate_issuance_date: str
-    evaluation_date: str
-    max_validity_days_allowed: float | None = None
-    actual_validity_days: float
-    validity_compliant: bool | None = None
-    cryptographic_compliant: bool
-    overall_compliant: bool | None = None
-    evaluation_notes: str
-
-
-class MLAdvisorySchema(BaseModel):
-    predicted_class: str
-    compliance_probability: float
-    is_anomaly: bool
-    anomaly_score: float
-    confidence: float
-    advisory_notes: str
-    model_version: str = "1.0.0"
-    is_advisory: bool = True
-
-
-class CertificateFeaturesSchema(BaseModel):
-    public_key_algorithm: str
-    key_size_bits: int | None = None
-    is_rsa: bool = False
-    is_ecdsa: bool = False
-    is_ed25519: bool = False
-    is_weak_key: bool = False
-    signature_algorithm: str
-    is_sha1_signature: bool = False
-    is_md5_signature: bool = False
-    is_secure_signature: bool = True
-    validity_duration_days: float
-    days_since_issuance: float
-    days_until_expiry: float
-    is_expired: bool = False
-    is_not_yet_valid: bool = False
-    is_short_lived: bool = False
-    has_san: bool = False
-    san_count: int = 0
-    has_wildcard_san: bool = False
-    has_ip_san: bool = False
-    matches_tested_hostname: bool | None = None
-    is_ca: bool = False
-    is_self_signed: bool = False
-    chain_length: int = 1
-    is_chain_complete: bool = False
-    has_trusted_anchor: bool = False
-    has_crl_distribution_points: bool = False
-    has_ocsp_aia: bool = False
-    has_scts: bool = False
-    sct_count: int = 0
-    is_cabf_validity_compliant: bool = False
-    cabf_max_allowed_validity_days: float | None = None
-    policy_applicability: str = "APPLICABLE"
-    is_ca_constraint_compliant: bool = True
-    is_eku_compliant: bool = True
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class CertificateAnalyzeRequest(BaseModel):
-    """Request payload for direct certificate evaluation."""
+    """Payload to analyze a certificate or endpoint TLS configuration."""
 
-    hostname: str | None = Field(
+    target_hostname: str | None = Field(
         default=None,
-        description="Target hostname for endpoint TLS handshake or certificate identity verification",
+        description="Target server hostname for RFC 9525 verification or live TLS handshake probe",
+        max_length=253,
+        examples=["api.trustlens.io"],
     )
-    port: int = Field(default=443, ge=1, le=65535, description="Endpoint TLS destination port")
-    pem: str | None = Field(
+    port: int = Field(
+        default=443,
+        ge=1,
+        le=65535,
+        description="Destination port (default 443)",
+    )
+    tls_protocol_version: str = Field(
+        default="TLSv1.3",
+        description="Negotiated TLS protocol version (e.g. TLSv1.3, TLSv1.2)",
+    )
+    cipher_suite: str | None = Field(
         default=None,
-        description="Raw PEM certificate or multi-certificate bundle string",
+        description="Negotiated cipher suite name (e.g. TLS_AES_256_GCM_SHA384)",
+    )
+    reference_observation_timestamp: datetime | None = Field(
+        default=None,
+        description="Observation timestamp (UTC) for temporal validity checks",
+    )
+    certificate_der_base64: str | None = Field(
+        default=None,
+        description="Base64-encoded binary DER representation of the leaf X.509 certificate",
+    )
+    presented_intermediates_base64: list[str] = Field(
+        default_factory=list,
+        description="List of base64-encoded binary DER intermediate certificates",
+    )
+    certificate_pem: str | None = Field(
+        default=None,
+        description="PEM-encoded certificate or full-chain certificate bundle string",
+    )
+    revocation_observation: dict[str, Any] | None = Field(
+        default=None,
+        description="External OCSP / CRL status observation evidence",
     )
     include_ml_advisory: bool = Field(
-        default=True,
-        description="Whether to evaluate auxiliary ML compliance and anomaly advisory",
+        default=False,
+        description="Whether to run the advisory ML anomaly and compliance models",
     )
+
+
+class CertificateFindingItem(BaseModel):
+    """Specific security or policy finding generated by the certificate rule engine."""
+
+    code: str = Field(..., description="Canonical finding rule code (e.g. RULE_EXPIRED)")
+    title: str = Field(..., description="Human-readable title")
+    severity: str = Field(..., description="Severity level: CRITICAL, HIGH, MEDIUM, LOW, INFO")
+    description: str = Field(..., description="Technical detail and browser impact")
+    evidence: dict[str, Any] | None = Field(
+        default=None, description="Structured parameters and telemetry"
+    )
+    recommendation: str | None = Field(
+        default=None, description="Actionable remediation instructions"
+    )
+    score_deduction: int = Field(default=0, description="Deduction applied to certificate score")
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CertificateAssessmentResponse(BaseModel):
-    """Complete digital trust intelligence assessment response."""
+    """Complete authoritative certificate intelligence assessment."""
 
+    id: uuid.UUID | None = Field(
+        default=None, description="Stored assessment record ID in TrustLens database"
+    )
+    target_hostname: str | None = Field(default=None, description="Evaluated target hostname")
+    certificate_sha256: str = Field(
+        ..., description="SHA-256 fingerprint of the evaluated certificate"
+    )
+    subject_dn: str = Field(default="", description="Subject Distinguished Name")
+    issuer_dn: str = Field(default="", description="Issuer Distinguished Name")
+    verdict: str = Field(
+        ..., description="Certificate trust verdict: TRUSTED, WARNING, DISTRUSTED, INCONCLUSIVE"
+    )
+    trust_score: int | None = Field(
+        default=None,
+        ge=0,
+        le=100,
+        description="Deterministic Certificate Trust Score (0-100); None if inconclusive",
+    )
+    confidence: float = Field(
+        ...,
+        ge=0.0,
+        le=1.0,
+        description="Confidence level based on chain resolution and evidence completeness",
+    )
+    scoring_version: str = Field(
+        default="cert_v1.0.0", description="Rule and scoring engine version"
+    )
+    checks_completed: int = Field(
+        default=0, ge=0, description="Total number of PKI checks executed"
+    )
+    findings: list[CertificateFindingItem] = Field(
+        default_factory=list, description="Prioritized list of analysis findings"
+    )
+    features: dict[str, Any] | None = Field(
+        default=None, description="Extracted structural and cryptographic feature vector"
+    )
+    policy_evaluation: dict[str, Any] | None = Field(
+        default=None, description="CA/B Forum and platform policy compliance results"
+    )
+    ml_advisory: dict[str, Any] | None = Field(
+        default=None, description="Optional non-blocking advisory ML prediction"
+    )
+    recommendations: list[str] = Field(
+        default_factory=list, description="Consolidated security recommendations"
+    )
+    summary: str = Field(..., description="Executive human-readable summary of the certificate")
+    evaluated_at: datetime = Field(
+        default_factory=lambda: datetime.now(UTC),
+        description="UTC timestamp of analysis",
+    )
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class CertificateScanSummaryItem(BaseModel):
+    """Compact summary of a certificate scan for list views."""
+
+    id: uuid.UUID
+    target_hostname: str
     certificate_sha256: str
-    subject_dn: str
-    issuer_dn: str
-    verdict: str  # "TRUSTED", "WARNING", "DISTRUSTED", "INCONCLUSIVE"
     trust_score: int
+    verdict: str
     confidence: float
-    scoring_version: str = "cert_v1.0.0"
-    checks_completed: int = 6
-    findings: list[FindingEvidenceItem] = Field(default_factory=list)
-    features: dict[str, Any] = Field(default_factory=dict)
-    policy_evaluation: dict[str, Any] | None = None
-    ml_advisory: dict[str, Any] | None = None
-    recommendations: list[str] = Field(default_factory=list)
-    summary: str
-    evaluated_at: str | None = None
+    checks_completed: int
+    scanned_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class CertificateScanListResponse(BaseModel):
+    """Paginated list of certificate scans."""
+
+    items: list[CertificateScanSummaryItem]
+    total: int
+    limit: int
+    offset: int

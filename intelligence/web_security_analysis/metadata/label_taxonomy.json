@@ -1,0 +1,271 @@
+{
+  "taxonomy_version": "1.0.0",
+  "name": "TrustLens Web Security Posture Taxonomy",
+  "description": "Standardized multi-label security finding and posture categorization system for web technical security analysis.",
+  "status_definitions": {
+    "PASS": "The security control was verified to be correctly implemented according to baseline security standards.",
+    "FAIL": "A verified security weakness or misconfiguration was detected that degrades technical security posture.",
+    "WARN": "A security concern or optimization opportunity was detected, but it does not represent an unambiguous violation.",
+    "NOT_APPLICABLE": "The security control does not apply to this specific endpoint configuration (e.g., HTTP-only controls on non-HTTP services).",
+    "UNKNOWN": "Insufficient telemetry or inconclusive response prevented authoritative determination."
+  },
+  "severity_rubric": {
+    "CRITICAL": {
+      "score_penalty": 35,
+      "description": "Direct, severe exposure or total breakdown of transport security (e.g. expired certificate, TLS downgrade, completely broken HTTPS). Precludes GOOD or MODERATE posture."
+    },
+    "HIGH": {
+      "score_penalty": 20,
+      "description": "Substantial cryptographic or authentication weakness (e.g. deprecated TLS 1.0/1.1, self-signed certificate, weak ciphers). Precludes GOOD posture."
+    },
+    "MEDIUM": {
+      "score_penalty": 10,
+      "description": "Absence of core foundational defense-in-depth controls (e.g. missing HSTS, missing Content-Security-Policy, cookies transmitted without Secure flag)."
+    },
+    "LOW": {
+      "score_penalty": 3,
+      "description": "Absence of secondary hardening headers or minor misconfigurations (e.g. missing X-Content-Type-Options, missing Referrer-Policy, banner version disclosure)."
+    },
+    "INFO": {
+      "score_penalty": 0,
+      "description": "Informational observation or optional modern defense mechanism (e.g. CAA records, Permissions-Policy, modern TLS 1.3 indicator)."
+    }
+  },
+  "website_posture_rubric": {
+    "GOOD": {
+      "min_score": 80,
+      "criteria": "Numerical posture score >= 80, and zero findings with severity HIGH or CRITICAL."
+    },
+    "MODERATE": {
+      "min_score": 50,
+      "criteria": "Numerical posture score between 50 and 79, with no unmitigated CRITICAL findings."
+    },
+    "POOR": {
+      "min_score": 0,
+      "criteria": "Numerical posture score < 50, or presence of one or more CRITICAL security findings."
+    },
+    "INSUFFICIENT_EVIDENCE": {
+      "min_score": 0,
+      "criteria": "Domain could not be resolved or connected to, rendering technical posture indeterminable."
+    }
+  },
+  "finding_catalog": [
+    {
+      "id": "TLS-MISSING-HTTPS",
+      "category": "TLS_SECURITY",
+      "name": "Missing or Inaccessible HTTPS",
+      "default_severity": "CRITICAL",
+      "guidance": "RFC 2818, CA/B Forum Baseline Requirements",
+      "recommendation": "Deploy a valid TLS certificate from an accredited Certificate Authority and enable HTTPS on port 443."
+    },
+    {
+      "id": "TLS-CERT-EXPIRED",
+      "category": "TLS_SECURITY",
+      "name": "Expired TLS Certificate",
+      "default_severity": "CRITICAL",
+      "guidance": "RFC 5280 Section 4.1.2.5",
+      "recommendation": "Renew the TLS certificate immediately using automated issuance (e.g. ACME) to prevent browser connection blocks."
+    },
+    {
+      "id": "TLS-HOSTNAME-MISMATCH",
+      "category": "TLS_SECURITY",
+      "name": "Certificate Hostname Mismatch",
+      "default_severity": "HIGH",
+      "guidance": "RFC 6125",
+      "recommendation": "Reissue certificate ensuring the requested domain name is listed in the Subject Alternative Names (SAN) extension."
+    },
+    {
+      "id": "TLS-SELF-SIGNED",
+      "category": "TLS_SECURITY",
+      "name": "Self-Signed Certificate in Production",
+      "default_severity": "HIGH",
+      "guidance": "CA/B Forum Baseline Requirements",
+      "recommendation": "Replace self-signed certificate with one issued by a trusted public root CA from the Mozilla CCADB store."
+    },
+    {
+      "id": "TLS-VERSION-DEPRECATED",
+      "category": "TLS_SECURITY",
+      "name": "Deprecated TLS Protocol Version (TLS 1.0/1.1)",
+      "default_severity": "HIGH",
+      "guidance": "RFC 8996",
+      "recommendation": "Disable TLS 1.0 and 1.1 in web server and load balancer configurations; enforce TLS 1.2 or TLS 1.3 minimum."
+    },
+    {
+      "id": "TLS-EXPIRING-SOON",
+      "category": "TLS_SECURITY",
+      "name": "Certificate Expiring Within 15 Days",
+      "default_severity": "LOW",
+      "guidance": "Operational Security Best Practices",
+      "recommendation": "Verify automated renewal pipeline is operational before certificate reaches expiration."
+    },
+    {
+      "id": "SEC-HSTS-MISSING",
+      "category": "HTTP_HEADERS",
+      "name": "Missing HTTP Strict Transport Security (HSTS)",
+      "default_severity": "MEDIUM",
+      "guidance": "RFC 6797 Section 6.1",
+      "recommendation": "Configure 'Strict-Transport-Security: max-age=31536000; includeSubDomains; preload' on all HTTPS responses."
+    },
+    {
+      "id": "SEC-HSTS-MAX-AGE-LOW",
+      "category": "HTTP_HEADERS",
+      "name": "HSTS max-age Below Recommended Threshold",
+      "default_severity": "LOW",
+      "guidance": "RFC 6797 Section 11.2",
+      "recommendation": "Increase HSTS max-age to at least 10886400 seconds (126 days), preferably 31536000 seconds (1 year)."
+    },
+    {
+      "id": "SEC-CSP-MISSING",
+      "category": "HTTP_HEADERS",
+      "name": "Missing Content-Security-Policy (CSP)",
+      "default_severity": "MEDIUM",
+      "guidance": "W3C Content Security Policy Level 3",
+      "recommendation": "Deploy a robust Content-Security-Policy header restricting script-src, object-src, and default-src."
+    },
+    {
+      "id": "SEC-CSP-UNSAFE-DIRECTIVE",
+      "category": "HTTP_HEADERS",
+      "name": "Permissive Content-Security-Policy Directives",
+      "default_severity": "LOW",
+      "guidance": "W3C CSP Level 3 Section 7",
+      "recommendation": "Refactor inline scripts and styles to use cryptographic nonces or hashes rather than 'unsafe-inline' or 'unsafe-eval'."
+    },
+    {
+      "id": "SEC-XFO-MISSING",
+      "category": "HTTP_HEADERS",
+      "name": "Missing Clickjacking Protection (X-Frame-Options)",
+      "default_severity": "LOW",
+      "guidance": "RFC 7034",
+      "recommendation": "Set 'X-Frame-Options: DENY' or 'SAMEORIGIN', or define 'frame-ancestors' in Content-Security-Policy."
+    },
+    {
+      "id": "SEC-XCTO-MISSING",
+      "category": "HTTP_HEADERS",
+      "name": "Missing MIME-Sniffing Protection (X-Content-Type-Options)",
+      "default_severity": "LOW",
+      "guidance": "Fetch Living Standard Section 2.2.1",
+      "recommendation": "Add 'X-Content-Type-Options: nosniff' header to prevent browsers from MIME-sniffing away from declared Content-Type."
+    },
+    {
+      "id": "SEC-REFERRER-POLICY-MISSING",
+      "category": "HTTP_HEADERS",
+      "name": "Missing Referrer-Policy Header",
+      "default_severity": "LOW",
+      "guidance": "W3C Referrer Policy",
+      "recommendation": "Deploy 'Referrer-Policy: strict-origin-when-cross-origin' to protect sensitive URL parameters in HTTP referrers."
+    },
+    {
+      "id": "SEC-PERMISSIONS-POLICY-MISSING",
+      "category": "HTTP_HEADERS",
+      "name": "Missing Permissions-Policy Header",
+      "default_severity": "INFO",
+      "guidance": "W3C Permissions Policy",
+      "recommendation": "Define 'Permissions-Policy' to restrict sensitive browser features such as camera, microphone, and geolocation."
+    },
+    {
+      "id": "SEC-COOP-MISSING",
+      "category": "HTTP_HEADERS",
+      "name": "Missing Cross-Origin-Opener-Policy (COOP)",
+      "default_severity": "INFO",
+      "guidance": "HTML Living Standard Section 7.4",
+      "recommendation": "Deploy 'Cross-Origin-Opener-Policy: same-origin' to isolate browsing contexts from cross-origin attacks."
+    },
+    {
+      "id": "SEC-CORP-MISSING",
+      "category": "HTTP_HEADERS",
+      "name": "Missing Cross-Origin-Resource-Policy (CORP)",
+      "default_severity": "INFO",
+      "guidance": "W3C Fetch Living Standard",
+      "recommendation": "Deploy 'Cross-Origin-Resource-Policy: same-origin' to prevent cross-origin reads of static assets."
+    },
+    {
+      "id": "SEC-COEP-MISSING",
+      "category": "HTTP_HEADERS",
+      "name": "Missing Cross-Origin-Embedder-Policy (COEP)",
+      "default_severity": "INFO",
+      "guidance": "HTML Living Standard Section 7.5",
+      "recommendation": "Deploy 'Cross-Origin-Embedder-Policy: require-corp' where cross-origin resource isolation is needed."
+    },
+    {
+      "id": "COOKIE-MISSING-SECURE",
+      "category": "COOKIE_SECURITY",
+      "name": "Insecure Cookie Transmission (Missing Secure Flag)",
+      "default_severity": "MEDIUM",
+      "guidance": "RFC 6265bis Section 5.4.1",
+      "recommendation": "Ensure all Set-Cookie directives include the 'Secure' attribute to prevent transmission over cleartext HTTP."
+    },
+    {
+      "id": "COOKIE-MISSING-HTTPONLY",
+      "category": "COOKIE_SECURITY",
+      "name": "Sensitive Cookie Accessible to Script (Missing HttpOnly)",
+      "default_severity": "LOW",
+      "guidance": "RFC 6265bis Section 5.4.2",
+      "recommendation": "Append 'HttpOnly' flag to authentication and session cookies to mitigate client-side script theft."
+    },
+    {
+      "id": "COOKIE-MISSING-SAMESITE",
+      "category": "COOKIE_SECURITY",
+      "name": "Cookie Lacks SameSite Attribute",
+      "default_severity": "LOW",
+      "guidance": "RFC 6265bis Section 5.4.7",
+      "recommendation": "Set 'SameSite=Lax' or 'SameSite=Strict' on all cookies to mitigate cross-site request forgery (CSRF)."
+    },
+    {
+      "id": "REDIR-HTTP-NO-REDIRECT",
+      "category": "REDIRECT_INTEGRITY",
+      "name": "Plain HTTP Does Not Redirect to HTTPS",
+      "default_severity": "MEDIUM",
+      "guidance": "NIST SP 800-52 Rev 2",
+      "recommendation": "Configure web server to return a 301 Permanent Redirect on port 80 to the corresponding HTTPS endpoint."
+    },
+    {
+      "id": "REDIR-INSECURE-DOWNGRADE",
+      "category": "REDIRECT_INTEGRITY",
+      "name": "Insecure HTTPS-to-HTTP Downgrade in Redirect Chain",
+      "default_severity": "CRITICAL",
+      "guidance": "RFC 6797 Section 7.2",
+      "recommendation": "Eliminate redirect hops that route through plain HTTP (port 80) from an initial HTTPS origin."
+    },
+    {
+      "id": "INFO-SERVER-VERSION-LEAK",
+      "category": "SERVER_EXPOSURE",
+      "name": "Server Header Discloses Detailed Version",
+      "default_severity": "LOW",
+      "guidance": "OWASP WSTG-INFO-02",
+      "recommendation": "Configure ServerTokens Prod (Apache) or server_tokens off (Nginx) to minimize version disclosure."
+    },
+    {
+      "id": "INFO-X-POWERED-BY-PRESENT",
+      "category": "SERVER_EXPOSURE",
+      "name": "Framework Exposure via X-Powered-By Header",
+      "default_severity": "LOW",
+      "guidance": "OWASP WSTG-INFO-08",
+      "recommendation": "Disable the X-Powered-By header in application framework configurations (e.g., expose_php = Off)."
+    },
+    {
+      "id": "DNS-CAA-MISSING",
+      "category": "DNS_RESILIENCE",
+      "name": "Missing DNS CAA Record",
+      "default_severity": "INFO",
+      "guidance": "RFC 8659",
+      "recommendation": "Publish DNS CAA resource records specifying which Certificate Authorities are authorized to issue certificates for the domain."
+    },
+    {
+      "id": "DNS-DNSSEC-MISSING",
+      "category": "DNS_RESILIENCE",
+      "name": "DNSSEC Not Deployed",
+      "default_severity": "INFO",
+      "guidance": "RFC 4033",
+      "recommendation": "Sign the authoritative DNS zone with DNSSEC to prevent cache poisoning and DNS spoofing."
+    },
+    {
+      "id": "DNS-RESOLUTION-FAIL",
+      "category": "DNS_RESILIENCE",
+      "name": "Domain Resolution Failure (NXDOMAIN / SERVFAIL)",
+      "default_severity": "CRITICAL",
+      "guidance": "RFC 1035",
+      "recommendation": "Check zone file delegation, nameserver availability, and registrar DNS configuration."
+    }
+  ]
+}
+
