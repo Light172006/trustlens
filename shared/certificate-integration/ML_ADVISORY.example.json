@@ -1,0 +1,16 @@
+{
+  "_comment": "Example JSON payload for CertificateAssessment.ml_advisory and CertificateMLAdvisor.predict().to_dict(). This signal is auxiliary and non-authoritative.",
+  "predicted_class": "POLICY_COMPLIANT",
+  "compliance_probability": 0.9998,
+  "is_anomaly": false,
+  "anomaly_score": 0.1245,
+  "confidence": 0.9998,
+  "advisory_notes": "Advisory signal: predicted POLICY_COMPLIANT (99.98% probability). Normal profile consistent with standard Web PKI patterns. Note: This signal is advisory and does NOT supersede deterministic RFC validation.",
+  "model_version": "1.0.0",
+  "is_advisory": true,
+  "guidelines_for_consumers": {
+    "backend_usage": "Store in db as ml_advisory_json. Do not use to override deterministic trust_score or verdict.",
+    "frontend_usage": "Display inside an expandable 'Machine Learning Intelligence' drawer with an 'Advisory Only' pill badge. Never display as the primary security indicator."
+  }
+}
+

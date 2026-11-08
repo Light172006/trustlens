@@ -1,0 +1,152 @@
+{
+  "ablation": {
+    "all_features": {
+      "description": "Full feature set (12 numeric, 3 categorical)",
+      "metrics": {
+        "accuracy": 0.9997405293201869,
+        "precision": 0.9996916435399321,
+        "recall": 1.0,
+        "macro_f1": 0.999514068253615,
+        "weighted_f1": 0.9997404432460452,
+        "confusion_matrix": {
+          "true_negative": 611,
+          "false_positive": 1,
+          "false_negative": 0,
+          "true_positive": 3242
+        },
+        "roc_auc": 0.9999994959941616,
+        "pr_auc": 0.9999999048869648,
+        "brier_score": 0.00021765399192460755
+      }
+    },
+    "without_validity_duration": {
+      "description": "Ablated: validity_duration_days removed",
+      "metrics": {
+        "accuracy": 0.9997405293201869,
+        "precision": 0.9996916435399321,
+        "recall": 1.0,
+        "macro_f1": 0.999514068253615,
+        "weighted_f1": 0.9997404432460452,
+        "confusion_matrix": {
+          "true_negative": 611,
+          "false_positive": 1,
+          "false_negative": 0,
+          "true_positive": 3242
+        },
+        "roc_auc": 0.9996497159423094,
+        "pr_auc": 0.9999335754358843,
+        "brier_score": 0.00041415499918215224
+      }
+    },
+    "without_key_size_bits": {
+      "description": "Ablated: key_size_bits removed",
+      "metrics": {
+        "accuracy": 0.9997405293201869,
+        "precision": 0.9996916435399321,
+        "recall": 1.0,
+        "macro_f1": 0.999514068253615,
+        "weighted_f1": 0.9997404432460452,
+        "confusion_matrix": {
+          "true_negative": 611,
+          "false_positive": 1,
+          "false_negative": 0,
+          "true_positive": 3242
+        },
+        "roc_auc": 1.0,
+        "pr_auc": 1.0,
+        "brier_score": 0.00014485058292550306
+      }
+    },
+    "without_key_usage_count": {
+      "description": "Ablated: key_usage_count removed",
+      "metrics": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "macro_f1": 1.0,
+        "weighted_f1": 1.0,
+        "confusion_matrix": {
+          "true_negative": 612,
+          "false_positive": 0,
+          "false_negative": 0,
+          "true_positive": 3242
+        },
+        "roc_auc": 1.0,
+        "pr_auc": 1.0,
+        "brier_score": 1.5285533167303235e-05
+      }
+    },
+    "without_san_count": {
+      "description": "Ablated: san_count removed",
+      "metrics": {
+        "accuracy": 0.9997405293201869,
+        "precision": 0.9996916435399321,
+        "recall": 1.0,
+        "macro_f1": 0.999514068253615,
+        "weighted_f1": 0.9997404432460452,
+        "confusion_matrix": {
+          "true_negative": 611,
+          "false_positive": 1,
+          "false_negative": 0,
+          "true_positive": 3242
+        },
+        "roc_auc": 0.9999994959941616,
+        "pr_auc": 0.9999999048869648,
+        "brier_score": 0.00023067052863543188
+      }
+    },
+    "non_rule_structural_only": {
+      "description": "Ablated: Non-rule structural features only (pure extensions/counts)",
+      "metrics": {
+        "accuracy": 0.9997405293201869,
+        "precision": 0.9996916435399321,
+        "recall": 1.0,
+        "macro_f1": 0.999514068253615,
+        "weighted_f1": 0.9997404432460452,
+        "confusion_matrix": {
+          "true_negative": 611,
+          "false_positive": 1,
+          "false_negative": 0,
+          "true_positive": 3242
+        },
+        "roc_auc": 0.9983919693725732,
+        "pr_auc": 0.9986985979217939,
+        "brier_score": 0.00034623871308240884
+      }
+    }
+  },
+  "baseline_comparison": {
+    "rule_vs_ground_truth": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "macro_f1": 1.0,
+      "weighted_f1": 1.0,
+      "confusion_matrix": {
+        "true_negative": 612,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_positive": 3242
+      }
+    },
+    "ml_vs_ground_truth": {
+      "accuracy": 0.9997405293201869,
+      "precision": 0.9996916435399321,
+      "recall": 1.0,
+      "macro_f1": 0.999514068253615,
+      "weighted_f1": 0.9997404432460452,
+      "confusion_matrix": {
+        "true_negative": 611,
+        "false_positive": 1,
+        "false_negative": 0,
+        "true_positive": 3242
+      }
+    },
+    "ml_vs_rule_engine": {
+      "agreement_rate": 0.9997405293201869,
+      "agreement_count": 3853,
+      "disagreement_count": 1,
+      "cohens_kappa": 0.9990281366297674
+    }
+  }
+}

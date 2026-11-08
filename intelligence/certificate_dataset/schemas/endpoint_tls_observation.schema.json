@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://trustlens.io/schemas/endpoint_tls_observation.schema.json",
+  "title": "TrustLensEndpointTLSObservation",
+  "description": "Standardized schema for live and recorded TLS endpoint handshakes and context-dependent observations.",
+  "type": "object",
+  "required": [
+    "observation_id",
+    "hostname",
+    "port",
+    "sni_hostname",
+    "observation_timestamp",
+    "leaf_certificate_fingerprint",
+    "presented_intermediate_fingerprints",
+    "tls_protocol_version",
+    "negotiated_cipher_suite",
+    "hostname_verification_result",
+    "chain_verification_result",
+    "trust_store_identifier",
+    "handshake_status",
+    "observation_source",
+    "collection_method"
+  ],
+  "properties": {
+    "observation_id": { "type": "string" },
+    "hostname": { "type": "string" },
+    "port": { "type": "integer", "minimum": 1, "maximum": 65535 },
+    "sni_hostname": { "type": "string" },
+    "observation_timestamp": { "type": "string", "format": "date-time" },
+    "leaf_certificate_fingerprint": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "presented_intermediate_fingerprints": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+    },
+    "tls_protocol_version": {
+      "type": "string",
+      "enum": ["TLSv1.3", "TLSv1.2", "TLSv1.1", "TLSv1.0", "SSLv3", "UNKNOWN"]
+    },
+    "negotiated_cipher_suite": { "type": "string" },
+    "alpn_protocol": { "type": ["string", "null"] },
+    "hostname_verification_result": {
+      "type": "string",
+      "enum": ["MATCH", "MISMATCH", "IP_MATCH", "IP_MISMATCH", "NOT_CHECKED", "ERROR"]
+    },
+    "chain_verification_result": {
+      "type": "string",
+      "enum": [
+        "VALID_TRUSTED",
+        "EXPIRED",
+        "NOT_YET_VALID",
+        "SELF_SIGNED",
+        "UNTRUSTED_ROOT",
+        "INCOMPLETE_CHAIN",
+        "SIGNATURE_INVALID",
+        "REVOKED",
+        "ERROR"
+      ]
+    },
+    "verification_error_codes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "trust_store_identifier": { "type": "string" },
+    "trust_store_version": { "type": "string" },
+    "verification_library_and_version": { "type": "string" },
+    "handshake_status": {
+      "type": "string",
+      "enum": ["SUCCESS", "FAILED_HANDSHAKE", "CONNECTION_REFUSED", "TIMEOUT", "RESET"]
+    },
+    "observation_source": { "type": "string" },
+    "collection_method": { "type": "string" }
+  },
+  "additionalProperties": false
+}
+

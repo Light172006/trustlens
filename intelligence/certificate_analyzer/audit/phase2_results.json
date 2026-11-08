@@ -1,0 +1,142 @@
+{
+  "split_disjointness": {
+    "fingerprint_overlap": {
+      "train_val": 0,
+      "train_test": 0,
+      "val_test": 0
+    },
+    "spki_overlap": {
+      "train_val": 0,
+      "train_test": 0,
+      "val_test": 0
+    },
+    "zero_leakage_between_splits": true
+  },
+  "dependency_table": [
+    {
+      "feature": "validity_duration_days",
+      "source": "ASN.1 Validity (notAfter - notBefore)",
+      "direct_role_in_label": "Direct threshold in CABF rule: duration_days <= max_allowed_days (398d)",
+      "correlation_with_target": -0.4155984850877454,
+      "mutual_information": 0.44317456998314564,
+      "classification": "Legitimate Structural Feature (Constituent of Deterministic Policy Rule)"
+    },
+    {
+      "feature": "key_size_bits",
+      "source": "ASN.1 SubjectPublicKeyInfo (bit length)",
+      "direct_role_in_label": "Direct threshold in crypto security check: RSA key_size >= 2048",
+      "correlation_with_target": -0.20824963325027082,
+      "mutual_information": 0.03837131073178601,
+      "classification": "Legitimate Structural Feature (Constituent of Deterministic Policy Rule)"
+    },
+    {
+      "feature": "key_algorithm",
+      "source": "ASN.1 SubjectPublicKeyInfo algorithm OID",
+      "direct_role_in_label": "Direct role: determines whether RSA or ECC rules apply",
+      "correlation_with_target": -0.20080937034191548,
+      "mutual_information": 0.025776064198693494,
+      "classification": "Legitimate Structural Feature (Constituent of Deterministic Policy Rule)"
+    },
+    {
+      "feature": "signature_algorithm",
+      "source": "ASN.1 Certificate signatureAlgorithm OID",
+      "direct_role_in_label": "Direct role: checks if digest is SHA-1/MD5 (insecure/deprecated)",
+      "correlation_with_target": -0.1960039271181238,
+      "mutual_information": 0.03475813331626543,
+      "classification": "Legitimate Structural Feature (Constituent of Deterministic Policy Rule)"
+    },
+    {
+      "feature": "ec_curve",
+      "source": "ASN.1 SubjectPublicKeyInfo namedCurve OID",
+      "direct_role_in_label": "Indirect role: checks approved curves (secp256r1, secp384r1)",
+      "correlation_with_target": 0.18797343440788036,
+      "mutual_information": 0.03962520287658178,
+      "classification": "Legitimate Structural Feature"
+    },
+    {
+      "feature": "is_ca",
+      "source": "ASN.1 BasicConstraints extension is_ca boolean",
+      "direct_role_in_label": "Indirect role: Leaf certificates in Web PKI should not be CAs",
+      "correlation_with_target": -0.2178887324763588,
+      "mutual_information": 0.016498680517256892,
+      "classification": "Legitimate Structural Feature"
+    },
+    {
+      "feature": "is_self_signed",
+      "source": "Subject DN == Issuer DN identity comparison",
+      "direct_role_in_label": "Indirect role: Web PKI leaf certificates are signed by intermediate CAs",
+      "correlation_with_target": NaN,
+      "mutual_information": 0.0,
+      "classification": "Legitimate Structural Feature"
+    },
+    {
+      "feature": "san_count",
+      "source": "ASN.1 SubjectAlternativeName extension entries count",
+      "direct_role_in_label": "Indirect role: Web PKI leaf certs require SAN (RFC 5280 / BR)",
+      "correlation_with_target": 0.1557525897581742,
+      "mutual_information": 0.17525615454377408,
+      "classification": "Legitimate Structural Feature"
+    },
+    {
+      "feature": "is_wildcard",
+      "source": "SAN string prefix '*. ' presence",
+      "direct_role_in_label": "None in policy rule",
+      "correlation_with_target": NaN,
+      "mutual_information": 0.00012985423353484293,
+      "classification": "Independent Auxiliary Feature"
+    },
+    {
+      "feature": "has_scts",
+      "source": "ASN.1 extension 1.3.6.1.4.1.11129.2.4.2 presence",
+      "direct_role_in_label": "None in policy rule (Apple/Google CT requirement, not in target)",
+      "correlation_with_target": 0.20304621011893684,
+      "mutual_information": 0.03577895453665714,
+      "classification": "Independent Auxiliary Feature"
+    },
+    {
+      "feature": "sct_count",
+      "source": "Number of Embedded SCT items in extension",
+      "direct_role_in_label": "None in policy rule",
+      "correlation_with_target": 0.2029129959209696,
+      "mutual_information": 0.04049232824839799,
+      "classification": "Independent Auxiliary Feature"
+    },
+    {
+      "feature": "extension_count",
+      "source": "Total count of ASN.1 extensions present in certificate",
+      "direct_role_in_label": "None in policy rule",
+      "correlation_with_target": 0.5008254566643596,
+      "mutual_information": 0.18713847549566154,
+      "classification": "Independent Auxiliary Feature"
+    },
+    {
+      "feature": "key_usage_count",
+      "source": "Number of enabled KeyUsage bit flags",
+      "direct_role_in_label": "Indirect correlation with standard leaf profiles",
+      "correlation_with_target": 0.7094583538119174,
+      "mutual_information": 0.415743414819138,
+      "classification": "Independent Auxiliary Feature"
+    },
+    {
+      "feature": "extended_key_usage_count",
+      "source": "Number of EKU purpose OIDs present",
+      "direct_role_in_label": "Indirect correlation with TLS serverAuth profile",
+      "correlation_with_target": 0.6172287518935312,
+      "mutual_information": 0.20727890162792462,
+      "classification": "Independent Auxiliary Feature"
+    },
+    {
+      "feature": "subject_dn_length",
+      "source": "Character length of Subject DN RFC4514 string",
+      "direct_role_in_label": "None in policy rule",
+      "correlation_with_target": -0.42234855675650684,
+      "mutual_information": 0.4071941826475166,
+      "classification": "Independent Auxiliary Feature"
+    }
+  ],
+  "classification_verdict": {
+    "is_direct_data_leakage": false,
+    "is_rule_distillation": true,
+    "reasoning": "No target labels, finding codes, rule names, or deduction scores leak into features. The splits are strictly 0.0% fingerprint-disjoint and 0.0% SPKI-disjoint. The ground truth target 'POLICY_COMPLIANT' is defined deterministically by CA/B Forum Baseline Requirements (validity <= 398 days, RSA key >= 2048, secure hash algorithms). Because raw features include validity_duration_days, key_size_bits, key_algorithm, and signature_algorithm, the machine learning model operates as a high-fidelity linear/smooth Rule Distillation surrogate of deterministic PKI rules."
+  }
+}

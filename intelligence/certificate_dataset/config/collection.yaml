@@ -1,0 +1,43 @@
+version: "1.0.0"
+
+network_safeguards:
+  connect_timeout_seconds: 5.0
+  read_timeout_seconds: 15.0
+  max_response_bytes: 10485760  # 10 MB limit for safety
+  max_retries: 3
+  backoff_factor: 1.5
+  enforce_dns_validation: true
+  blocked_ip_ranges:
+    - "127.0.0.0/8"       # Loopback IPv4
+    - "10.0.0.0/8"        # RFC 1918 Private
+    - "172.16.0.0/12"     # RFC 1918 Private
+    - "192.168.0.0/16"    # RFC 1918 Private
+    - "169.254.0.0/16"    # Link-local IPv4
+    - "0.0.0.0/8"         # Current network
+    - "224.0.0.0/4"       # Multicast
+    - "240.0.0.0/4"       # Reserved
+    - "::1/128"           # Loopback IPv6
+    - "fc00::/7"          # Unique local IPv6
+    - "fe80::/10"         # Link-local IPv6
+
+rate_limiting:
+  ct_log_requests_per_second: 5.0
+  ocsp_requests_per_second: 2.0
+  crl_requests_per_second: 1.0
+
+batching:
+  ct_chunk_size: 500
+  parquet_row_group_size: 5000
+  checkpoint_interval_records: 1000
+
+paths:
+  raw_storage: "data/raw"
+  normalized_storage: "data/normalized"
+  labeled_storage: "data/labeled"
+  endpoint_observations: "data/endpoint_observations"
+  revocation_storage: "data/revocation"
+  trust_stores: "data/trust_stores"
+  splits_storage: "data/splits"
+  manifest_storage: "data/manifests"
+  quarantine_storage: "data/quarantine"
+
