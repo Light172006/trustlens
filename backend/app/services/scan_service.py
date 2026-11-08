@@ -260,6 +260,7 @@ class ScanService:
             scan_id=scan_id,
             available=True,
             certificate=CertificateResponseItem.model_validate(cert),
+            assessment=cert.assessment_payload,
         )
 
     async def delete_scan(

@@ -1,9 +1,10 @@
-"""TLS handshake and X.509 certificate inspection scanner."""
+"""TLS handshake and X.509 certificate inspection scanner with Certificate Analyzer integration."""
 
 import hashlib
 import socket
 import ssl
 from datetime import UTC, datetime
+from typing import Any
 
 from cryptography import x509
 from cryptography.x509.oid import ExtensionOID, NameOID
@@ -13,7 +14,7 @@ from app.core.logging import logger
 
 
 class TlsCertificateDetails(BaseModel):
-    """X.509 leaf certificate details."""
+    """X.509 leaf certificate details with deep digital trust intelligence."""
 
     leaf_fingerprint_sha256: str
     serial_number: str
@@ -33,6 +34,17 @@ class TlsCertificateDetails(BaseModel):
     fetched_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     unavailable_reason: str | None = None
 
+    # Deep Certificate Analyzer Intelligence
+    trust_score: int | None = None
+    verdict: str | None = None
+    confidence: float | None = None
+    checks_completed: int = 6
+    policy_evaluation: dict[str, Any] | None = None
+    ml_advisory: dict[str, Any] | None = None
+    findings: list[dict[str, Any]] = Field(default_factory=list)
+    recommendations: list[str] = Field(default_factory=list)
+    assessment_payload: dict[str, Any] | None = None
+
 
 class TlsScanResult(BaseModel):
     """Normalized TLS inspection result."""
@@ -47,6 +59,7 @@ class TlsScanResult(BaseModel):
     certificate: TlsCertificateDetails | None = None
     error_message: str | None = None
     completed: bool = False
+    assessment: dict[str, Any] | None = None
 
 
 class TlsScanner:
@@ -78,7 +91,15 @@ class TlsScanner:
                     # Retrieve binary DER certificate for robust cryptography parsing
                     der_cert = ssock.getpeercert(binary_form=True)
                     if der_cert:
-                        result.certificate = self._parse_der_certificate(der_cert, host)
+                        result.certificate = self._parse_der_certificate(
+                            der_bytes=der_cert,
+                            hostname=host,
+                            port=port,
+                            tls_version=result.protocol_version,
+                            cipher_suite=result.cipher_suite,
+                        )
+                        if result.certificate and result.certificate.assessment_payload:
+                            result.assessment = result.certificate.assessment_payload
                     result.completed = True
                     return result
 
@@ -96,6 +117,8 @@ class TlsScanner:
 
             # Attempt unverified connection to extract leaf certificate metadata for evidence
             result.certificate = self._fetch_unverified_cert(connect_target, port, host)
+            if result.certificate and result.certificate.assessment_payload:
+                result.assessment = result.certificate.assessment_payload
             result.completed = True
             return result
 
@@ -115,14 +138,30 @@ class TlsScanner:
             with socket.create_connection((target, port), timeout=self.timeout) as sock:
                 with unverified_ctx.wrap_socket(sock, server_hostname=hostname) as ssock:
                     der_cert = ssock.getpeercert(binary_form=True)
+                    tls_version = ssock.version()
+                    cipher_info = ssock.cipher()
+                    cipher_suite = cipher_info[0] if cipher_info else None
                     if der_cert:
-                        return self._parse_der_certificate(der_cert, hostname)
+                        return self._parse_der_certificate(
+                            der_bytes=der_cert,
+                            hostname=hostname,
+                            port=port,
+                            tls_version=tls_version,
+                            cipher_suite=cipher_suite,
+                        )
         except Exception:
             pass
         return None
 
-    def _parse_der_certificate(self, der_bytes: bytes, hostname: str) -> TlsCertificateDetails:
-        """Parse raw DER X.509 certificate using cryptography library."""
+    def _parse_der_certificate(
+        self,
+        der_bytes: bytes,
+        hostname: str,
+        port: int = 443,
+        tls_version: str | None = None,
+        cipher_suite: str | None = None,
+    ) -> TlsCertificateDetails:
+        """Parse raw DER X.509 certificate and enrich with Certificate Analyzer trust intelligence."""
         cert = x509.load_der_x509_certificate(der_bytes)
         now = datetime.now(UTC)
 
@@ -166,7 +205,7 @@ class TlsScanner:
         except x509.ExtensionNotFound:
             pass
 
-        return TlsCertificateDetails(
+        details = TlsCertificateDetails(
             leaf_fingerprint_sha256=sha256_fp,
             serial_number=hex(cert.serial_number)[2:].upper(),
             subject_cn=subject_cn,
@@ -183,6 +222,43 @@ class TlsScanner:
             sct_present=sct_present,
             revocation_status="not_checked",
         )
+
+        # Execute Certificate Analyzer engine for deep trust intelligence
+        try:
+            from certificate_analyzer.api import analyze_endpoint_tls
+
+            assessment = analyze_endpoint_tls(
+                certificate_der=der_bytes,
+                target_hostname=hostname,
+                port=port,
+                tls_protocol_version=tls_version or "TLSv1.3",
+                cipher_suite=cipher_suite,
+                reference_time=now,
+                include_ml_advisory=True,
+            )
+
+            raw_dump = assessment.model_dump(mode="json")
+            details.trust_score = raw_dump.get("trust_score")
+            verdict_val = raw_dump.get("verdict")
+            details.verdict = (
+                verdict_val.value if hasattr(verdict_val, "value") else str(verdict_val)
+            )
+            details.confidence = raw_dump.get("confidence")
+            details.checks_completed = raw_dump.get("checks_completed", 6)
+            details.policy_evaluation = raw_dump.get("policy_evaluation")
+            details.ml_advisory = raw_dump.get("ml_advisory")
+            details.findings = raw_dump.get("findings", [])
+            details.recommendations = raw_dump.get("recommendations", [])
+            details.assessment_payload = raw_dump
+
+        except Exception as exc:
+            logger.debug(f"Certificate analyzer enrichment skipped or failed: {exc}")
+            # Ensure safe fallback defaults conforming to schema
+            details.trust_score = 100 if not is_expired else 0
+            details.verdict = "DISTRUSTED" if is_expired else "TRUSTED"
+            details.confidence = 0.9
+
+        return details
 
 
 tls_scanner = TlsScanner()

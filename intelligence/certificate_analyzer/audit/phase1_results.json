@@ -1,0 +1,112 @@
+{
+  "train": {
+    "sample_count": 18096,
+    "positive_count": 15158,
+    "negative_count": 2938,
+    "metrics": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "macro_f1": 1.0,
+      "weighted_f1": 1.0,
+      "confusion_matrix": {
+        "true_negative": 2938,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_positive": 15158
+      },
+      "roc_auc": 1.0,
+      "pr_auc": 1.0,
+      "brier_score": 4.166005130103419e-06
+    }
+  },
+  "val": {
+    "sample_count": 3881,
+    "positive_count": 3262,
+    "negative_count": 619,
+    "metrics": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "macro_f1": 1.0,
+      "weighted_f1": 1.0,
+      "confusion_matrix": {
+        "true_negative": 619,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_positive": 3262
+      },
+      "roc_auc": 1.0,
+      "pr_auc": 1.0,
+      "brier_score": 5.656851102291589e-06
+    }
+  },
+  "test": {
+    "sample_count": 3854,
+    "positive_count": 3242,
+    "negative_count": 612,
+    "metrics": {
+      "accuracy": 0.9997405293201869,
+      "precision": 0.9996916435399321,
+      "recall": 1.0,
+      "macro_f1": 0.999514068253615,
+      "weighted_f1": 0.9997404432460452,
+      "confusion_matrix": {
+        "true_negative": 611,
+        "false_positive": 1,
+        "false_negative": 0,
+        "true_positive": 3242
+      },
+      "roc_auc": 0.9999994959941616,
+      "pr_auc": 0.9999999048869648,
+      "brier_score": 0.00021765399192460755
+    }
+  },
+  "matches_manifest": {
+    "train": true,
+    "val": true,
+    "test": true
+  },
+  "false_positives_test": [
+    {
+      "fingerprint": "e83c3c4db04c1e483d9895534268a3b97374133a61e599acfd4cb891c0017490",
+      "probability": 0.9019998838848803,
+      "row": {
+        "key_algorithm": "RSA",
+        "key_size_bits": 2048.0,
+        "ec_curve": "none",
+        "signature_algorithm": "sha256WithRSAEncryption",
+        "validity_duration_days": 1826.0208,
+        "san_count": 0,
+        "is_wildcard": 0,
+        "has_scts": 0,
+        "sct_count": 0,
+        "extension_count": 7,
+        "key_usage_count": 3,
+        "extended_key_usage_count": 0,
+        "is_ca": 0,
+        "is_self_signed": 0,
+        "subject_dn_length": 158,
+        "target": 0
+      },
+      "labels": {
+        "PARSE_VALID": "PASS",
+        "TIME_VALID": "FAIL",
+        "EXPIRED": "PASS",
+        "NOT_YET_VALID": "FAIL",
+        "HOSTNAME_MATCH": "NOT_CHECKED",
+        "CHAIN_TRUSTED": "NOT_CHECKED",
+        "CHAIN_INCOMPLETE": "NOT_CHECKED",
+        "SELF_SIGNED": "FAIL",
+        "REVOKED": "FAIL",
+        "REVOCATION_UNKNOWN": "PASS",
+        "WEAK_PUBLIC_KEY": "FAIL",
+        "WEAK_SIGNATURE": "FAIL",
+        "SAN_PRESENT": "FAIL",
+        "CA_CONSTRAINT_VALID": "PASS",
+        "EKU_PROFILE_VALID": "PASS",
+        "POLICY_COMPLIANT": "FAIL"
+      }
+    }
+  ]
+}

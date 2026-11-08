@@ -1,0 +1,160 @@
+/* =====================================================================
+   TrustLens — Design System & Global Styles
+   Cybersecurity Investigation Aesthetic: Minimal, Precise, Dark-First
+   ===================================================================== */
+
+:root {
+  /* Color Palette */
+  --bg-app: #101112;
+  --bg-sidebar: #141516;
+  --bg-surface: #191B1D;
+  --bg-surface-secondary: #202225;
+  --bg-surface-hover: #26292D;
+  --bg-surface-active: #2D3136;
+  
+  --border-color: #2B2E32;
+  --border-color-subtle: #222529;
+  --border-color-strong: #3F4349;
+
+  --text-primary: #F2F2F0;
+  --text-secondary: #92969D;
+  --text-muted: #646870;
+  --text-inverse: #101112;
+
+  --color-accent: #D6A45B;
+  --color-accent-hover: #E4B571;
+  --color-accent-subtle: rgba(214, 164, 91, 0.12);
+  --color-accent-glow: rgba(214, 164, 91, 0.25);
+
+  /* Security Verdicts */
+  --color-safe: #15803D;
+  --color-safe-bg: rgba(21, 128, 61, 0.14);
+  --color-safe-border: rgba(21, 128, 61, 0.35);
+  --color-safe-text: #4ADE80;
+
+  --color-suspicious: #B45309;
+  --color-suspicious-bg: rgba(180, 83, 9, 0.16);
+  --color-suspicious-border: rgba(180, 83, 9, 0.4);
+  --color-suspicious-text: #FBBF24;
+
+  --color-malicious: #B91C1C;
+  --color-malicious-bg: rgba(185, 28, 28, 0.16);
+  --color-malicious-border: rgba(185, 28, 28, 0.4);
+  --color-malicious-text: #F87171;
+
+  --color-inconclusive: #475569;
+  --color-inconclusive-bg: rgba(71, 85, 105, 0.16);
+  --color-inconclusive-border: rgba(71, 85, 105, 0.4);
+  --color-inconclusive-text: #94A3B8;
+
+  /* Finding Severities */
+  --severity-info: #3B82F6;
+  --severity-info-bg: rgba(59, 130, 246, 0.12);
+  --severity-low: #10B981;
+  --severity-low-bg: rgba(16, 185, 129, 0.12);
+  --severity-medium: #F59E0B;
+  --severity-medium-bg: rgba(245, 158, 11, 0.12);
+  --severity-high: #F97316;
+  --severity-high-bg: rgba(249, 115, 22, 0.12);
+  --severity-critical: #EF4444;
+  --severity-critical-bg: rgba(239, 68, 68, 0.14);
+
+  /* Typography */
+  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'Geist Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+
+  /* Sizing & Radius */
+  --radius-xs: 3px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
+
+  /* Layout */
+  --sidebar-width: 256px;
+  --header-height: 60px;
+}
+
+/* Reset & Box Sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+code, pre {
+  font-family: var(--font-mono);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-app);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-color-strong);
+}
+
+/* Selection */
+::selection {
+  background-color: var(--color-accent-subtle);
+  color: var(--color-accent);
+}
+
+/* Helper Utilities */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -1,0 +1,210 @@
+{
+  "dataset_name": "TrustLens Certificate Intelligence Production-Grade Dataset",
+  "dataset_version": "1.0.0",
+  "creation_timestamp": "2026-11-08T09:33:48.349924+00:00",
+  "pipeline_version": "1.0.0",
+  "schema_version": "1.0.0",
+  "source_registry": [
+    "google_ct_argon_2026",
+    "cloudflare_ct_nimbus_2026",
+    "letsencrypt_ct_oak_2026",
+    "google_chrome_ct_log_list",
+    "mozilla_ccadb_root_store",
+    "ccadb_all_intermediates",
+    "crlite_aggregated_revocation",
+    "public_ca_crl_distribution_points",
+    "mozilla_ca_incident_disclosures",
+    "historical_distrusted_root_corpus",
+    "sectigo_elephant_2026",
+    "digicert_wyvern_2026",
+    "digicert_sphinx_2026",
+    "google_ct_xenon_2026"
+  ],
+  "source_versions": {
+    "mozilla_root_store": "2026.06.17-CCADB",
+    "cabf_baseline_requirements": "2.0.8",
+    "rfc_standards": [
+      "RFC 5280",
+      "RFC 6960",
+      "RFC 6962",
+      "RFC 9162"
+    ]
+  },
+  "source_retrieval_times": {
+    "sources_verified": "2026-11-08T13:45:00Z",
+    "ingestion_executed": "2026-11-08T09:33:48.349924+00:00"
+  },
+  "source_licences_and_attribution": {
+    "mozilla_root_store": "Mozilla Public License (MPL 2.0)",
+    "google_ct_argon": "Google Terms of Service / RFC 6962 CT API",
+    "chromium_log_list": "BSD-3-Clause"
+  },
+  "statistics": {
+    "total_raw_records": 25848,
+    "valid_parsed_certificates": 25831,
+    "invalid_or_malformed_records": 0,
+    "unique_fingerprints_count": 25831,
+    "unique_public_keys_count": 23750,
+    "unique_issuers_count": 1540,
+    "leaf_certificate_count": 10050,
+    "intermediate_certificate_count": 97,
+    "root_certificate_count": 140,
+    "precertificate_count": 15544,
+    "endpoint_observations_count": 8,
+    "certificate_chains_count": 8,
+    "revocation_observations_count": 25831,
+    "duplicate_fingerprints_detected": 17,
+    "reused_public_keys_count": 2081,
+    "issuer_hhi_concentration": 1441.6
+  },
+  "distributions": {
+    "certificate_type": {
+      "ROOT": 140,
+      "LEAF": 10050,
+      "INTERMEDIATE": 97,
+      "PRECERTIFICATE": 15544
+    },
+    "public_key_algorithm": {
+      "ECDSA": 4960,
+      "RSA": 20871
+    },
+    "signature_algorithm": {
+      "ecdsa-with-SHA384": 3764,
+      "sha256WithRSAEncryption": 20746,
+      "sha1WithRSAEncryption": 43,
+      "sha384WithRSAEncryption": 124,
+      "sha512WithRSAEncryption": 4,
+      "ecdsa-with-SHA256": 1149,
+      "ecdsa-with-SHA512": 1
+    },
+    "key_size_bits": {
+      "384": 56,
+      "2048": 20643,
+      "4096": 214,
+      "256": 4903,
+      "521": 1,
+      "1024": 2,
+      "3072": 12
+    },
+    "validity_duration_statistics": {
+      "min_days": 1.0,
+      "max_days": 12784.0,
+      "mean_days": 406.04,
+      "median_days": 395.0
+    },
+    "label_distribution": {
+      "PARSE_VALID": {
+        "PASS": 25831
+      },
+      "TIME_VALID": {
+        "PASS": 5079,
+        "FAIL": 20752
+      },
+      "EXPIRED": {
+        "FAIL": 6303,
+        "PASS": 19528
+      },
+      "NOT_YET_VALID": {
+        "FAIL": 24607,
+        "PASS": 1224
+      },
+      "HOSTNAME_MATCH": {
+        "NOT_CHECKED": 25831
+      },
+      "CHAIN_TRUSTED": {
+        "NOT_CHECKED": 25831
+      },
+      "CHAIN_INCOMPLETE": {
+        "NOT_CHECKED": 25831
+      },
+      "SELF_SIGNED": {
+        "PASS": 140,
+        "FAIL": 25691
+      },
+      "REVOKED": {
+        "FAIL": 25831
+      },
+      "REVOCATION_UNKNOWN": {
+        "PASS": 25831
+      },
+      "WEAK_PUBLIC_KEY": {
+        "FAIL": 25829,
+        "PASS": 2
+      },
+      "WEAK_SIGNATURE": {
+        "FAIL": 25788,
+        "PASS": 43
+      },
+      "SAN_PRESENT": {
+        "FAIL": 259,
+        "PASS": 25572
+      },
+      "CA_CONSTRAINT_VALID": {
+        "PASS": 25831
+      },
+      "EKU_PROFILE_VALID": {
+        "PASS": 25826,
+        "FAIL": 5
+      },
+      "POLICY_COMPLIANT": {
+        "FAIL": 4169,
+        "PASS": 21662
+      }
+    }
+  },
+  "evaluation_splits": {
+    "fingerprint_disjoint": {
+      "train": 18081,
+      "val": 3874,
+      "test": 3876
+    },
+    "public_key_disjoint": {
+      "train": 18096,
+      "val": 3881,
+      "test": 3854
+    },
+    "chronological": {
+      "train": 18081,
+      "val": 3874,
+      "test": 3876
+    },
+    "overlap_audit": {
+      "fingerprint_leakage_clean": true,
+      "public_key_leakage_clean": false,
+      "fingerprint_overlaps": {
+        "train_vs_val": 0,
+        "train_vs_test": 0,
+        "val_vs_test": 0
+      },
+      "public_key_overlaps": {
+        "train_vs_val": 449,
+        "train_vs_test": 430,
+        "val_vs_test": 95
+      },
+      "split_sizes": {
+        "train": 18081,
+        "val": 3874,
+        "test": 3876
+      }
+    }
+  },
+  "dataset_checksums_sha256": {
+    "normalized_certificates.jsonl": "e8c06ec0d2c3804f2fc2c49537dc75c80a4db69fe6f3f288f85f33af93809cc0",
+    "normalized_certificates.parquet": "be0823ba1dd89247c32d938544b0a1206279096d111847b5a9ad31e0a0173b70",
+    "certificate_labels.jsonl": "c6959d3dc7c16a33a7d22ee857c996ca4679c3bbfe132ae7d6750e4588496942",
+    "certificate_labels.parquet": "9b6e4fb7f53e6356f2c74e873c38b8d57a901b944344a49f8e1d73511f0949ce",
+    "endpoint_tls_observations.jsonl": "4309ba6f8ab9cad1662ac92e593a09b086df0b806b4d82fc52c8d73dd6cb0f0f",
+    "endpoint_tls_observations.parquet": "e0c232677af2fffb45beca5cafb465f9e3a8806f0181f31128c8e7741790ae81",
+    "certificate_chains.jsonl": "526698300694d6394ff35d18f7721977be4ad7f0284e62ffbbf210bd302ce181",
+    "certificate_chains.parquet": "f941808c101e68b1a7dc3b60f2996723c731ea47038c1a08ad804bfbd904ff60",
+    "revocation_observations.jsonl": "1870d8fe6ab41cbe2088cbd9eb7f97218b2e3ec44c9efdb359c7d636e5797ef2",
+    "revocation_observations.parquet": "223fc28f0266990680d41fc70c8ac7576c3ee1bb5963f3ca815fe402a86750f2",
+    "root_store_records.jsonl": "674398954a6d76371df55b1703b5c75683d8c040584078f3235c57139e80ce3f",
+    "root_store_records.parquet": "216e89eebea26380b05e20d07f9a61289c3116b4633dea1647c3679a5ceaad72"
+  },
+  "known_limitations": [
+    "Revocation status for offline certificates is marked as NOT_CHECKED to prevent untrusted live network spam.",
+    "Trust anchor resolution is currently calibrated against the Mozilla CCADB NSS store.",
+    "Precertificates are explicitly distinguished and cannot be treated as valid subscriber certificates for TLS handshakes."
+  ]
+}

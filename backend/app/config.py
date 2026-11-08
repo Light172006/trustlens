@@ -1,8 +1,21 @@
 """Application configuration and environment settings using Pydantic Settings."""
 
 import json
+import sys
 from functools import lru_cache
+from pathlib import Path
 from typing import Any
+
+# Ensure shared contracts, intelligence packages, and certificate analyzer are resolvable
+_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+for _p in [
+    _REPO_ROOT,
+    _REPO_ROOT / "shared",
+    _REPO_ROOT / "intelligence" / "certificate_analyzer" / "src",
+    _REPO_ROOT / "intelligence" / "certificate_dataset" / "src",
+]:
+    if _p.exists() and str(_p) not in sys.path:
+        sys.path.insert(0, str(_p))
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict

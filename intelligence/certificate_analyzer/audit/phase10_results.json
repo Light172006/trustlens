@@ -1,0 +1,58 @@
+{
+  "edge_case_tests": [
+    {
+      "category": "Unseen Categoricals",
+      "name": "Post-Quantum Dilithium3 Algorithm",
+      "status": "PASSED",
+      "error": null,
+      "output": "Class=COMPLIANT, Prob=0.5240, Anomaly=False"
+    },
+    {
+      "category": "Unseen Categoricals",
+      "name": "Ed25519 Modern Key",
+      "status": "PASSED",
+      "error": null,
+      "output": "Class=COMPLIANT, Prob=0.9931, Anomaly=False"
+    },
+    {
+      "category": "Numeric Outliers",
+      "name": "50,000 SAN CDN Stress",
+      "status": "PASSED",
+      "error": null,
+      "output": "Class=COMPLIANT, Prob=1.0000, Anomaly=True"
+    },
+    {
+      "category": "Numeric Outliers",
+      "name": "100-Year Validity (36,500 Days)",
+      "status": "PASSED",
+      "error": null,
+      "output": "Class=NON_COMPLIANT, Prob=0.0000, Anomaly=False"
+    },
+    {
+      "category": "Numeric Outliers",
+      "name": "Negative Validity Days (-100.0)",
+      "status": "PASSED",
+      "error": null,
+      "output": "Class=NON_COMPLIANT, Prob=0.0673, Anomaly=False"
+    },
+    {
+      "category": "Sparse/Empty Records",
+      "name": "Empty Dict Record",
+      "status": "PASSED",
+      "error": null,
+      "output": "Class=NON_COMPLIANT, Prob=0.1133, Anomaly=False"
+    },
+    {
+      "category": "Sparse/Empty Records",
+      "name": "None Fields Record",
+      "status": "PASSED",
+      "error": null,
+      "output": "Class=NON_COMPLIANT, Prob=0.1133, Anomaly=False"
+    }
+  ],
+  "multithreaded_concurrency": {
+    "tasks_executed": 100,
+    "threads": 10,
+    "all_consistent": true
+  }
+}

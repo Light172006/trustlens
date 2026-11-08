@@ -1,127 +1,173 @@
-# TrustLens — Unified Website Security Assessment Platform
+# TrustLens — Unified Website Security & Certificate Trust Intelligence Platform
 
-TrustLens is a production-oriented cybersecurity SaaS platform that determines whether a website is **SAFE**, **SUSPICIOUS**, **MALICIOUS**, or **INCONCLUSIVE**.
+TrustLens is a production-grade cybersecurity intelligence platform designed to determine whether a website or endpoint is **SAFE**, **SUSPICIOUS**, **MALICIOUS**, or **INCONCLUSIVE**.
 
-The platform combines four capabilities:
-1. **Threat Intelligence Analysis**: Live lookups against OpenPhish, URLhaus, and curated local threat indicators.
-2. **Passive Web Security Assessment**: Strict HTTP inspection, security header audits, and redirect tracking.
-3. **SSL/TLS Certificate Validation**: X.509 leaf certificate validation, SAN inspection, chain validity, and expiration checks.
-4. **Collaborative Threat Intelligence**: Community threat reporting with strict moderator workflows and auditable decision trails.
+The platform couples high-throughput passive perimeter heuristics with a newly integrated, deterministic **X.509 Certificate Analyzer** and auxiliary machine learning compliance advisory engine.
 
 ---
 
-## Technical Architecture & Core Principles
+## 🚀 Key Platform Capabilities
 
-- **Modular Monolith**: Clean layer separation across API, Services, Models, Scanners, and Integrations.
-- **SSRF Safeguards**: Pre-flight DNS resolution, global IPv4/IPv6 routability validation, loopback/private/link-local/metadata IP rejection, connection pinning, and manual redirect hop revalidation.
-- **Strict Decoupling**: Integration boundary with the AI Intelligence Engine is mediated via typed Pydantic contracts and dependency injection.
-- **Deterministic Risk Scoring**: Decisive threat feed rules take precedence over additive heuristics. Missing evidence yields `INCONCLUSIVE` instead of false `SAFE`.
-
----
-
-## Technology Stack
-
-| Technology | Responsibility |
-|---|---|
-| **Python 3.12** | Backend Language |
-| **FastAPI** | High-performance REST API Framework |
-| **Pydantic v2** | Strict validation & Data Transfer Objects |
-| **SQLAlchemy 2.0** | Async ORM & Relational Data Access |
-| **PostgreSQL 16+** | Primary Database |
-| **Alembic** | Versioned Database Migrations |
-| **Redis 7.4+** | In-memory message broker & cache |
-| **Celery 5.4+** | Asynchronous task processing |
-| **HTTPX & dnspython** | Safe HTTP scanning & DNS resolution |
-| **cryptography** | X.509 Certificate parsing and validation |
-| **PyJWT & Argon2id** | JWT auth, token rotation, and password hashing |
-| **pytest & Ruff** | Automated test suite & linting/formatting |
-| **Docker & Compose** | Containerization & local orchestration |
+1. **Passive Web Security Assessment**: Strict HTTP perimeter inspections, DNS record enumeration, security header analysis (`HSTS`, `CSP`, `X-Frame-Options`), and SSRF-hardened redirect tracking.
+2. **Threat Intelligence Correlation**: Real-time cross-referencing against OpenPhish, URLhaus, and local indicators of compromise.
+3. **Deep X.509 Certificate Analyzer (New Feature)**:
+   - **RFC 5280 Path Validation**: Full certification chain reconstruction anchored against the Mozilla CCADB (Common CA Database) root store.
+   - **RFC 9525 Identity Matching**: Subject Alternative Name (`dNSName`, `iPAddress`) and Common Name SAN validation supporting internationalized domain names (IDN/Punycode) and wildcards.
+   - **CA/Browser Forum Baseline Requirements v2.3.1**: Automated validation of certificate validity periods (enforcing the 200-day maximum lifetime limit for subscriber certificates).
+   - **Certificate Transparency (RFC 6962)**: Embedded Signed Certificate Timestamp (SCT) presence and count verification.
+   - **Deterministic Trust Scoring (0–100)**: Transparent score deduction framework cleanly decoupled from confidence metrics (0.0–1.0).
+   - **Fail-Safe Revocation Invariant**: Any revoked certificate immediately yields a hard zero score (`trust_score = 0`) and `DISTRUSTED` verdict.
+   - **Auxiliary Machine Learning Advisory**: Random Forest and anomaly detection models providing Web PKI baseline comparisons (`[ Advisory Signal Only ]`).
+4. **Interactive Certificate Analysis Console**:
+   - Live endpoint TLS handshake analysis for any public domain or FQDN.
+   - Direct analysis of pasted PEM certificates and multi-certificate chains.
+5. **Collaborative Threat Intelligence**: Community-sourced threat reporting with moderator audit trails.
 
 ---
 
-## Repository Structure
+## 🏗️ Architecture & Technology Stack
+
+### Backend Stack
+- **Python 3.12+ / 3.14**: High-concurrency async runtime.
+- **FastAPI**: Asynchronous REST API framework with Pydantic v2 schemas.
+- **SQLAlchemy 2.0**: Async ORM supporting PostgreSQL (`asyncpg`) and SQLite (`aiosqlite`).
+- **Celery 5.4+ & Redis 7.4+**: Distributed background scanning workers and broker.
+- **Cryptography & OpenSSL**: X.509 leaf and chain DER parsing, cipher negotiation, and signature verification.
+- **scikit-learn & pandas**: Auxiliary ML compliance classification and anomaly scoring.
+- **HTTPX & dnspython**: SSRF-hardened HTTP client and DNS resolver.
+
+### Frontend Stack
+- **React 19 & Vite 8**: Dark-first, minimal cybersecurity investigation interface.
+- **Plain CSS**: Modern scoped CSS tokens adhering to TrustLens visual identity (`globals.css` and `components.css`).
+- **Lucide React & Ant Design**: Streamlined icons and accessible UI components.
+- **Zero Heavy Overheads**: Strictly NO TypeScript, NO Tailwind CSS, NO Next.js, and NO Redux.
+
+---
+
+## 📂 Repository Structure
 
 ```text
 trustlens/
 ├── backend/
 │   ├── app/
-│   │   ├── main.py                   # FastAPI Application Entrypoint
-│   │   ├── config.py                 # Pydantic Settings & Environment Variables
-│   │   ├── api/v1/                   # REST API v1 Routers & Endpoints
-│   │   ├── core/                     # Logging, Security, Exceptions, Permissions
-│   │   ├── database/                 # SQLAlchemy Base, Async Sessions, Init DB
-│   │   ├── models/                   # SQLAlchemy 2.0 ORM Models
-│   │   ├── schemas/                  # Pydantic v2 Request/Response DTOs
-│   │   ├── services/                 # Domain Business Logic
-│   │   ├── scanners/                 # URL, DNS, HTTP, TLS, Redirect, Headers
-│   │   ├── integrations/             # AI Engine Integration & Test Double
-│   │   ├── workers/                  # Celery Application & Tasks
-│   │   └── tests/                    # Unit, Integration, & Security Tests
-│   ├── migrations/                   # Alembic Database Migrations
-│   ├── Dockerfile                    # Production Hardened Dockerfile
-│   ├── requirements.txt              # Pinned Python Dependencies
-│   ├── pyproject.toml                # Tooling Configuration (Ruff, Mypy, Pytest)
-│   ├── alembic.ini                   # Alembic Configuration
-│   └── .env.example                  # Environment Configuration Template
-├── shared/
-│   └── contracts/                    # Cross-Boundary Data Contracts
-├── docker-compose.yml                # Docker Compose Orchestration
-├── .gitignore                        # Git Ignore Rules
-└── README.md                         # Documentation
+│   │   ├── main.py                     # FastAPI application factory & middleware
+│   │   ├── config.py                   # Pydantic Settings & environment bootstrapping
+│   │   ├── api/v1/                     # REST API v1 routers & endpoints
+│   │   │   ├── endpoints/
+│   │   │   │   ├── certificates.py     # POST /api/v1/certificates/analyze
+│   │   │   │   ├── scans.py            # POST /api/v1/scans & GET /scans/{id}/certificate
+│   │   │   │   ├── auth.py             # User authentication & token management
+│   │   │   │   └── ...
+│   │   │   └── router.py               # Centralized v1 router registration
+│   │   ├── core/                       # Security, logging, exceptions, SSRF protection
+│   │   ├── database/                   # SQLAlchemy async engine & session management
+│   │   ├── models/                     # Database models (Certificate, CertificateScan, Scan)
+│   │   ├── schemas/                    # Pydantic v2 DTOs (CertificateAssessment, Policy)
+│   │   ├── scanners/                   # tls_scanner.py (integrated with Certificate Analyzer)
+│   │   ├── workers/                    # Celery scan pipeline and task orchestration
+│   │   └── tests/                      # Automated test suite (62 passing integration tests)
+│   ├── requirements.txt                # Pinned backend dependencies
+│   └── .env.example                    # Backend environment template
+├── frontend/
+│   ├── src/
+│   │   ├── pages/
+│   │   │   ├── CertificatePage.jsx     # Interactive Certificate Analyzer & Telemetry View
+│   │   │   ├── ScanReportPage.jsx      # Scan report with Certificate Trust preview
+│   │   │   ├── DashboardPage.jsx       # Overview & recent scan audits
+│   │   │   └── ...
+│   │   ├── components/layout/          # AppLayout with Certificate Analyzer navigation
+│   │   ├── services/                   # certificate.service.js & scan.service.js
+│   │   └── styles/                     # Design system (globals.css, components.css)
+│   ├── package.json                    # React 19 & Vite configuration
+│   └── vite.config.js
+├── intelligence/
+│   ├── certificate_analyzer/           # X.509 Certificate Analyzer Core Engine
+│   │   ├── src/certificate_analyzer/   # RFC 5280, RFC 9525, CA/B Forum, Scoring & ML
+│   │   └── tests/                      # 72 engine unit tests
+│   └── certificate_dataset/            # Mozilla CCADB root store & training corpus
+└── shared/
+    └── certificate-integration/        # Engineering contracts, frontend & backend specs
 ```
 
 ---
 
-## Quickstart & Local Development
+## ⚡ Quickstart Guide
 
-> 📖 **Comprehensive Step-by-Step Guide:**  
-> For detailed instructions on running with Docker Compose, native local environments, Windows Celery flags (`-P solo`), troubleshooting, and curl verification scripts, see **[STARTUP_GUIDE.md](file:///d:/trustlens/STARTUP_GUIDE.md)**.
->
-> 🎨 **Frontend Engineering Integration:**  
-> For React 19 / TypeScript schemas, token protocols, and polling state machines, see **[FRONTEND_REQUIREMENTS.md](file:///d:/trustlens/FRONTEND_REQUIREMENTS.md)**.
-
-### Prerequisites
-- Python 3.11+ (or Python 3.12)
-- Docker & Docker Compose (optional for containerized setup)
-
-### 1. Local Environment Setup
+### 1. Backend Setup
 ```bash
-# Clone and enter directory
-cd trustlens/backend
+cd backend
 
-# Create virtual environment
+# Create and activate virtual environment
 python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+source .venv/bin/activate       # On Windows: .venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
+pip install pandas scikit-learn asyncpg
 
-# Copy environment variables
+# Configure environment
 cp .env.example .env
+
+# Run database migrations / initialization
+# For local dev without Postgres, SQLite is supported out of the box:
+# export DATABASE_URL="sqlite+aiosqlite:///./trustlens.db"
+
+# Start the API server
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-### 2. Run with Docker Compose
+### 2. Frontend Setup
 ```bash
-# From the repository root:
-docker compose up -d --build
+cd frontend
 
-# Verify services:
-docker compose ps
+# Install npm packages
+npm install
 
-# View API logs:
-docker compose logs -f api
+# Start Vite development server
+npm run dev
+# The frontend console will be live at http://localhost:5173
 ```
 
-### 3. Verify Health Endpoints
-- Base Health: `http://localhost:8000/health`
-- Database Health: `http://localhost:8000/health/database`
-- Redis Health: `http://localhost:8000/health/redis`
-- Interactive OpenAPI Docs: `http://localhost:8000/docs`
+### 3. Verify Health & OpenAPI Documentation
+- Base Health Probe: `http://localhost:8000/health`
+- Interactive OpenAPI Swagger Docs: `http://localhost:8000/docs`
+- Certificate Analyzer Direct UI: `http://localhost:5173/certificates`
 
-### 4. Running Automated Tests (57 Tests)
+---
+
+## 🧪 Automated Testing
+
+### Backend Integration & Security Tests (62 Tests)
 ```bash
 cd backend
-python run_test.py
-# Or: pytest -v app/tests
+python -m pytest app/tests/ -v
 ```
+All 62 tests cover authentication, scans, reports, dashboard, health, scanners, SSRF protections, and certificate analysis.
 
+### Certificate Engine Unit Tests (72 Tests)
+```bash
+cd intelligence/certificate_analyzer
+python -m pytest tests/ -v
+```
+Verifies RFC 5280 path validation, RFC 9525 SAN matching, CA/B Forum v2.3.1 rules, trust scoring invariants, and ML model loading.
+
+### Frontend Production Build
+```bash
+cd frontend
+npm run build
+```
+Compiles and bundles the React 19 application with zero errors or warnings.
+
+---
+
+## 🛡️ Security Principles & Guardrails
+
+1. **TLS ≠ Legitimacy**: A valid certificate encrypts communications; it does not prove a site is harmless. This distinction is prominently displayed across TrustLens.
+2. **Strict SSRF Immunity**: The certificate analysis endpoint actively filters all inputs against private, loopback, link-local, multicast, and cloud metadata IP ranges (`169.254.169.254`, `127.0.0.0/8`, `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`, `::1`).
+3. **Payload Boundaries**: Direct PEM uploads are strictly capped at 10 MB to prevent resource exhaustion attacks.
+4. **Advisory Machine Learning**: The ML advisory is strictly auxiliary and will never override cryptographic validity or deterministic path checks.
+
+---
+
+## 📜 License
+TrustLens is proprietary software developed for enterprise website security and threat intelligence operations. All rights reserved.

@@ -230,8 +230,41 @@ async def run_scan_pipeline(scan_id: str, allow_private_for_tests: bool = False)
                 hostname_match=tls_result.hostname_match,
                 sct_present=cert.sct_present,
                 fetched_at=cert.fetched_at,
+                trust_score=cert.trust_score,
+                verdict=cert.verdict,
+                confidence=cert.confidence,
+                checks_completed=cert.checks_completed,
+                policy_evaluation=cert.policy_evaluation,
+                ml_advisory=cert.ml_advisory,
+                findings=cert.findings,
+                recommendations=cert.recommendations,
+                assessment_payload=cert.assessment_payload,
             )
             db.add(cert_record)
+
+            # Persist certificate findings into findings table if deduction > 0
+            existing_finding_codes = {f.code for f in assessment.findings}
+            for c_find in cert.findings or []:
+                f_code = c_find.get("code")
+                deduction = c_find.get("score_deduction", 0)
+                if f_code and f_code not in existing_finding_codes and deduction > 0:
+                    sev = str(c_find.get("severity", "medium")).lower()
+                    db.add(
+                        Finding(
+                            id=uuid.uuid4(),
+                            scan_id=scan.id,
+                            category="certificate",
+                            code=f_code,
+                            title=c_find.get("title", f_code),
+                            description=c_find.get("description", ""),
+                            severity=sev if sev in ("critical", "high", "medium", "low", "info") else "medium",
+                            points=deduction,
+                            evidence=c_find.get("evidence") or {},
+                            remediation=c_find.get("recommendation") or "Review TLS certificate configuration.",
+                            source="certificate_analyzer",
+                            created_at=now,
+                        )
+                    )
 
         # Persist redirect hops
         if http_result and http_result.redirects.hops:
