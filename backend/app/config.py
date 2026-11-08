@@ -108,13 +108,20 @@ class Settings(BaseSettings):
     @classmethod
     def normalize_database_url(cls, v: Any) -> str:
         """Normalize standard postgres:// and postgresql:// URLs to postgresql+asyncpg:// for async engine."""
+        import os
+
         if isinstance(v, str):
             s = v.strip()
+            # If running on Vercel without a configured remote database, fallback to /tmp SQLite
+            if os.getenv("VERCEL") and ("localhost" in s or "127.0.0.1" in s):
+                return "sqlite+aiosqlite:////tmp/trustlens.db"
             if s.startswith("postgres://"):
                 return s.replace("postgres://", "postgresql+asyncpg://", 1)
             if s.startswith("postgresql://") and not s.startswith("postgresql+"):
                 return s.replace("postgresql://", "postgresql+asyncpg://", 1)
             return s
+        if v is None and os.getenv("VERCEL"):
+            return "sqlite+aiosqlite:////tmp/trustlens.db"
         return str(v)
 
     @field_validator("DATABASE_SYNC_URL", mode="before")

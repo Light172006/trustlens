@@ -48,14 +48,13 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         f"Starting {settings.PROJECT_NAME} v{settings.VERSION} in {settings.ENVIRONMENT} mode..."
     )
 
-    # In development mode, auto-initialize database tables if not already present
-    if settings.DEBUG or settings.ENVIRONMENT in ("development", "test"):
-        try:
-            from app.database.init_db import init_db
+    # Auto-initialize database tables if not already present
+    try:
+        from app.database.init_db import init_db
 
-            await init_db()
-        except Exception as exc:
-            logger.warning(f"Database schema auto-initialization skipped or deferred: {exc}")
+        await init_db()
+    except Exception as exc:
+        logger.warning(f"Database schema auto-initialization skipped or deferred: {exc}")
 
     yield
 

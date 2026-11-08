@@ -28,13 +28,26 @@ if "sqlite" in settings.DATABASE_URL:
 
         engine_kwargs["poolclass"] = StaticPool
 else:
-    engine_kwargs.update(
-        {
-            "pool_size": 10,
-            "max_overflow": 20,
-            "pool_recycle": 3600,
-        }
-    )
+    import os
+
+    # In serverless environments (e.g. Vercel), use lighter connection pool and short timeout
+    if os.getenv("VERCEL"):
+        engine_kwargs.update(
+            {
+                "pool_size": 2,
+                "max_overflow": 5,
+                "pool_recycle": 300,
+                "connect_args": {"timeout": 5.0},
+            }
+        )
+    else:
+        engine_kwargs.update(
+            {
+                "pool_size": 10,
+                "max_overflow": 20,
+                "pool_recycle": 3600,
+            }
+        )
 
 async_engine: AsyncEngine = create_async_engine(
     settings.DATABASE_URL,
