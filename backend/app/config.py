@@ -9,23 +9,22 @@ from typing import Any
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# Ensure intelligence modules are dynamically accessible
+# Ensure intelligence and shared modules are dynamically accessible across runtimes
 _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-_CERT_ANALYZER_SRC = _REPO_ROOT / "intelligence" / "certificate_analyzer" / "src"
-_CERT_DATASET_SRC = _REPO_ROOT / "intelligence" / "certificate_dataset" / "src"
-_INTELLIGENCE_SRC = _REPO_ROOT / "intelligence"
-_WEB_SECURITY_SRC = _REPO_ROOT / "intelligence" / "web_security_analysis"
-_WEB_SECURITY_ANALYZER_SRC = _REPO_ROOT / "intelligence" / "web_security_analysis" / "analyzer"
+_BACKEND_ROOT = Path(__file__).resolve().parent.parent
 
-for _src_path in [
-    _INTELLIGENCE_SRC,
-    _CERT_ANALYZER_SRC,
-    _CERT_DATASET_SRC,
-    _WEB_SECURITY_SRC,
-    _WEB_SECURITY_ANALYZER_SRC,
-]:
-    if _src_path.exists() and str(_src_path) not in sys.path:
-        sys.path.insert(0, str(_src_path))
+for _base in [_REPO_ROOT, _BACKEND_ROOT]:
+    for _sub in [
+        _base / "shared",
+        _base / "shared" / "contracts",
+        _base / "intelligence",
+        _base / "intelligence" / "certificate_analyzer" / "src",
+        _base / "intelligence" / "certificate_dataset" / "src",
+        _base / "intelligence" / "web_security_analysis",
+        _base / "intelligence" / "web_security_analysis" / "analyzer",
+    ]:
+        if _sub.exists() and str(_sub) not in sys.path:
+            sys.path.insert(0, str(_sub))
 
 
 class Settings(BaseSettings):
@@ -105,43 +104,6 @@ class Settings(BaseSettings):
     WEB_SECURITY_TIMEOUT_SECONDS: float = 8.0
     WEB_SECURITY_MAX_REDIRECTS: int = 5
 
-    @field_validator("DATABASE_URL", mode="before")
-    @classmethod
-    def assemble_db_url(cls, v: object, info: Any) -> str:
-        """Normalize DATABASE_URL for asyncpg and auto-fallback to SQLite in local dev if PostgreSQL is closed."""
-        raw_val = str(v).strip() if v else ""
-        if not raw_val:
-            raw_val = (
-                "postgresql+asyncpg://trustlens_user:trustlens_password@localhost:5432/trustlens_db"
-            )
-
-        # Standardize cloud database protocols (e.g. Render/Heroku/Neon/Supabase) to asyncpg
-        if raw_val.startswith("postgres://"):
-            raw_val = raw_val.replace("postgres://", "postgresql+asyncpg://", 1)
-        elif raw_val.startswith("postgresql://") and not raw_val.startswith("postgresql+"):
-            raw_val = raw_val.replace("postgresql://", "postgresql+asyncpg://", 1)
-
-        data_dict: dict[str, object] = dict(getattr(info, "data", {}) or {})
-        env_val = str(data_dict.get("ENVIRONMENT", "development")).lower()
-
-        # If running in local dev and targeting localhost:5432 when it's not active, fallback to SQLite
-        if env_val != "production" and ("localhost:5432" in raw_val or "127.0.0.1:5432" in raw_val):
-            is_open = False
-            try:
-                import socket
-
-                with socket.create_connection(("127.0.0.1", 5432), timeout=0.2):
-                    is_open = True
-            except OSError:
-                is_open = False
-
-            if not is_open:
-                sqlite_path = _REPO_ROOT / "backend" / "trustlens_dev.db"
-                sqlite_url = f"sqlite+aiosqlite:///{sqlite_path.as_posix()}"
-                return sqlite_url
-
-        return raw_val
-
     @field_validator("DATABASE_SYNC_URL", mode="before")
     @classmethod
     def assemble_sync_db_url(cls, v: object, info: Any) -> str:
@@ -150,20 +112,14 @@ class Settings(BaseSettings):
         raw_async = str(data_dict.get("DATABASE_URL", ""))
 
         if isinstance(v, str) and v.strip():
-            sync_val = v.strip()
-            if sync_val.startswith("postgres://"):
-                sync_val = sync_val.replace("postgres://", "postgresql+psycopg://", 1)
-            elif sync_val.startswith("postgresql://") and not sync_val.startswith("postgresql+"):
-                sync_val = sync_val.replace("postgresql://", "postgresql+psycopg://", 1)
-            if "sqlite" in raw_async and "sqlite" not in sync_val:
-                return raw_async.replace("sqlite+aiosqlite://", "sqlite://")
-            return sync_val
-
-        if "postgresql+asyncpg://" in raw_async:
-            return raw_async.replace("postgresql+asyncpg://", "postgresql+psycopg://")
-        if "sqlite+aiosqlite://" in raw_async:
-            return raw_async.replace("sqlite+aiosqlite://", "sqlite://")
-        return raw_async
+            return v
+        data = info.data
+        async_url = str(data.get("DATABASE_URL", ""))
+        if "postgresql+asyncpg://" in async_url:
+            return async_url.replace("postgresql+asyncpg://", "postgresql+psycopg://")
+        elif "sqlite+aiosqlite://" in async_url:
+            return async_url.replace("sqlite+aiosqlite://", "sqlite://")
+        return async_url
 
     @field_validator("ALLOWED_CORS_ORIGINS", mode="before")
     @classmethod
