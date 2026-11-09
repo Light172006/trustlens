@@ -105,34 +105,82 @@ class Settings(BaseSettings):
     WEB_SECURITY_TIMEOUT_SECONDS: float = 8.0
     WEB_SECURITY_MAX_REDIRECTS: int = 5
 
+    @field_validator("DATABASE_URL", mode="before")
+    @classmethod
+    def assemble_db_url(cls, v: object, info: Any) -> str:
+        """Normalize DATABASE_URL for asyncpg and auto-fallback to SQLite in local dev if PostgreSQL is closed."""
+        raw_val = str(v).strip() if v else ""
+        if not raw_val:
+            raw_val = (
+                "postgresql+asyncpg://trustlens_user:trustlens_password@localhost:5432/trustlens_db"
+            )
+
+        # Standardize cloud database protocols (e.g. Render/Heroku/Neon/Supabase) to asyncpg
+        if raw_val.startswith("postgres://"):
+            raw_val = raw_val.replace("postgres://", "postgresql+asyncpg://", 1)
+        elif raw_val.startswith("postgresql://") and not raw_val.startswith("postgresql+"):
+            raw_val = raw_val.replace("postgresql://", "postgresql+asyncpg://", 1)
+
+        data_dict: dict[str, object] = dict(getattr(info, "data", {}) or {})
+        env_val = str(data_dict.get("ENVIRONMENT", "development")).lower()
+
+        # If running in local dev and targeting localhost:5432 when it's not active, fallback to SQLite
+        if env_val != "production" and ("localhost:5432" in raw_val or "127.0.0.1:5432" in raw_val):
+            is_open = False
+            try:
+                import socket
+
+                with socket.create_connection(("127.0.0.1", 5432), timeout=0.2):
+                    is_open = True
+            except OSError:
+                is_open = False
+
+            if not is_open:
+                sqlite_path = _REPO_ROOT / "backend" / "trustlens_dev.db"
+                sqlite_url = f"sqlite+aiosqlite:///{sqlite_path.as_posix()}"
+                return sqlite_url
+
+        return raw_val
+
     @field_validator("DATABASE_SYNC_URL", mode="before")
     @classmethod
-    def assemble_sync_db_url(cls, v: Any, info: Any) -> str:
+    def assemble_sync_db_url(cls, v: object, info: Any) -> str:
         """Derive sync database URL from DATABASE_URL if omitted."""
+        data_dict: dict[str, object] = dict(getattr(info, "data", {}) or {})
+        raw_async = str(data_dict.get("DATABASE_URL", ""))
+
         if isinstance(v, str) and v.strip():
-            return v
-        data = info.data
-        async_url = str(data.get("DATABASE_URL", ""))
-        if "postgresql+asyncpg://" in async_url:
-            return async_url.replace("postgresql+asyncpg://", "postgresql+psycopg://")
-        elif "sqlite+aiosqlite://" in async_url:
-            return async_url.replace("sqlite+aiosqlite://", "sqlite://")
-        return async_url
+            sync_val = v.strip()
+            if sync_val.startswith("postgres://"):
+                sync_val = sync_val.replace("postgres://", "postgresql+psycopg://", 1)
+            elif sync_val.startswith("postgresql://") and not sync_val.startswith("postgresql+"):
+                sync_val = sync_val.replace("postgresql://", "postgresql+psycopg://", 1)
+            if "sqlite" in raw_async and "sqlite" not in sync_val:
+                return raw_async.replace("sqlite+aiosqlite://", "sqlite://")
+            return sync_val
+
+        if "postgresql+asyncpg://" in raw_async:
+            return raw_async.replace("postgresql+asyncpg://", "postgresql+psycopg://")
+        if "sqlite+aiosqlite://" in raw_async:
+            return raw_async.replace("sqlite+aiosqlite://", "sqlite://")
+        return raw_async
 
     @field_validator("ALLOWED_CORS_ORIGINS", mode="before")
     @classmethod
-    def parse_cors_origins(cls, v: Any) -> list[str]:
+    def parse_cors_origins(cls, v: object) -> list[str]:
         """Parse list or JSON string of origins."""
         if isinstance(v, str):
-            v = v.strip()
-            if v.startswith("[") and v.endswith("]"):
+            s_val = v.strip()
+            if s_val.startswith("[") and s_val.endswith("]"):
                 try:
-                    parsed: Any = json.loads(v)
-                    if isinstance(parsed, list):
-                        return [str(origin).strip() for origin in parsed if str(origin).strip()]
+                    parsed_json: object = json.loads(s_val)
+                    if isinstance(parsed_json, list):
+                        return [
+                            str(origin).strip() for origin in parsed_json if str(origin).strip()
+                        ]
                 except json.JSONDecodeError:
                     pass
-            return [origin.strip() for origin in v.split(",") if origin.strip()]
+            return [origin.strip() for origin in s_val.split(",") if origin.strip()]
         if isinstance(v, list):
             return [str(origin).strip() for origin in v if str(origin).strip()]
         return []

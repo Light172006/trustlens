@@ -1,0 +1,30 @@
+python-interpreter-path = "C:/Users/jyoti/AppData/Local/Programs/Python/Python311/python.exe"
+
+site-packages-path = [
+    ".venv/Lib/site-packages",
+    "C:/Users/jyoti/AppData/Local/Programs/Python/Python311/Lib/site-packages",
+]
+
+search-path = [
+    ".",
+    "..",
+    "app",
+    "../intelligence",
+    "../intelligence/certificate_analyzer/src",
+    "../intelligence/certificate_dataset/src",
+    "../intelligence/web_security_analysis",
+    "../intelligence/web_security_analysis/analyzer",
+    "../shared",
+    ".venv/Lib/site-packages",
+]
+
+[errors]
+missing-import = false
+no-any-return-explicit = false
+unannotated-return = false
+implicit-any-parameter = false
+missing-attribute = false
+bad-argument-type = false
+unnecessary-type-conversion = false
+unreachable-except-clause = false
+

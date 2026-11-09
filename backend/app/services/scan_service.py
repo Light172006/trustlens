@@ -104,7 +104,9 @@ class ScanService:
             # Standalone / in-process execution (ideal for local development without Redis/Celery)
             logger.info(f"Dispatching in-process background scan pipeline for scan {new_scan.id}")
             asyncio.create_task(
-                run_scan_pipeline(scan_id=new_scan.id, allow_private_for_tests=allow_private_for_tests)
+                run_scan_pipeline(
+                    scan_id=new_scan.id, allow_private_for_tests=allow_private_for_tests
+                )
             )
 
         return new_scan, False
